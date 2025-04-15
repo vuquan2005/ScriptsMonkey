@@ -17,10 +17,9 @@
     truyen.addEventListener("click", function () {
         const scrollY = window.innerHeight * 0.75;
         clickTimer = setTimeout(() => {
-            truyen.scrollIntoView({
+            window.scrollBy({
+                top: scrollY,
                 behavior: "smooth",
-                block: "start",
-                inline: "nearest",
             });
           }, 250);
     });
@@ -29,7 +28,7 @@
     truyen.addEventListener("dblclick", function () {
         clearTimeout(clickTimer);
         isZoomed = !isZoomed;
-        truyen.style.zoom = isZoomed ? "2" : "1";
+        truyen.style.transform = isZoomed ? "scale(1.5)" : "scale(1)";
     });
     //End
 })();
