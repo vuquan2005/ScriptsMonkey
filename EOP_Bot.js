@@ -22,13 +22,11 @@
             taskTitle = taskTitleElement.textContent;
             setTimeout(run, 1000);
         }
-    }, 500);
+    }, 1000);
 
     function delay(ms) {
         return new Promise((resolve) => setTimeout(resolve, ms));
     }
-
-    setTimeout(run, 1000);
 
     async function run() {
         console.log("New Task");
