@@ -12,5 +12,14 @@
 
 (function() {
     'use strict';
-    
+    var truyen = document.querySelector("div.image-section");
+    //Scroll
+    truyen.addEventListener("click", function() {
+      const scrollY = window.innerHeight * 0.75;
+      window.scrollBy({
+        top: scrollY,
+        behavior: "smooth"
+      });
+    });
+    //End
 })();
