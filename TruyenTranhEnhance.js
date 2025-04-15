@@ -25,7 +25,7 @@
     let isZoomed = false;
     truyen.addEventListener("dblclick", function() {
       isZoomed = !isZoomed;
-      truyen.style.zoom = isZoomed ? "2" : "1";
+      truyen.style.transform = isZoomed ? "scale(1.5)" : "scale(1)";
     });
     //End
 })();
