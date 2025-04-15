@@ -1,12 +1,12 @@
 // ==UserScript==
 // @name         TruyenTranhEnhance
 // @namespace    https://github.com/vuquan2005
-// @version      0.2.2
+// @version      0.1.2
 // @description  Enhance your Manga reading experience
 // @author       QuanVu
 // @include      /^https:\/\/goctruyentranhvui\d+\.com\/.*$/
-// @updateURL    https://raw.githubusercontent.com/vuquan2005/ScriptsMonkey/refs/heads/main/TruyenTranhEnhance.js
-// @downloadURL  https://raw.githubusercontent.com/vuquan2005/ScriptsMonkey/refs/heads/main/TruyenTranhEnhance.js
+// @updateURL
+// @downloadURL
 // @grant        none
 // ==/UserScript==
 
