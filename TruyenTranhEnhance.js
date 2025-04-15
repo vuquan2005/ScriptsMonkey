@@ -10,22 +10,22 @@
 // @grant        none
 // ==/UserScript==
 
-(function() {
-    'use strict';
+(function () {
+    "use strict";
     var truyen = document.querySelector("div.image-section");
     //Scroll
-    truyen.addEventListener("click", function() {
-      const scrollY = window.innerHeight * 0.75;
-      window.scrollBy({
-        top: scrollY,
-        behavior: "smooth"
-      });
+    truyen.addEventListener("click", function () {
+        const scrollY = window.innerHeight * 0.75;
+        window.scrollBy({
+            top: scrollY,
+            behavior: "smooth",
+        });
     });
     //Zoom
     let isZoomed = false;
-    truyen.addEventListener("dblclick", function() {
-      isZoomed = !isZoomed;
-      truyen.style.zoom = isZoomed ? "2" : "1";
+    truyen.addEventListener("dblclick", function () {
+        isZoomed = !isZoomed;
+        truyen.style.zoom = isZoomed ? "2" : "1";
     });
     //End
 })();
