@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Bot
 // @namespace    https://github.com/vuquan2005
-// @version      3.1
+// @version      3.2
 // @description  A bot working on eop.edu.vn
 // @author       QuanVu
 // @include      https://eop.edu.vn/study/task/*
@@ -97,13 +97,15 @@
 
     function TimeDoTask() {
         const contentElement = document.querySelector("div.ditem");
-        const listenQuestion = document.querySelector("div.dta-main");     
+        const listenQuestion = document.querySelector("div.dta-main");
+        const randomNumber = Math.floor(Math.random() * 15);
         if (contentElement) {
             const text = contentElement.textContent;
             const wordMatchRegExp = /[^\s]+/g;
             const words = text.matchAll(wordMatchRegExp);
             const wordCount = [...words].length;
             let readingTime = (wordCount / 300)*60;
+            readingTime += randomNumber;
             if (listenQuestion) readingTime += 90;
             return readingTime;
         }
