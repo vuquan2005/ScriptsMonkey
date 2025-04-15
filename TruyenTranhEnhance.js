@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TruyenTranhEnhance
 // @namespace    https://github.com/vuquan2005
-// @version      0.0.1
+// @version      0.1.0
 // @description  Enhance your Manga reading experience
 // @author       QuanVu
 // @include      /^https:\/\/goctruyentranhvui\d+\.com\/.*$/
@@ -20,6 +20,12 @@
         top: scrollY,
         behavior: "smooth"
       });
+    });
+    //Zoom
+    let isZoomed = false;
+    truyen.addEventListener("dblclick", function() {
+      isZoomed = !isZoomed;
+      truyen.style.transform = isZoomed ? "scale(1.5)" : "scale(1)";
     });
     //End
 })();
