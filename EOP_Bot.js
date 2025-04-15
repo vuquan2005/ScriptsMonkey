@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Bot
 // @namespace    https://github.com/vuquan2005
-// @version      0.3.3
+// @version      3.0
 // @description  A bot working on eop.edu.vn
 // @author       QuanVu
 // @include      https://eop.edu.vn/study/task/*
