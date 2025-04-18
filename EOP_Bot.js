@@ -13,7 +13,7 @@
 
 (function () {
     "use strict";
-
+    //
     const taskTitleElement = document.querySelector("span#dtasktitle");
     let taskTitle = "";
     setInterval(() => {
@@ -37,35 +37,34 @@
                 handler(el);
             }
         });
-
         function handleVocab(el) {
-            console.log("Handling vocabulary...");
+            console.log("Vocabulary...");
             console.log(
                 "Can't do this, because the EOP detect:\n\"Uncaught (in promise) NotAllowedError: play() failed because the user didn't interact with the document first.\""
             );
         }
-
         function handleDMCQ(el) {
-            console.log("Handling DMCQ...");
+            console.log("DMCQ...");
             console.log("Can't do this, because i think so");
         }
-
         function handleQuestion(el) {
-            console.log("Handling question...");
+            console.log("Question...");
             const chooseQuestion = el.querySelector("p.dchk");
             if (chooseQuestion) {
                 console.log("Can't do the choose question");
             } else {
                 console.log("Bot do");
-                // Call questionFill() in "scripts/questionFill.js"
                 var timeDoTask = TimeDoTask();
-                console.log("Task will be completed in: ", timeDoTask + 30, " s");
+                console.log(
+                    "Task will be completed in: ",
+                    timeDoTask + 30,
+                    " s"
+                );
                 questionFill();
             }
         }
-
         function handleContent(el) {
-            console.log("Handling content...");
+            console.log("Content...");
             setInterval(() => {
                 const btnDone = document.querySelector(
                     'button.btn.btn-info.dnut[type="button"]'
@@ -76,11 +75,9 @@
             }, 5000);
         }
     }
-
     function delay(ms) {
         return new Promise((resolve) => setTimeout(resolve, ms));
     }
-
     function TimeDoTask() {
         const contentElement = document.querySelector("div.ditem");
         const listenQuestion = document.querySelector("div.dta-main");
@@ -90,38 +87,30 @@
             const wordMatchRegExp = /[^\s]+/g;
             const words = text.matchAll(wordMatchRegExp);
             const wordCount = [...words].length;
-            let readingTime = (wordCount / 300)*60;
+            let readingTime = (wordCount / 300) * 60;
             readingTime += randomNumber;
             if (listenQuestion) readingTime += 90;
             return readingTime;
         }
     }
     async function questionFill() {
-        // Fill in the answers
         await document.querySelectorAll("input").forEach((input) => {
             if (input.type !== "file") {
                 input.value = "a";
             }
         });
-
-        // Click the Done buttons
         const btnDone = document.querySelector('button.btn.btn-info.dnut[type="button"]');
         if (btnDone) {
             btnDone.click();
         }
-
-        // Create a button inside <div id="mfooter">
         const mfooter = document.getElementById("mfooter");
         const clockBtn = document.createElement("button");
         clockBtn.className = "btn dnut";
         clockBtn.style = "display: inline-block;";
         mfooter.appendChild(clockBtn);
-
-        // Find the Preview button and click it
         const btnPreview = document.querySelector(
             'button.btn.btn-danger.dnut[type="button"]'
         );
-        // Auto click the Preview button after 30 seconds
         if (btnPreview) {
             let countdown = 30;
             clockBtn.textContent = `Xem đáp án sau: ${countdown}`;
@@ -136,11 +125,8 @@
                 }
             }, 1000);
         }
-        // Wait 31s for the answers 
         await delay(31000);
-        // Create an array containing images from input elements
         const answersImg = getAnswer();
-        // Use Tesseract to recognize the text in the images
         console.log(answersImg);
         var answersTxt = [];
         await imgToTxt(answersImg)
@@ -154,7 +140,6 @@
             });
 
         console.log(answersTxt);
-
         await delay(100);
         const btnReW = document.querySelector(
             'button.btn.btn-primary.dnut[type="button"]'
@@ -162,29 +147,22 @@
         if (btnReW) {
             btnReW.click();
         }
-
-        // Fill in the recognized text into the input fields
         const inputFields = document.querySelectorAll("input[type='text']");
         inputFields.forEach((input, index) => {
             if (answersTxt[index]) {
                 input.value = answersTxt[index];
             }
         });
-
         let timeDo = Math.round(TimeDoTask());
-        clockBtn.textContent = 'Đã điền xong, chờ ' + timeDo + 's';
+        clockBtn.textContent = "Đã điền xong, chờ " + timeDo + "s";
         await delay(timeDo * 1000);
-        // Click the Done buttons
         const btnDone2 = document.querySelector(
             'button.btn.btn-info.dnut[type="button"]'
         );
         if (btnDone2) {
             btnDone2.click();
         }
-
-        //end
     }
-
     function getAnswer() {
         const inputs = document.querySelectorAll(
             'input[style*="background-image"]'
@@ -192,12 +170,11 @@
         const imageArray = [];
         inputs.forEach((input) => {
             const style = input.style.backgroundImage;
-            const url = style.slice(5, -2); // Extract URL from 'url("...")'
+            const url = style.slice(5, -2);
             imageArray.push(url);
         });
         return imageArray;
     }
-
     async function imgToTxt(images) {
         const results = [];
 
@@ -209,14 +186,10 @@
                 results.push({ image: imagePath, text });
             } catch (err) {
                 results.push({ image: imagePath, text: null });
-                alert(
-                    "Lỗi trong quá trình nhận diện:",
-                    err
-                );
+                alert("Lỗi trong quá trình nhận diện:", err);
                 console.error("Error recognizing image:", err);
             }
         }
-
         return results;
     }
     //End
