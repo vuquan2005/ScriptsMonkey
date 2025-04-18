@@ -1,13 +1,14 @@
 // ==UserScript==
 // @name         EOP Bot
 // @namespace    https://github.com/vuquan2005
-// @version      3.2
+// @version      4.0
 // @description  A bot working on eop.edu.vn
 // @author       QuanVu
 // @include      https://eop.edu.vn/study/task/*
 // @updateURL    https://raw.githubusercontent.com/vuquan2005/ScriptsMonkey/refs/heads/main/EOP_Bot.js
 // @downloadURL  https://raw.githubusercontent.com/vuquan2005/ScriptsMonkey/refs/heads/main/EOP_Bot.js
-// @grant        none
+// @grant        GM_setValue
+// @grant        GM_getValue
 // @require      https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js
 // ==/UserScript==
 
@@ -63,16 +64,36 @@
                 questionFill();
             }
         }
-        function handleContent(el) {
-            console.log("Content...");
-            setInterval(() => {
-                const btnDone = document.querySelector(
-                    'button.btn.btn-info.dnut[type="button"]'
-                );
-                if (btnDone) {
-                    btnDone.click();
+        async function handleContent(el) {
+            if (document.querySelector("div.dcontent.upload-content")) {
+                console.log("Upload content...");
+                let linkUpLoad = await GM_getValue("linkUpLoad", "");
+                while (linkUpLoad == "") {
+                    console.log("Inputting link upload...");
+                    linkUpLoad = prompt("Link upload not found. Please enter the link upload: ") || "";
+                    if (linkUpLoad != "") {
+                        await GM_setValue("linkUpLoad", linkUpLoad);
+                        console.log("Link upload saved: ", linkUpLoad);
+                    }
                 }
-            }, 5000);
+                setTimeout(() => {
+                    document.querySelector("#dupload > div > textarea").value = linkUpLoad;
+                    console.log("Link upload = ", linkUpLoad);
+                    const btnDone = document.querySelector(
+                        'button.btn.btn-info.dnut[type="button"]'
+                    );
+                    btnDone.click();
+                }, 5000);
+            }
+            if (document.querySelector("div.dcontent.view-content")) {
+                console.log("View content...");
+                setTimeout(() => {
+                    const btnDone = document.querySelector(
+                        'button.btn.btn-info.dnut[type="button"]'
+                    );
+                    btnDone.click();
+                }, 10000);
+            }
         }
     }
     function delay(ms) {
