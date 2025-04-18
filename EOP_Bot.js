@@ -16,25 +16,20 @@
 
     const taskTitleElement = document.querySelector("span#dtasktitle");
     let taskTitle = "";
-
     setInterval(() => {
         if (taskTitleElement.textContent !== taskTitle) {
             taskTitle = taskTitleElement.textContent;
             setTimeout(run, 1000);
         }
     }, 1000);
-
     function run() {
         console.log("\nNew Task");
-        // Định nghĩa các phần tử và hàm xử lý tương ứng
         const elementHandlers = [
             { selector: "div.dvocabulary", handler: handleVocab },
             { selector: "div.dmcq", handler: handleDMCQ },
             { selector: "div.dquestion", handler: handleQuestion },
             { selector: "div.dcontent", handler: handleContent },
         ];
-
-        // Duyệt và xử lý phần tử tương ứng
         elementHandlers.forEach(({ selector, handler }) => {
             const el = document.querySelector(selector);
             if (el) {
@@ -43,20 +38,11 @@
             }
         });
 
-        // Các hàm xử lý tương ứng
         function handleVocab(el) {
             console.log("Handling vocabulary...");
             console.log(
                 "Can't do this, because the EOP detect:\n\"Uncaught (in promise) NotAllowedError: play() failed because the user didn't interact with the document first.\""
             );
-            // el.querySelectorAll('i.daudio').forEach((input) => {
-            //     if (input) {
-            //         setInterval(() => {
-            //             input.click();
-            //             input.log('Playing audio...');
-            //         }, 3000);
-            //     }
-            // });
         }
 
         function handleDMCQ(el) {
