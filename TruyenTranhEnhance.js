@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         TruyenTranhEnhance
 // @namespace    https://github.com/vuquan2005
-// @version      0.4.0
+// @version      0.4.1
 // @description  Enhance your Manga reading experience
 // @author       QuanVu
 // @include      /^https:\/\/goctruyentranhvui\d+\.com\/.*$/
@@ -50,7 +50,7 @@
             display: flex;
             background-color:rgba(0, 0, 0, 0.1);
             margin: 2px;
-            padding: 5px 10px;
+            padding: 5px;
             font-size: 15px;
             border: none;
             border-radius: 10px;
