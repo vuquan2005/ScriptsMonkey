@@ -198,6 +198,10 @@
         const inputFields = document.querySelectorAll("input[type='text']");
         inputFields.forEach((input, index) => {
             if (answersTxt[index]) {
+                // Remove any unwanted characters from the recognized text
+                answersTxt[index] == "Cc" ? (answersTxt[index] = "C") : answersTxt[index];
+                answersTxt[index] = answersTxt[index].replace(/\|/g, "i");
+                // fill the input field with the recognized text
                 input.value = answersTxt[index];
             }
         });
