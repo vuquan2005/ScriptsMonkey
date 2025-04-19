@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Bot
 // @namespace    https://github.com/vuquan2005
-// @version      4.0
+// @version      4.1
 // @description  A bot working on eop.edu.vn
 // @author       QuanVu
 // @include      https://eop.edu.vn/study/task/*
@@ -68,22 +68,35 @@
             if (document.querySelector("div.dcontent.upload-content")) {
                 console.log("Upload content...");
                 let linkUpLoad = await GM_getValue("linkUpLoad", "");
-                while (linkUpLoad == "") {
-                    console.log("Inputting link upload...");
-                    linkUpLoad = prompt("Link upload not found. Please enter the link upload: ") || "";
-                    if (linkUpLoad != "") {
-                        await GM_setValue("linkUpLoad", linkUpLoad);
-                        console.log("Link upload saved: ", linkUpLoad);
+                let isAutoUpload = await GM_getValue("isAutoUpload", null);
+                if (isAutoUpload == null) {
+                    isAutoUpload = confirm(
+                        "Do you want to upload content automatically?"
+                    );
+                    await GM_setValue("isAutoUpload", isAutoUpload);
+                }
+                if (await GM_getValue("isAutoUpload", false)) {
+                    while (linkUpLoad == "") {
+                        console.log("Inputting link upload...");
+                        linkUpLoad =
+                            prompt(
+                                "Link upload not found. Please enter the link upload: "
+                            ) || "";
+                        if (linkUpLoad != "") {
+                            await GM_setValue("linkUpLoad", linkUpLoad);
+                            console.log("Link upload saved: ", linkUpLoad);
+                        }
                     }
+                    document.querySelector("#dupload > div > textarea").value =
+                        linkUpLoad;
+                    console.log("Link upload = ", linkUpLoad);
                 }
                 setTimeout(() => {
-                    document.querySelector("#dupload > div > textarea").value = linkUpLoad;
-                    console.log("Link upload = ", linkUpLoad);
                     const btnDone = document.querySelector(
                         'button.btn.btn-info.dnut[type="button"]'
                     );
                     btnDone.click();
-                }, 5000);
+                }, 7000);
             }
             if (document.querySelector("div.dcontent.view-content")) {
                 console.log("View content...");
@@ -120,7 +133,9 @@
                 input.value = "a";
             }
         });
-        const btnDone = document.querySelector('button.btn.btn-info.dnut[type="button"]');
+        const btnDone = document.querySelector(
+            'button.btn.btn-info.dnut[type="button"]'
+        );
         if (btnDone) {
             btnDone.click();
         }
