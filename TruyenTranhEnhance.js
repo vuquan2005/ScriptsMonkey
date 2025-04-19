@@ -4,7 +4,7 @@
 // @version      0.4.1
 // @description  Enhance your Manga reading experience
 // @author       QuanVu
-// @include      /^https:\/\/goctruyentranhvui\d+\.com\/.*$/
+// @include      /https:\/\/goctruyentranhvui\d+\.com\/truyen\/.*/
 // @updateURL    https://raw.githubusercontent.com/vuquan2005/ScriptsMonkey/refs/heads/main/TruyenTranhEnhance.js
 // @downloadURL  https://raw.githubusercontent.com/vuquan2005/ScriptsMonkey/refs/heads/main/TruyenTranhEnhance.js
 // @grant        GM_addStyle

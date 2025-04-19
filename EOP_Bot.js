@@ -138,11 +138,13 @@
     }
     ///
     async function questionFill() {
-        await document.querySelectorAll("input.danw.dinline").forEach((input) => {
-            if (input.type !== "file") {
-                input.value = "a";
-            }
-        });
+        await document
+            .querySelectorAll("input.danw.dinline")
+            .forEach((input) => {
+                if (input.type !== "file") {
+                    input.value = "a";
+                }
+            });
         const btnDone = document.querySelector(
             'button.btn.btn-info.dnut[type="button"]'
         );
