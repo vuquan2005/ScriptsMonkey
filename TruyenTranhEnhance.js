@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         TruyenTranhEnhance
-// @namespace    https://github.com/vuquan2005
+// @namespace    https://github.com/vuquan2005/ScriptsMonkey
 // @version      0.4.1
 // @description  Enhance your Manga reading experience
 // @author       QuanVu

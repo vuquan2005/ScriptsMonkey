@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         EOP Bot
-// @namespace    https://github.com/vuquan2005
+// @namespace    https://github.com/vuquan2005/ScriptsMonkey
 // @version      4.1
 // @description  A bot working on eop.edu.vn
 // @author       QuanVu
