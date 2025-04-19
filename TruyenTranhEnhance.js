@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         TruyenTranhEnhance
+// @name         GocTruyenTranhEnhance
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
 // @version      0.4.1
 // @description  Enhance your Manga reading experience
@@ -23,16 +23,9 @@
             behavior: "smooth",
         });
     });
-    //Zoom
-    let isZoomed = false;
-    truyen.addEventListener("dblclick", function () {
-        isZoomed = !isZoomed;
-        document.querySelector("body").style.transform = isZoomed ? "scale(1.5)" : "scale(1)";
-    });
     // Change opacity
     let opacity = GM_getValue("opacity", 1);
     console.log(opacity);
-
     GM_addStyle(`
         img.image.finished { opacity: ${opacity};}
         .opacity-btn {
