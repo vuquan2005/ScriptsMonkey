@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         EOP Bot
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      4.1
+// @version      4.2
 // @description  A bot working on eop.edu.vn
 // @author       QuanVu
-// @match      https://eop.edu.vn/study/task/*
+// @match        https://eop.edu.vn/study/task/*
 // @updateURL    https://raw.githubusercontent.com/vuquan2005/ScriptsMonkey/refs/heads/main/EOP_Bot.js
 // @downloadURL  https://raw.githubusercontent.com/vuquan2005/ScriptsMonkey/refs/heads/main/EOP_Bot.js
 // @grant        GM_setValue
@@ -117,6 +117,7 @@
             }
         }
     }
+    ///
     function delay(ms) {
         return new Promise((resolve) => setTimeout(resolve, ms));
     }
@@ -135,8 +136,9 @@
             return readingTime;
         }
     }
+    ///
     async function questionFill() {
-        await document.querySelectorAll("input").forEach((input) => {
+        await document.querySelectorAll("input.danw.dinline").forEach((input) => {
             if (input.type !== "file") {
                 input.value = "a";
             }
