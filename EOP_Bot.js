@@ -25,6 +25,7 @@
     }, 1000);
     function run() {
         console.log("\nNew Task");
+        var timeDoTask = TimeDoTask();
         const elementHandlers = [
             { selector: "div.dvocabulary", handler: handleVocab },
             { selector: "div.dmcq", handler: handleDMCQ },
@@ -52,10 +53,17 @@
             console.log("Question...");
             const chooseQuestion = el.querySelector("p.dchk");
             if (chooseQuestion) {
-                console.log("Can't do the choose question");
+                arlet(
+                    "Can't do the choose question, Please choose your answer!"
+                );
+                setTimeout(() => {
+                    const btnDone = document.querySelector(
+                        'button.btn.btn-info.dnut[type="button"]'
+                    );
+                    btnDone.click();
+                }, timeDoTask * 1000);
             } else {
                 console.log("Bot do");
-                var timeDoTask = TimeDoTask();
                 console.log(
                     "Task will be completed in: ",
                     timeDoTask + 30,
@@ -96,7 +104,7 @@
                         'button.btn.btn-info.dnut[type="button"]'
                     );
                     btnDone.click();
-                }, 7000);
+                }, timeDoTask * 1000);
             }
             if (document.querySelector("div.dcontent.view-content")) {
                 console.log("View content...");
@@ -105,7 +113,7 @@
                         'button.btn.btn-info.dnut[type="button"]'
                     );
                     btnDone.click();
-                }, 10000);
+                }, timeDoTask * 1000);
             }
         }
     }
@@ -121,7 +129,7 @@
             const wordMatchRegExp = /[^\s]+/g;
             const words = text.matchAll(wordMatchRegExp);
             const wordCount = [...words].length;
-            let readingTime = (wordCount / 300) * 60;
+            let readingTime = (wordCount / 320) * 60;
             readingTime += randomNumber;
             if (listenQuestion) readingTime += 90;
             return readingTime;
