@@ -67,7 +67,6 @@
         async function handleContent(el) {
             if (document.querySelector("div.dcontent.upload-content")) {
                 console.log("Upload content...");
-                let linkUpLoad = await GM_getValue("linkUpLoad", "");
                 let isAutoUpload = await GM_getValue("isAutoUpload", null);
                 if (isAutoUpload == null) {
                     isAutoUpload = confirm(
@@ -75,7 +74,8 @@
                     );
                     await GM_setValue("isAutoUpload", isAutoUpload);
                 }
-                if (await GM_getValue("isAutoUpload", false)) {
+                if (isAutoUpload) {
+                    let linkUpLoad = await GM_getValue("linkUpLoad", "");
                     while (linkUpLoad == "") {
                         console.log("Inputting link upload...");
                         linkUpLoad =
