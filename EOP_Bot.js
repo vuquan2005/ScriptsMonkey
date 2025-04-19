@@ -4,7 +4,7 @@
 // @version      4.1
 // @description  A bot working on eop.edu.vn
 // @author       QuanVu
-// @include      https://eop.edu.vn/study/task/*
+// @match      https://eop.edu.vn/study/task/*
 // @updateURL    https://raw.githubusercontent.com/vuquan2005/ScriptsMonkey/refs/heads/main/EOP_Bot.js
 // @downloadURL  https://raw.githubusercontent.com/vuquan2005/ScriptsMonkey/refs/heads/main/EOP_Bot.js
 // @grant        GM_setValue
