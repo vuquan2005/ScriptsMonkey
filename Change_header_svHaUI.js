@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.0
+// @version      2.1
 // @description  Do some things on sv.haui.edu.vn
 // @author       QuanVu
 // @match        https://sv.haui.edu.vn/*
@@ -25,8 +25,5 @@
             </li>
         `;
         tabToAddElement.insertAdjacentHTML("afterend", studyTabNext);
-        console.log("Tab added successfully!");
-    } else {
-        console.log("Tab not found!");
     }
 })();
