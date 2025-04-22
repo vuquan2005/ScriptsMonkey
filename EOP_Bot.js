@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         EOP Bot
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      4.4
+// @version      4.5
 // @description  A bot working on eop.edu.vn
 // @author       QuanVu
-// @match        https://eop.edu.vn/study/task/*
+// @match        https://eop.edu.vn/study/*
 // @updateURL    https://raw.githubusercontent.com/vuquan2005/ScriptsMonkey/refs/heads/main/EOP_Bot.js
 // @downloadURL  https://raw.githubusercontent.com/vuquan2005/ScriptsMonkey/refs/heads/main/EOP_Bot.js
 // @grant        GM_setValue
@@ -16,6 +16,10 @@
     "use strict";
     //
     const taskTitleElement = document.querySelector("span#dtasktitle");
+    if (!taskTitleElement) {
+        console.error("It's not a task");
+        return;
+    }
     let taskTitle = "";
     setInterval(() => {
         if (taskTitleElement.textContent !== taskTitle) {
