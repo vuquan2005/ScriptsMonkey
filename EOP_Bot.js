@@ -53,9 +53,7 @@
             console.log("Question...");
             const chooseQuestion = el.querySelector("p.dchk");
             if (chooseQuestion) {
-                arlet(
-                    "Can't do the choose question, Please choose your answer!"
-                );
+                arlet("Can't do the choose question, Please choose your answer!");
                 setTimeout(() => {
                     const btnDone = document.querySelector(
                         'button.btn.btn-info.dnut[type="button"]'
@@ -64,11 +62,7 @@
                 }, timeDoTask * 1000);
             } else {
                 console.log("Bot do");
-                console.log(
-                    "Task will be completed in: ",
-                    timeDoTask + 30,
-                    " s"
-                );
+                console.log("Task will be completed in: ", timeDoTask + 30, " s");
                 questionFill();
             }
         }
@@ -78,9 +72,7 @@
                 let oDienLink = document.querySelector("#dupload > div > textarea").value;
                 let isAutoUpload = await GM_getValue("isAutoUpload", null);
                 if (isAutoUpload == null) {
-                    isAutoUpload = confirm(
-                        "Do you want to upload content automatically?"
-                    );
+                    isAutoUpload = confirm("Do you want to upload content automatically?");
                     await GM_setValue("isAutoUpload", isAutoUpload);
                 }
                 console.log("Auto upload is: ", isAutoUpload);
@@ -89,9 +81,7 @@
                     while (linkUpLoad == "") {
                         console.log("Inputting link upload...");
                         linkUpLoad =
-                            prompt(
-                                "Link upload not found. Please enter the link upload: "
-                            ) || "";
+                            prompt("Link upload not found. Please enter the link upload: ") || "";
                         if (linkUpLoad != "") {
                             await GM_setValue("linkUpLoad", linkUpLoad);
                             console.log("Link upload saved: ", linkUpLoad);
@@ -139,16 +129,12 @@
     }
     ///
     async function questionFill() {
-        await document
-            .querySelectorAll("input.danw.dinline")
-            .forEach((input) => {
-                if (input.type !== "file") {
-                    input.value = "a";
-                }
-            });
-        const btnDone = document.querySelector(
-            'button.btn.btn-info.dnut[type="button"]'
-        );
+        await document.querySelectorAll("input.danw.dinline").forEach((input) => {
+            if (input.type !== "file") {
+                input.value = "a";
+            }
+        });
+        const btnDone = document.querySelector('button.btn.btn-info.dnut[type="button"]');
         if (btnDone) {
             btnDone.click();
         }
@@ -157,9 +143,7 @@
         clockBtn.className = "btn dnut";
         clockBtn.style = "display: inline-block;";
         mfooter.appendChild(clockBtn);
-        const btnPreview = document.querySelector(
-            'button.btn.btn-danger.dnut[type="button"]'
-        );
+        const btnPreview = document.querySelector('button.btn.btn-danger.dnut[type="button"]');
         if (btnPreview) {
             let countdown = 30;
             clockBtn.textContent = `Xem đáp án sau: ${countdown}`;
@@ -190,9 +174,7 @@
 
         console.log(answersTxt);
         await delay(100);
-        const btnReW = document.querySelector(
-            'button.btn.btn-primary.dnut[type="button"]'
-        );
+        const btnReW = document.querySelector('button.btn.btn-primary.dnut[type="button"]');
         if (btnReW) {
             btnReW.click();
         }
@@ -209,17 +191,13 @@
         let timeDo = Math.round(TimeDoTask());
         clockBtn.textContent = "Đã điền xong, chờ " + timeDo + "s";
         await delay(timeDo * 1000);
-        const btnDone2 = document.querySelector(
-            'button.btn.btn-info.dnut[type="button"]'
-        );
+        const btnDone2 = document.querySelector('button.btn.btn-info.dnut[type="button"]');
         if (btnDone2) {
             btnDone2.click();
         }
     }
     function getAnswer() {
-        const inputs = document.querySelectorAll(
-            'input[style*="background-image"]'
-        );
+        const inputs = document.querySelectorAll('input[style*="background-image"]');
         const imageArray = [];
         inputs.forEach((input) => {
             const style = input.style.backgroundImage;
