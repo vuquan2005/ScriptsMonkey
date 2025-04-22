@@ -75,6 +75,7 @@
         async function handleContent(el) {
             if (document.querySelector("div.dcontent.upload-content")) {
                 console.log("Upload content...");
+                let oDienLink = document.querySelector("#dupload > div > textarea").value;
                 let isAutoUpload = await GM_getValue("isAutoUpload", null);
                 if (isAutoUpload == null) {
                     isAutoUpload = confirm(
@@ -82,7 +83,8 @@
                     );
                     await GM_setValue("isAutoUpload", isAutoUpload);
                 }
-                if (isAutoUpload) {
+                console.log("Auto upload is: ", isAutoUpload);
+                if (isAutoUpload || !oDienLink) {
                     let linkUpLoad = await GM_getValue("linkUpLoad", "");
                     while (linkUpLoad == "") {
                         console.log("Inputting link upload...");
@@ -95,8 +97,7 @@
                             console.log("Link upload saved: ", linkUpLoad);
                         }
                     }
-                    document.querySelector("#dupload > div > textarea").value =
-                        linkUpLoad;
+                    oDienLink = linkUpLoad;
                     console.log("Link upload = ", linkUpLoad);
                 }
                 setTimeout(() => {
