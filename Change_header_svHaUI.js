@@ -1,16 +1,32 @@
 // ==UserScript==
-// @name         Change header sv HaUI
+// @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      1.0
-// @description  Change header sv HaUI
+// @version      2.0
+// @description  Do some things on sv.haui.edu.vn
 // @author       QuanVu
 // @match        https://sv.haui.edu.vn/*
 // @grant        none
 // ==/UserScript==
 
-(function() {
-    'use strict';
-
+(function () {
+    "use strict";
+    // Change header
     const newTitle = document.querySelector("div.panel-heading").textContent;
     document.title = newTitle;
+    // add Học kết hợp! tab to sidebar
+    const tabToAddElement = document.querySelector('ul.sidebar-elements > li:nth-child(2)');
+    if (tabToAddElement) {
+        let studyTabNext = `
+            <li>
+                <a href="/sso/blearning">
+                    <i class="fa flaticon-science1 icon"></i>
+                    <span>Học kết hợp!</span>
+                </a>
+            </li>
+        `;
+        tabToAddElement.insertAdjacentHTML("afterend", studyTabNext);
+        console.log("Tab added successfully!");
+    } else {
+        console.log("Tab not found!");
+    }
 })();
