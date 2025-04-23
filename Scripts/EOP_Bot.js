@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Bot
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      4.6
+// @version      4.7
 // @description  A bot working on eop.edu.vn
 // @author       QuanVu
 // @match        https://eop.edu.vn/study/*
@@ -157,31 +157,28 @@
             }, 1000);
         }
         await delay(31000);
-        const answersImg = getAnswer();
-        console.log(answersImg);
+        let inputs = document.querySelectorAll('input[style*="background-image"]');
+        while (inputs.length === 0) {
+            await delay(500);
+            inputs = document.querySelectorAll('input[style*="background-image"]');
+        }
+        const answersImg = getAnswer(inputs);
+        console.log("Imgs: ", answersImg);
         var answersTxt = [];
         await imgToTxt(answersImg)
             .then((results) => {
                 results.forEach((text) => {
                     answersTxt.push(text.text);
                 });
-            })
-            .catch((err) => {
-                alert("Lỗi trong quá trình nhận diện:", err);
             });
 
-        console.log(answersTxt);
+        console.log("Answers: ", answersTxt);
         await delay(100);
         const btnReW = document.querySelector('button.btn.btn-primary.dnut[type="button"]');
         if (btnReW) btnReW.click();
         const inputFields = document.querySelectorAll("input[type='text']");
         inputFields.forEach((input, index) => {
             if (answersTxt[index]) {
-                answersTxt[index] = answersTxt[index].replace(/\n/g, "");
-                // Remove any unwanted characters from the recognized text
-                if (answersTxt[index] == "Cc") answersTxt[index] = "C";
-                answersTxt[index] = answersTxt[index].replace(/\|/g, "i");
-                // fill the input field with the recognized text
                 input.value = answersTxt[index];
             }
         });
@@ -193,24 +190,40 @@
             btnDone2.click();
         }
     }
-    function getAnswer() {
-        const inputs = document.querySelectorAll('input[style*="background-image"]');
+    function getAnswer(inputs) {
         const imageArray = [];
-        inputs.forEach((input) => {
+        for (const input of inputs)
+        {
             const style = input.style.backgroundImage;
             const url = style.slice(5, -2);
             imageArray.push(url);
-        });
+        }
         return imageArray;
     }
     async function imgToTxt(images) {
-        const results = [];
-
-        for (const imagePath of images) {
-            const {
-                data: { text },
-            } = await Tesseract.recognize(imagePath, "eng");
-            results.push({ image: imagePath, text });
+        let results = [];
+        while (1)
+        {
+            results = [];
+            for (const imagePath of images) {
+                const {
+                    data: { text },
+                } = await Tesseract.recognize(imagePath, "eng");
+                results.push({ text });
+            }
+            console.log("Recognized text: ", results);
+            if (results.some((result) => result.text == "")) {
+                console.log("Somethings is enror, retrying...");
+                await delay(1000);
+            } else {
+                break;
+            }
+        }
+        for (let i = 0; i < results.length; i++) {
+            results[i].text = results[i].text.replace(/\n/g, "");
+            if (results[i].text == "Cc")
+                results[i].text = "C";
+            results[i].text = results[i].text.replace(/\|/g, "i");
         }
         return results;
     }
