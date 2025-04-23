@@ -4,6 +4,7 @@
 // @version      2.1
 // @description  Do some things on sv.haui.edu.vn
 // @author       QuanVu
+// @downloadURL  https://raw.githubusercontent.com/vuquan2005/ScriptsMonkey/refs/heads/main/svHaUI.js
 // @match        https://sv.haui.edu.vn/*
 // @grant        none
 // ==/UserScript==
