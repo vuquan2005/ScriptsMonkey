@@ -40,76 +40,70 @@
             const el = document.querySelector(selector);
             if (el) {
                 console.log("Tìm thấy phần tử: ", selector);
-                handler(el);
+                handler(el, timeDoTask);
             }
         });
-        function handleVocab(el) {
-            console.log("Vocabulary...");
-            console.log(
-                "Can't do this, because the EOP detect:\n\"Uncaught (in promise) NotAllowedError: play() failed because the user didn't interact with the document first.\""
-            );
+    }
+    ///
+
+    function handleVocab(el) {
+        console.log("Vocabulary...");
+        console.log("Can't do this");
+    }
+    function handleDMCQ(el) {
+        console.log("DMCQ...");
+        console.log("Can't do this, because i think so");
+    }
+    function handleQuestion(el, timeDoTask) {
+        console.log("Question...");
+        const chooseQuestion = el.querySelector("p.dchk");
+        if (chooseQuestion) {
+            console.log("Can't do the choose question, Please choose your answer!");
+            setTimeout(() => {
+                const btnDone = document.querySelector('button.btn.btn-info.dnut[type="button"]');
+                btnDone.click();
+            }, timeDoTask * 1000);
+        } else {
+            console.log("Bot do");
+            console.log("Task will be completed in: ", timeDoTask + 30, " s");
+            questionFill();
         }
-        function handleDMCQ(el) {
-            console.log("DMCQ...");
-            console.log("Can't do this, because i think so");
-        }
-        function handleQuestion(el) {
-            console.log("Question...");
-            const chooseQuestion = el.querySelector("p.dchk");
-            if (chooseQuestion) {
-                arlet("Can't do the choose question, Please choose your answer!");
-                setTimeout(() => {
-                    const btnDone = document.querySelector(
-                        'button.btn.btn-info.dnut[type="button"]'
-                    );
-                    btnDone.click();
-                }, timeDoTask * 1000);
-            } else {
-                console.log("Bot do");
-                console.log("Task will be completed in: ", timeDoTask + 30, " s");
-                questionFill();
+    }
+    async function handleContent(el, timeDoTask) {
+        if (document.querySelector("div.dcontent.upload-content")) {
+            console.log("Upload content...");
+            let oDienLink = document.querySelector("#dupload > div > textarea").value;
+            let isAutoUpload = await GM_getValue("isAutoUpload", null);
+            if (isAutoUpload == null) {
+                isAutoUpload = confirm("Do you want to upload content automatically?");
+                await GM_setValue("isAutoUpload", isAutoUpload);
             }
-        }
-        async function handleContent(el) {
-            if (document.querySelector("div.dcontent.upload-content")) {
-                console.log("Upload content...");
-                let oDienLink = document.querySelector("#dupload > div > textarea").value;
-                let isAutoUpload = await GM_getValue("isAutoUpload", null);
-                if (isAutoUpload == null) {
-                    isAutoUpload = confirm("Do you want to upload content automatically?");
-                    await GM_setValue("isAutoUpload", isAutoUpload);
-                }
-                console.log("Auto upload is: ", isAutoUpload);
-                if (isAutoUpload || !oDienLink) {
-                    let linkUpLoad = await GM_getValue("linkUpLoad", "");
-                    while (linkUpLoad == "") {
-                        console.log("Inputting link upload...");
-                        linkUpLoad =
-                            prompt("Link upload not found. Please enter the link upload: ") || "";
-                        if (linkUpLoad != "") {
-                            await GM_setValue("linkUpLoad", linkUpLoad);
-                            console.log("Link upload saved: ", linkUpLoad);
-                        }
+            console.log("Auto upload is: ", isAutoUpload);
+            if (isAutoUpload || !oDienLink) {
+                let linkUpLoad = await GM_getValue("linkUpLoad", "");
+                while (linkUpLoad == "") {
+                    console.log("Inputting link upload...");
+                    linkUpLoad =
+                        prompt("Link upload not found. Please enter the link upload: ") || "";
+                    if (linkUpLoad != "") {
+                        await GM_setValue("linkUpLoad", linkUpLoad);
+                        console.log("Link upload saved: ", linkUpLoad);
                     }
-                    oDienLink = linkUpLoad;
-                    console.log("Link upload = ", linkUpLoad);
                 }
-                setTimeout(() => {
-                    const btnDone = document.querySelector(
-                        'button.btn.btn-info.dnut[type="button"]'
-                    );
-                    btnDone.click();
-                }, timeDoTask * 1000);
+                oDienLink = linkUpLoad;
+                console.log("Link upload = ", linkUpLoad);
             }
-            if (document.querySelector("div.dcontent.view-content")) {
-                console.log("View content...");
-                setTimeout(() => {
-                    const btnDone = document.querySelector(
-                        'button.btn.btn-info.dnut[type="button"]'
-                    );
-                    btnDone.click();
-                }, timeDoTask * 1000);
-            }
+            setTimeout(() => {
+                const btnDone = document.querySelector('button.btn.btn-info.dnut[type="button"]');
+                btnDone.click();
+            }, timeDoTask * 1000);
+        }
+        if (document.querySelector("div.dcontent.view-content")) {
+            console.log("View content...");
+            setTimeout(() => {
+                const btnDone = document.querySelector('button.btn.btn-info.dnut[type="button"]');
+                btnDone.click();
+            }, timeDoTask * 1000);
         }
     }
     ///
@@ -179,15 +173,13 @@
         console.log(answersTxt);
         await delay(100);
         const btnReW = document.querySelector('button.btn.btn-primary.dnut[type="button"]');
-        if (btnReW)
-            btnReW.click();
+        if (btnReW) btnReW.click();
         const inputFields = document.querySelectorAll("input[type='text']");
         inputFields.forEach((input, index) => {
             if (answersTxt[index]) {
                 answersTxt[index] = answersTxt[index].replace(/\n/g, "");
                 // Remove any unwanted characters from the recognized text
-                if (answersTxt[index] == "Cc")
-                    answersTxt[index] = "C";
+                if (answersTxt[index] == "Cc") answersTxt[index] = "C";
                 answersTxt[index] = answersTxt[index].replace(/\|/g, "i");
                 // fill the input field with the recognized text
                 input.value = answersTxt[index];
