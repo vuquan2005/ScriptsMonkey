@@ -179,14 +179,15 @@
         console.log(answersTxt);
         await delay(100);
         const btnReW = document.querySelector('button.btn.btn-primary.dnut[type="button"]');
-        if (btnReW) {
+        if (btnReW)
             btnReW.click();
-        }
         const inputFields = document.querySelectorAll("input[type='text']");
         inputFields.forEach((input, index) => {
             if (answersTxt[index]) {
+                answersTxt[index] = answersTxt[index].replace(/\n/g, "");
                 // Remove any unwanted characters from the recognized text
-                answersTxt[index] == "Cc" ? (answersTxt[index] = "C") : answersTxt[index];
+                if (answersTxt[index] == "Cc")
+                    answersTxt[index] = "C";
                 answersTxt[index] = answersTxt[index].replace(/\|/g, "i");
                 // fill the input field with the recognized text
                 input.value = answersTxt[index];
@@ -214,16 +215,10 @@
         const results = [];
 
         for (const imagePath of images) {
-            try {
-                const {
-                    data: { text },
-                } = await Tesseract.recognize(imagePath, "eng");
-                results.push({ image: imagePath, text });
-            } catch (err) {
-                results.push({ image: imagePath, text: null });
-                alert("Lỗi trong quá trình nhận diện:", err);
-                console.error("Error recognizing image:", err);
-            }
+            const {
+                data: { text },
+            } = await Tesseract.recognize(imagePath, "eng");
+            results.push({ image: imagePath, text });
         }
         return results;
     }
