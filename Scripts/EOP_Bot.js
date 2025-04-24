@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Bot
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      4.7
+// @version      4.8
 // @description  A bot working on eop.edu.vn
 // @author       QuanVu
 // @match        https://eop.edu.vn/study/*
@@ -75,11 +75,11 @@
             let oDienLink = document.querySelector("#dupload > div > textarea").value;
             let isAutoUpload = await GM_getValue("isAutoUpload", null);
             if (isAutoUpload == null) {
-                isAutoUpload = confirm("Do you want to upload content automatically?");
+                isAutoUpload = confirm("Do you want to upload content link (Google drive, padlet,...) automatically?");
                 await GM_setValue("isAutoUpload", isAutoUpload);
             }
             console.log("Auto upload is: ", isAutoUpload);
-            if (isAutoUpload || !oDienLink) {
+            if (isAutoUpload && !oDienLink) {
                 let linkUpLoad = await GM_getValue("linkUpLoad", "");
                 while (linkUpLoad == "") {
                     console.log("Inputting link upload...");
