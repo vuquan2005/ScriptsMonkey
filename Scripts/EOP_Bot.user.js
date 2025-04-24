@@ -5,8 +5,8 @@
 // @description  A bot working on eop.edu.vn
 // @author       QuanVu
 // @match        https://eop.edu.vn/study/*
-// @updateURL    https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/EOP_Bot.js
-// @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/EOP_Bot.js
+// @updateURL    https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/EOP_Bot.user.js
+// @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/EOP_Bot.user.js
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @require      https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js
