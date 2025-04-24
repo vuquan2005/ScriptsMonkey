@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Bot
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      4.10
+// @version      4.11
 // @description  A bot working on eop.edu.vn
 // @author       QuanVu
 // @match        https://eop.edu.vn/study/*
@@ -90,8 +90,8 @@
                         console.log("Link upload saved: ", linkUpLoad);
                     }
                 }
-                oDienLink = linkUpLoad;
-                console.log("Link upload = ", linkUpLoad);
+                document.querySelector("#dupload > div > textarea").value = linkUpLoad;
+                console.log("Link upload = ", document.querySelector("#dupload > div > textarea").value);
             }
             setTimeout(() => {
                 const btnDone = document.querySelector('button.btn.btn-info.dnut[type="button"]');
