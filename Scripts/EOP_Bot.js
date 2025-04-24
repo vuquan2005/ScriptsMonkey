@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Bot
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      4.8
+// @version      4.9
 // @description  A bot working on eop.edu.vn
 // @author       QuanVu
 // @match        https://eop.edu.vn/study/*
@@ -202,6 +202,7 @@
     }
     async function imgToTxt(images) {
         let results = [];
+        let timRedo = 0;
         while (1)
         {
             results = [];
@@ -214,7 +215,12 @@
             console.log("Recognized text: ", results);
             if (results.some((result) => result.text == "")) {
                 console.log("Somethings is enror, retrying...");
-                await delay(1000);
+                timRedo++;
+                if (timRedo > 5) {
+                    console.log("Too many errors, stopping...");
+                    break;
+                }
+                await delay(500);
             } else {
                 break;
             }
