@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      1.0
+// @version      1.1
 // @description  A useful tool to use on the eop.edu.vn
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -19,9 +19,13 @@
     if (currentURL.includes('/study/course/')) {
         const captchaInput = document.querySelector("div.dgcaptcha > input#txtcaptcha");
         if (captchaInput) {
-            // Dùng event input để tự động chuyển đổi chữ thường thành chữ hoa liên tục (khác với onchange)
+            // Dùng event input để tự động chuyển đổi chữ thường thành chữ hoa liên tục
             captchaInput.addEventListener('input', function() {
                 this.value = this.value.toUpperCase();
+            });
+            // Tự động click vào nút xem kết quả học tập khi nhấn enter hoặc ngừng nhập,...
+            captchaInput.addEventListener('change', function() {
+                document.querySelector('button.btn.btn-info[title="Xem kết quả học tập"]').click();
             });
         }
     }
