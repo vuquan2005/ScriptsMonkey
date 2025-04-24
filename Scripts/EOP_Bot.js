@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Bot
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      4.9
+// @version      4.10
 // @description  A bot working on eop.edu.vn
 // @author       QuanVu
 // @match        https://eop.edu.vn/study/*
@@ -226,7 +226,10 @@
             }
         }
         for (let i = 0; i < results.length; i++) {
+            // Remove some unwanted character
+            results[i].text = results[i].text.replace(/[^a-zA-Z0-9]/g, " ");
             results[i].text = results[i].text.replace(/\n/g, "");
+            // Fix some errors
             if (results[i].text == "Cc")
                 results[i].text = "C";
             results[i].text = results[i].text.replace(/\|/g, "i");
