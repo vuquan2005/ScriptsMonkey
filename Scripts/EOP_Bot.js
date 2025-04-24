@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Bot
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      4.11
+// @version      4.12
 // @description  A bot working on eop.edu.vn
 // @author       QuanVu
 // @match        https://eop.edu.vn/study/*
@@ -14,6 +14,13 @@
 
 (function () {
     "use strict";
+    //
+    const timerUnitTest = document.querySelector("div#countdown.timeTo.timeTo-white");
+    // nếu có phần tử thì return
+    if (timerUnitTest) {
+        console.log("!!! Đây là bài kiểm tra !!!");
+        return;
+    }
     //
     const taskTitleElement = document.querySelector("span#dtasktitle");
     if (!taskTitleElement) {
@@ -72,7 +79,7 @@
     async function handleContent(el, timeDoTask) {
         if (document.querySelector("div.dcontent.upload-content")) {
             console.log("Upload content...");
-            let oDienLink = document.querySelector("#dupload > div > textarea").value;
+            const oDienLink = document.querySelector("#dupload > div > textarea").value;
             let isAutoUpload = await GM_getValue("isAutoUpload", null);
             if (isAutoUpload == null) {
                 isAutoUpload = confirm("Do you want to upload content link (Google drive, padlet,...) automatically?");
