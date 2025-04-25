@@ -20,8 +20,9 @@ Có 2 cách để thêm userscript từ repo:
 1. Truy cập vào: [Scripts](https://github.com/vuquan2005/ScriptsMonkey/tree/main/Scripts)
 2. Vào thư mục scripts, chọn file <user-scripts> bạn muốn cài (file `.user.js`)
 3. Click vào nút **Raw** của file script
-4. Trình duyệt sẽ dẫn hướng đến file raw của scripts, hãy copy đường dẫn đó
-5. Mở Tampermonkey -> các tiện ích -> Cài từ URL	-> dán link vào rồi ấn "Cài đặt"
+4. Tampermonkey sẽ dẫn hướng bạn đến trang cài scripts, nếu không hãy thực hiện bước 5,6 hoặc cách 2.
+5. Trình duyệt sẽ dẫn hướng đến file raw của scripts, hãy copy đường dẫn đó
+6. Mở Tampermonkey -> các tiện ích -> Cài từ URL	-> dán link vào rồi ấn "Cài đặt"
 
 #### 📥 Cách 2: Copy-paste thủ công
 
