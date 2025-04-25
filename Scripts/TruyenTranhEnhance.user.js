@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GocTruyenTranhEnhance
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      0.4.1
+// @version      0.4.2
 // @description  Enhance your Manga reading experience
 // @author       QuanVu
 // @include      /https:\/\/goctruyentranhvui\d+\.com\/truyen\/.*/
@@ -17,7 +17,7 @@
     let truyen = document.querySelector("div.image-section");
     //Scroll
     truyen.addEventListener("click", function () {
-        const scrollY = window.innerHeight * 0.75;
+        const scrollY = window.innerHeight * 0.55;
         window.scrollBy({
             top: scrollY,
             behavior: "smooth",
