@@ -14,15 +14,36 @@
 
 (function () {
     "use strict";
-    let truyen = document.querySelector("div.image-section");
     //Scroll
-    truyen.addEventListener("click", function () {
-        const scrollY = window.innerHeight * 0.55;
-        window.scrollBy({
-            top: scrollY,
-            behavior: "smooth",
-        });
-    });
+    let clickCount = 0;
+    let clickTimer = null;
+    const delay = 150;
+    let truyen = document.querySelector("div.image-section");
+    truyen.onmousedown = function () {
+    };
+    truyen.onmouseup = function () {
+        clickCount++;
+        if (clickCount === 1) {
+            clickTimer = setTimeout(() => {
+                // Single click
+                const scrollY = window.innerHeight * 0.55;
+                window.scrollBy({
+                    top: scrollY,
+                    behavior: "smooth",
+                });
+                clickCount = 0;
+            }, delay);
+        } else if (clickCount === 2) {
+            clearTimeout(clickTimer);
+            // Double click
+            const scrollY = window.innerHeight * -0.55;
+            window.scrollBy({
+                top: scrollY,
+                behavior: "smooth",
+            });
+            clickCount = 0;
+        }
+    };
     // Change opacity
     let opacity = GM_getValue("opacity", 1);
     console.log(opacity);
@@ -59,8 +80,8 @@
     `;
     body.insertAdjacentHTML("beforebegin", opacityButton);
     //
-    let images = document.querySelectorAll('img.image.finished');
-    let opacityButton1 = document.querySelector("button.opacity-btn1")
+    let images = document.querySelectorAll("img.image.finished");
+    let opacityButton1 = document.querySelector("button.opacity-btn1");
     opacityButton1.addEventListener("click", function () {
         if (opacity >= 1) {
             opacity = 1;
@@ -75,7 +96,7 @@
             });
         `);
     });
-    let opacityButton2 = document.querySelector("button.opacity-btn2")
+    let opacityButton2 = document.querySelector("button.opacity-btn2");
     opacityButton2.addEventListener("click", function () {
         if (opacity <= 0) {
             opacity = 0;
