@@ -13,7 +13,14 @@
 
 (function() {
     'use strict';
-    // Auto viết hoa captcha
+    //* Bỏ chặn một số thứ *//
+    const events = ['copy', 'cut', 'paste', 'contextmenu', 'mousedown', 'mouseup', 'keydown', 'keypress', 'keyup'];
+    events.forEach(evt => {
+        window.addEventListener(evt, e => {
+            e.stopPropagation();
+        }, true);
+    });
+    //* Auto viết hoa captcha *//
     const currentURL = window.location.href;
     // nếu web hiện tại có dạng https://eop.edu.vn/study/course/
     if (currentURL.includes('/study/course/')) {
