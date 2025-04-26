@@ -67,10 +67,12 @@
     // ==================================
     // Change Opacity
     const Chhange_Opacity = function () {
-        let opacity = GM_getValue("opacity", 1);
+        let opacity = Number(Number(GM_getValue("opacity", 1)).toFixed(1));
         console.log(opacity);
         GM_addStyle(`
-            img.image.finished { opacity: ${opacity};}
+            img.image.finished {
+                opacity: ${opacity};
+            }
             .opacity-btn {
                 position: fixed;
                 left: 0px;
@@ -101,16 +103,11 @@
             </div>
         `;
         divSetting.insertAdjacentHTML("beforebegin", divOpacityButton);
-        //
-        //let images = $$("img.image.finished");
         let btnIncreaseOpacity = $("button.opacity-btn1");
         btnIncreaseOpacity.addEventListener("click", function () {
-            if (opacity >= 1) {
-                opacity = 1;
-                console.log(opacity);
-                return;
-            }
-            opacity += 0.1;
+            if (opacity >= 1) return;
+            opacity = opacity + 0.1;
+            opacity = Number(opacity.toFixed(1));
             GM_setValue("opacity", opacity);
             console.log(opacity);
             GM_addStyle(`
@@ -120,12 +117,9 @@
         });
         let btnDecreaseOpacity = $("button.opacity-btn2");
         btnDecreaseOpacity.addEventListener("click", function () {
-            if (opacity <= 0) {
-                opacity = 0;
-                console.log(opacity);
-                return;
-            }
-            opacity -= 0.1;
+            if (opacity <= 0) return;
+            opacity = opacity - 0.1;
+            opacity = Number(opacity.toFixed(1));
             GM_setValue("opacity", opacity);
             console.log(opacity);
             GM_addStyle(`
