@@ -17,11 +17,24 @@
     //Scroll
     let clickCount = 0;
     let clickTimer = null;
-    const delay = 150;
+    let longPressTimer = null;
+    let isLongPress = false;
+    const delay = 250;
+    const longPressDelay = 500;
     let truyen = document.querySelector("div.image-section");
     truyen.onmousedown = function () {
+        isLongPress = false;
+        longPressTimer = setTimeout(() => {
+            console.log("Long Press detected");
+            isLongPress = true;
+            clickCount = 0;
+        }, longPressDelay);
     };
     truyen.onmouseup = function () {
+        clearTimeout(longPressTimer);
+        if (isLongPress) {
+            return;
+        }
         clickCount++;
         if (clickCount === 1) {
             clickTimer = setTimeout(() => {
@@ -36,11 +49,9 @@
         } else if (clickCount === 2) {
             clearTimeout(clickTimer);
             // Double click
-            const scrollY = window.innerHeight * -0.55;
-            window.scrollBy({
-                top: scrollY,
-                behavior: "smooth",
-            });
+            clickCount = 0;
+        } else if (clickCount === 3) {
+            // Triple click
             clickCount = 0;
         }
     };
