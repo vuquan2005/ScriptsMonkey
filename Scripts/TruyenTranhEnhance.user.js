@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GocTruyenTranhEnhance
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      1.0.2
+// @version      1.0.3
 // @description  Enhance your Manga reading experience
 // @author       QuanVu
 // @include      /https:\/\/goctruyentranhvui\d+\.com\/truyen\/.*/
@@ -199,8 +199,8 @@
             .opacity-btn {
                 position: relative;
                 display: flex;
-                justify-content: center;
-                left: 0px;
+                justify-content: right;
+                right: -125px;
                 bottom: 0px;
                 width: auto;
                 border-radius: 10px;
