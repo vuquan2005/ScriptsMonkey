@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GocTruyenTranhEnhance
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      1.0.1
+// @version      1.0.2
 // @description  Enhance your Manga reading experience
 // @author       QuanVu
 // @include      /https:\/\/goctruyentranhvui\d+\.com\/truyen\/.*/
@@ -197,35 +197,38 @@
                 opacity: ${opacity};
             }
             .opacity-btn {
-                position: fixed;
+                position: relative;
+                display: flex;
+                justify-content: center;
                 left: 0px;
                 bottom: 0px;
                 width: auto;
-                height: auto;
                 border-radius: 10px;
-                display: flex;
                 z-index: 1000;
             }
             .opacity-btn1, .opacity-btn2 {
                 color:#ffffffee;
                 display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 20px;
                 background-color:rgba(0, 0, 0, 0.1);
-                margin: 2px;
-                padding: 5px;
-                font-size: 15px;
+                margin: 5px;
+                font-size: 24px;
+                height: auto;
                 border: none;
                 border-radius: 10px;
                 cursor: pointer;
                 }
         `);
-        let divSetting = $("div.setting");
+        const navGroupBtn = $("div.top-move-pannel > div > div:nth-child(2) > div > div");
         let divOpacityButton = `
             <div class="opacity-btn">
                 <button class="opacity-btn1">+</button>
                 <button class="opacity-btn2">-</button>
             </div>
         `;
-        divSetting.insertAdjacentHTML("beforebegin", divOpacityButton);
+        navGroupBtn.insertAdjacentHTML("beforeend", divOpacityButton);
         let btnIncreaseOpacity = $("button.opacity-btn1");
         btnIncreaseOpacity.addEventListener("click", function () {
             if (opacity >= 1) return;
