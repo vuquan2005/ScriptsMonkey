@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GocTruyenTranhEnhance
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      1.0.0
+// @version      1.0.1
 // @description  Enhance your Manga reading experience
 // @author       QuanVu
 // @include      /https:\/\/goctruyentranhvui\d+\.com\/truyen\/.*/
@@ -170,6 +170,7 @@
                 chapterNavigationTab.style.display = "none";
             } else {
                 chapterNavigationTab.style.display = "block";
+                chapterNavigationTab.classList.remove("fixed-toggle");
             }
             const rectTop = chapterNavigationTab.getBoundingClientRect();
             const rectBottom = chapterNavigationTabBottom.getBoundingClientRect();
