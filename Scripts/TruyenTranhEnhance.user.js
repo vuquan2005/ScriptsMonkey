@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GocTruyenTranhEnhance
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      1.0.3
+// @version      1.0.4
 // @description  Enhance your Manga reading experience
 // @author       QuanVu
 // @include      /https:\/\/goctruyentranhvui\d+\.com\/truyen\/.*/
@@ -197,27 +197,18 @@
                 opacity: ${opacity};
             }
             .opacity-btn {
-                position: relative;
-                display: flex;
-                justify-content: right;
-                right: -125px;
-                bottom: 0px;
-                width: auto;
+                position: absolute;
+                right: 15px;
                 border-radius: 10px;
                 z-index: 1000;
             }
             .opacity-btn1, .opacity-btn2 {
                 color:#ffffffee;
-                display: flex;
-                justify-content: center;
-                align-items: center;
                 width: 20px;
                 background-color:rgba(0, 0, 0, 0.1);
                 margin: 5px;
                 font-size: 24px;
-                height: auto;
                 border: none;
-                border-radius: 10px;
                 cursor: pointer;
                 }
         `);
