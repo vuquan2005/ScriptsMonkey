@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GocTruyenTranhEnhance
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.8.1
+// @version      2.8.2
 // @description  Enhance your Manga reading experience
 // @author       QuanVu
 // @include      /https:\/\/goctruyentranhvui\d+\.com\/truyen\/.*/
@@ -166,12 +166,14 @@
                 zoomTruyen = 1.5;
                 imagesTruyen.forEach(image => {
                     image.style.width = 150 + "%";
+                    image.style.left = "-25%";
                     console.log("Zoom 1.5", image.style.width);
                 });
             } else {
                 zoomTruyen = 1;
                 imagesTruyen.forEach(image => {
                     image.style.width = 100 + "%";
+                    image.style.left = "0%";
                     console.log("Zoom 1.0", image.style.width);
                 });
             }
@@ -182,12 +184,14 @@
                 zoomTruyen = 0.5;
                 imagesTruyen.forEach(image => {
                     image.style.width = 50 + "%";
+                    image.style.left = "25%";
                     console.log("Zoom 0.5", image.style.width);
                 });
             } else {
                 zoomTruyen = 1;
                 imagesTruyen.forEach(image => {
                     image.style.width = 100 + "%";
+                    image.style.left = "0%";
                     console.log("Zoom 1.0", image.style.width);
                 });
             }
