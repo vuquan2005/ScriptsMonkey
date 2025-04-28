@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GocTruyenTranhEnhance
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.0.0
+// @version      2.0.1
 // @description  Enhance your Manga reading experience
 // @author       QuanVu
 // @include      /https:\/\/goctruyentranhvui\d+\.com\/truyen\/.*/
@@ -43,7 +43,6 @@
                 isLongPress = true;
                 clickCount = 0;
             }, longPressDelay);
-            // stopPropagation
             event.stopPropagation();
         };
         // Event mouse up
@@ -106,7 +105,7 @@
             }
             .center-cell {
                 content: " ";
-                background-color: rgba(0, 0, 0, 0.5);
+                /*background-color: rgba(0, 0, 0, 0.5); /* For test */
                 position: fixed;
                 width: 30vw;
                 height: 40vh;
@@ -160,24 +159,20 @@
         const overlayCenter0 = $("div.center-cell");
         const chapterNavigationTab = $("div.top-move-pannel");
         const chapterNavigationTabBottom = $("div.view-bottom-panel");
-
+        // Hide the chapter navigation tab when scroll down
         if (window.scrollY > 145) {
             chapterNavigationTab.style.display = "none";
         } else {
             chapterNavigationTab.style.display = "block";
             chapterNavigationTab.classList.remove("fixed-toggle");
         }
+        // Hide the overlay when scroll to chapter navigation tab bottom
         const rectBottom = chapterNavigationTabBottom.getBoundingClientRect();
-
-        console.log("rectBottom", rectBottom.top.toFixed());
-        console.log(window.innerHeight - rectBottom.top.toFixed());
-
         if (window.innerHeight - rectBottom.top.toFixed() >= 0) {
             overlayCenter0.style.display = "none";
         } else {
             overlayCenter0.style.display = "block";
         }
-
     }
 
     // ==================================
