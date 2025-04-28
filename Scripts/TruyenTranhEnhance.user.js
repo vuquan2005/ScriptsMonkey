@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GocTruyenTranhEnhance
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.1.3
+// @version      2.1.4
 // @description  Enhance your Manga reading experience
 // @author       QuanVu
 // @include      /https:\/\/goctruyentranhvui\d+\.com\/truyen\/.*/
@@ -35,13 +35,8 @@
         let isLongPress = false;
         const delay = 200;
         const longPressDelay = 400;
-        //
-        element.addEventListener("mousedown", onmousedown);
-        element.addEventListener("mouseup", onmouseup);
-        element.addEventListener("touchstart", onmousedown);
-        element.addEventListener("touchend", onmouseup);
         // Event mosuse down
-        element.onmousedown = function (event) {
+        element.onpointerdown = function (event) {
             isLongPress = false;
             longPressTimer = setTimeout(() => {
                 longPressHandler();
@@ -53,7 +48,7 @@
             event.stopPropagation();
         };
         // Event mouse up
-        element.onmouseup = function (event) {
+        element.onpointerup = function (event) {
             console.log("mouseup");
             clearTimeout(longPressTimer);
             if (isLongPress) {
