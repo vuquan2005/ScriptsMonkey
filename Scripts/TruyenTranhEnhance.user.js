@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GocTruyenTranhEnhance
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.1.4
+// @version      2.1.5
 // @description  Enhance your Manga reading experience
 // @author       QuanVu
 // @include      /https:\/\/goctruyentranhvui\d+\.com\/truyen\/.*/
@@ -200,9 +200,9 @@
                 position: fixed;
                 top: 0px;
                 left: 0px;
-                font-size: 12px;
-                background-color: rgba(0, 0, 0, 0.5);
-                color: rgba(255, 255, 255, 0.8);
+                font-size: 18px;
+                background-color: rgba(0, 0, 0, 0.8);
+                color: rgba(255, 255, 255, 0.9);
                 padding: 4px 6px;
                 border-radius: 8px;
             }
