@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GocTruyenTranhEnhance
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.1.5
+// @version      2.1.6
 // @description  Enhance your Manga reading experience
 // @author       QuanVu
 // @include      /https:\/\/goctruyentranhvui\d+\.com\/truyen\/.*/
@@ -217,7 +217,7 @@
             clock.textContent = `${hours}:${minutes}`;
         }
         updateClock();
-        setInterval(updateClock, 60000);
+        setInterval(updateClock, 10000);
     }
     // ==================================
     // Change Opacity
