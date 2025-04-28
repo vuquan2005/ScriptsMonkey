@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GocTruyenTranhEnhance
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      1.0.4
+// @version      1.0.5
 // @description  Enhance your Manga reading experience
 // @author       QuanVu
 // @include      /https:\/\/goctruyentranhvui\d+\.com\/truyen\/.*/
@@ -149,7 +149,6 @@
         // $$();
         // function handleDblClick() {
         // }
-
         Enhance_Scroll(left, handleLongPress, handleClick_scrollDown);
         Enhance_Scroll(right, handleLongPress, handleClick_scrollDown);
         Enhance_Scroll(center0, handleLongPress, handleClick_scrollUp);
@@ -175,15 +174,18 @@
             const rectTop = chapterNavigationTab.getBoundingClientRect();
             const rectBottom = chapterNavigationTabBottom.getBoundingClientRect();
 
-            console.log("rectTop", rectTop.bottom.toFixed());
             console.log("rectBottom", rectBottom.top.toFixed());
-            console.log(window.scrollY, "\n");
+            
             if (rectTop.bottom.toFixed() >= 0)
             {
                 overlay.style.top = `${rectTop.bottom.toFixed()}px`;
                 overlay.style.height = `calc(100vh - ${rectTop.bottom.toFixed()}px)`;
             }
-                
+            if (window.innerHeight - rectTop.bottom.toFixed()>= 0)
+            {
+                overlay.style.bottom = `${rectTop.bottom.toFixed()}px`;
+                overlay.style.height = `calc(100vh - ${rectBottom.top.toFixed()}px)`;
+            }
         });
     }
 
