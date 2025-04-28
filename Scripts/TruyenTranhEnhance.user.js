@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GocTruyenTranhEnhance
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      1.0.5
+// @version      2.0.0
 // @description  Enhance your Manga reading experience
 // @author       QuanVu
 // @include      /https:\/\/goctruyentranhvui\d+\.com\/truyen\/.*/
@@ -36,16 +36,18 @@
         const delay = 200;
         const longPressDelay = 400;
         // Event mosuse down
-        element.onmousedown = function () {
+        element.onmousedown = function (event) {
             isLongPress = false;
             longPressTimer = setTimeout(() => {
                 longPressHandler();
                 isLongPress = true;
                 clickCount = 0;
             }, longPressDelay);
+            // stopPropagation
+            event.stopPropagation();
         };
         // Event mouse up
-        element.onmouseup = function () {
+        element.onmouseup = function (event) {
             clearTimeout(longPressTimer);
             if (isLongPress) {
                 return;
@@ -64,6 +66,7 @@
                 triClickHandler();
                 clickCount = 0;
             }
+            event.stopPropagation();
         };
     }
     // ==================================
@@ -80,16 +83,7 @@
         center.className = "grid-center";
         const center0 = document.createElement("div");
         center0.className = "center-cell";
-        center0.dataset.index = 0;
         center.appendChild(center0);
-        const center1 = document.createElement("div");
-        center1.className = "center-cell";
-        center1.dataset.index = 1;
-        center.appendChild(center1);
-        const center2 = document.createElement("div");
-        center2.className = "center-cell";
-        center2.dataset.index = 2;
-        center.appendChild(center2);
         overlay.appendChild(center);
         const right = document.createElement("div");
         right.className = "grid-right";
@@ -101,38 +95,43 @@
                 z-index: 5 !important;
             }
             #overlay-grid {
-                position: fixed;
+                position: absolute;
                 top: 0;
                 left: 0;
-                width: 100vw;
-                height: 100vh;
+                width: 100%;
+                height: 100%;
                 display: grid;
                 grid-template-columns: 1fr 1fr 1fr;
                 z-index: 10;
             }
-            .grid-center {
-                display: grid;
-                grid-template-rows: 1fr 1fr 1fr;
+            .center-cell {
+                content: " ";
+                background-color: rgba(0, 0, 0, 0.5);
+                position: fixed;
+                width: 30vw;
+                height: 40vh;
+                z-index: 100;
+                pointer-events: auto;
             }
         `);
+        // Set the width of the center cell to match the width of the center div
+        center0.style.width = center.getBoundingClientRect().width.toFixed() + "px";
         let showChapterNavigationTab;
+        // Event
         function chapterNavigationTabVisible() {
             showChapterNavigationTab = chapterNavigationTab.style.display == "block" ? true : false;
             if (showChapterNavigationTab && window.scrollY > 145) {
                 showChapterNavigationTab = false;
                 console.log("showChapterNavigationTab", showChapterNavigationTab);
+                // Hide the chapter navigation tab
                 chapterNavigationTab.style.display = "none";
                 chapterNavigationTab.classList.remove("fixed-toggle");
-                overlay.style.top = `0px`;
-                overlay.style.height = `calc(100vh)`;
             } else if (!showChapterNavigationTab && window.scrollY > 145) {
                 showChapterNavigationTab = true;
                 console.log("showChapterNavigationTab", showChapterNavigationTab);
+                // Show the chapter navigation tab
                 chapterNavigationTab.style.display = "block";
                 chapterNavigationTab.classList.add("fixed-toggle");
-                const rect = chapterNavigationTab.getBoundingClientRect().bottom.toFixed();
-                overlay.style.top = `${rect}px`;
-                overlay.style.height = `calc(100vh - ${rect}px)`;
             }
         }
         function handleClick_scrollDown() {
@@ -151,44 +150,34 @@
         }
         Enhance_Scroll(left, handleClick_scrollDown);
         Enhance_Scroll(right, handleClick_scrollDown);
-        Enhance_Scroll(center0, handleClick_scrollUp);
-        Enhance_Scroll(center1, chapterNavigationTabVisible);
-        Enhance_Scroll(center2, handleClick_scrollUp);
+        Enhance_Scroll(center, handleClick_scrollUp);
+        Enhance_Scroll(center0, chapterNavigationTabVisible);
     }
     // ==================================
     // Control scroll, overlay, visibility
-    function Control_Overlay() {
-        const overlay = $("div#overlay-grid");
+    function UpdateOverlay() {
+        // Selector elements
+        const overlayCenter0 = $("div.center-cell");
         const chapterNavigationTab = $("div.top-move-pannel");
         const chapterNavigationTabBottom = $("div.view-bottom-panel");
-        setTimeout(() => {
-            overlay.style.top = `145px`;
-        }, 50);
-        // Event scroll
-        document.addEventListener("scroll", function () {
-            if (window.scrollY > 145) {
-                chapterNavigationTab.style.display = "none";
-            } else {
-                chapterNavigationTab.style.display = "block";
-                chapterNavigationTab.classList.remove("fixed-toggle");
-            }
-            const rectTop = chapterNavigationTab.getBoundingClientRect();
-            const rectBottom = chapterNavigationTabBottom.getBoundingClientRect();
 
-            console.log("rectBottom", rectBottom.top.toFixed());
-            console.log(window.innerHeight - rectBottom.top.toFixed());
+        if (window.scrollY > 145) {
+            chapterNavigationTab.style.display = "none";
+        } else {
+            chapterNavigationTab.style.display = "block";
+            chapterNavigationTab.classList.remove("fixed-toggle");
+        }
+        const rectBottom = chapterNavigationTabBottom.getBoundingClientRect();
 
-            if (rectTop.bottom.toFixed() > 0) {
-                overlay.style.top = `${rectTop.bottom.toFixed()}px`;
-                overlay.style.height = `calc(100vh - ${rectTop.bottom.toFixed()}px)`;
-            }
-            if (window.innerHeight - rectBottom.top.toFixed() >= 0) {
-                overlay.style.top = `0px`;
-                overlay.style.bottom = `${rectBottom.top.toFixed()}px`;
-                overlay.style.height = `auto`;
-                //overlay.style.height = `calc(100vh - ${rectBottom.top.toFixed()}px)`;
-            }
-        });
+        console.log("rectBottom", rectBottom.top.toFixed());
+        console.log(window.innerHeight - rectBottom.top.toFixed());
+
+        if (window.innerHeight - rectBottom.top.toFixed() >= 0) {
+            overlayCenter0.style.display = "none";
+        } else {
+            overlayCenter0.style.display = "block";
+        }
+
     }
 
     // ==================================
@@ -251,7 +240,10 @@
     }
     // ==================================
     Overlay();
-    Control_Overlay();
+    UpdateOverlay();
     Change_Opacity();
+    document.addEventListener("scroll", function () {
+        UpdateOverlay();
+    });
     // End Script
 })();
