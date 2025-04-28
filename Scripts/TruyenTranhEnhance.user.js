@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GocTruyenTranhEnhance
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.7.2
+// @version      2.8.1
 // @description  Enhance your Manga reading experience
 // @author       QuanVu
 // @include      /https:\/\/goctruyentranhvui\d+\.com\/truyen\/.*/
@@ -18,6 +18,7 @@
     const $$ = (selector, scope = document) => scope.querySelectorAll(selector);
     // ==================================
     const positionOfOverlay = $("div.image-section");
+    const selectorImagesTruyen = "img.image.finished";
     const chapterNavigationTab = $("div.top-move-pannel");
     const positionOfOpacityBtn = $("div > div:nth-child(2) > div > div", chapterNavigationTab);
     // ==================================
@@ -31,12 +32,13 @@
     ) {
         let clickCount = 0;
         let clickTimer = null;
+        let dblClickTimer = null;
         let longPressTimer = null;
         let isLongPress = false;
         let startX = 0;
         let startY = 0;
         let moved = false;
-        const delay = 200;
+        const delay = 250;
         const longPressDelay = 400;
         const moveThreshold = 10; // pixel - nếu di chuyển quá 10px thì coi như vuốt
 
@@ -79,10 +81,13 @@
                 }, delay);
             } else if (clickCount === 2) {
                 clearTimeout(clickTimer);
-                dblClickHandler();
-                console.log(element.className, " Double Click");
-                clickCount = 0;
+                dblClickTimer = setTimeout(() => {
+                    dblClickHandler();
+                    console.log(element.className, " Double Click");
+                    clickCount = 0;
+                }, delay);
             } else if (clickCount === 3) {
+                clearTimeout(dblClickTimer);
                 triClickHandler();
                 console.log(element.className, " Triple Click");
                 clickCount = 0;
@@ -154,6 +159,39 @@
                 behavior: "smooth",
             });
         }
+        let zoomTruyen = 1;
+        function handleDblClick() {
+            let imagesTruyen = $$(selectorImagesTruyen);
+            if (zoomTruyen == 1) {
+                zoomTruyen = 1.5;
+                imagesTruyen.forEach(image => {
+                    image.style.width = 150 + "%";
+                    console.log("Zoom 1.5", image.style.width);
+                });
+            } else {
+                zoomTruyen = 1;
+                imagesTruyen.forEach(image => {
+                    image.style.width = 100 + "%";
+                    console.log("Zoom 1.0", image.style.width);
+                });
+            }
+        }
+        function handleTriClick() {
+            let imagesTruyen = $$(selectorImagesTruyen);
+            if (zoomTruyen == 1) {
+                zoomTruyen = 0.5;
+                imagesTruyen.forEach(image => {
+                    image.style.width = 50 + "%";
+                    console.log("Zoom 0.5", image.style.width);
+                });
+            } else {
+                zoomTruyen = 1;
+                imagesTruyen.forEach(image => {
+                    image.style.width = 100 + "%";
+                    console.log("Zoom 1.0", image.style.width);
+                });
+            }
+        }
         function chapterNavigationTabVisible() {
             showChapterNavigationTab = chapterNavigationTab.style.display == "block" ? true : false;
             if (showChapterNavigationTab && window.scrollY > 145) {
@@ -170,10 +208,10 @@
                 chapterNavigationTab.classList.add("fixed-toggle");
             }
         }
-        Enhance_Scroll(left, handleClick_scrollDown);
-        Enhance_Scroll(right, handleClick_scrollDown);
-        Enhance_Scroll(center, handleClick_scrollUp);
-        Enhance_Scroll(center0, chapterNavigationTabVisible, toggleFullScreen);
+        Enhance_Scroll(left, handleClick_scrollDown, () => {}, handleDblClick, handleTriClick);
+        Enhance_Scroll(right, handleClick_scrollDown, () => {}, handleDblClick, handleTriClick);
+        Enhance_Scroll(center, handleClick_scrollUp, () => {}, handleDblClick, handleTriClick);
+        Enhance_Scroll(center0, chapterNavigationTabVisible, toggleFullScreen, handleDblClick, handleTriClick);
     }
     // ==================================
     // Overlay update
