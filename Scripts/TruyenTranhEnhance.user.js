@@ -20,8 +20,8 @@
     // Scroll function
     function Enhance_Scroll(
         element,
-        longPressHandler = () => {},
         clickHandler = () => {},
+        longPressHandler = () => {},
         dblClickHandler = () => {},
         triClickHandler = () => {}
     ) {
@@ -113,7 +113,7 @@
         `);
         const chapterNavigationTab = $("div.top-move-pannel");
         let showChapterNavigationTab;
-        function handleLongPress() {
+        function chapterNavigationTabVisible() {
             showChapterNavigationTab = chapterNavigationTab.style.display == "block" ? true : false;
             if (showChapterNavigationTab && window.scrollY > 145) {
                 showChapterNavigationTab = false;
@@ -149,11 +149,11 @@
         // $$();
         // function handleDblClick() {
         // }
-        Enhance_Scroll(left, handleLongPress, handleClick_scrollDown);
-        Enhance_Scroll(right, handleLongPress, handleClick_scrollDown);
-        Enhance_Scroll(center0, handleLongPress, handleClick_scrollUp);
-        Enhance_Scroll(center1, handleLongPress, handleLongPress);
-        Enhance_Scroll(center2, handleLongPress, handleClick_scrollUp);
+        Enhance_Scroll(left, handleClick_scrollDown);
+        Enhance_Scroll(right, handleClick_scrollDown);
+        Enhance_Scroll(center0, handleClick_scrollUp);
+        Enhance_Scroll(center1, chapterNavigationTabVisible);
+        Enhance_Scroll(center2, handleClick_scrollUp);
     }
     // ==================================
     // Control scroll, overlay, visibility
