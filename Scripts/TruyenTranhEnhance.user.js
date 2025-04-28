@@ -44,14 +44,14 @@
                 isLongPress = true;
                 clickCount = 0;
             }, longPressDelay);
-            console.log("mousedown");
+            console.log("pointerdown");
             event.stopPropagation();
         };
         // Event mouse up
         element.onpointerup = function (event) {
-            console.log("mouseup");
+            console.log("pointerup");
             clearTimeout(longPressTimer);
-            if (isLongPress) {
+            if (isLongPress || moved) {
                 return;
             }
             clickCount++;
