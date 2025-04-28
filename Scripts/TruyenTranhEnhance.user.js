@@ -217,7 +217,7 @@
                 position: fixed;
                 top: 0px;
                 left: 0px;
-                font-size: 18px;
+                font-size: 16px;
                 background-color: rgba(0, 0, 0, 0.8);
                 color: rgba(255, 255, 255, 0.9);
                 padding: 4px 6px;
