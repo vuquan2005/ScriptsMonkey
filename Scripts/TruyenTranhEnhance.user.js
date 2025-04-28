@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GocTruyenTranhEnhance
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.1.6
+// @version      2.7.0
 // @description  Enhance your Manga reading experience
 // @author       QuanVu
 // @include      /https:\/\/goctruyentranhvui\d+\.com\/truyen\/.*/
@@ -33,21 +33,37 @@
         let clickTimer = null;
         let longPressTimer = null;
         let isLongPress = false;
+        let startX = 0;
+        let startY = 0;
+        let moved = false;
         const delay = 200;
         const longPressDelay = 400;
-        // Event mosuse down
+        const moveThreshold = 10; // pixel - nếu di chuyển quá 10px thì coi như vuốt
+
         element.onpointerdown = function (event) {
             isLongPress = false;
+            moved = false;
+            startX = event.clientX;
+            startY = event.clientY;
             longPressTimer = setTimeout(() => {
-                longPressHandler();
-                console.log(element.className, " Long Press");
-                isLongPress = true;
-                clickCount = 0;
+                if (!moved) {
+                    longPressHandler();
+                    console.log(element.className, "Long Press");
+                    isLongPress = true;
+                    clickCount = 0;
+                }
             }, longPressDelay);
             console.log("pointerdown");
             event.stopPropagation();
         };
-        // Event mouse up
+        element.onpointermove = function (event) {
+            const dx = event.clientX - startX;
+            const dy = event.clientY - startY;
+            if (Math.abs(dx) > moveThreshold || Math.abs(dy) > moveThreshold) {
+                moved = true;
+                clearTimeout(longPressTimer); // Nếu di chuyển, huỷ luôn long press
+            }
+        };
         element.onpointerup = function (event) {
             console.log("pointerup");
             clearTimeout(longPressTimer);
@@ -74,6 +90,7 @@
             event.stopPropagation();
         };
     }
+
     // ==================================
     // Overlay
     function Overlay() {
