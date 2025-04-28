@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GocTruyenTranhEnhance
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.7.1
+// @version      2.7.2
 // @description  Enhance your Manga reading experience
 // @author       QuanVu
 // @include      /https:\/\/goctruyentranhvui\d+\.com\/truyen\/.*/
@@ -202,11 +202,16 @@
     function toggleFullScreen() {
         if (!document.fullscreenElement) {
             document.documentElement.requestFullscreen();
-            $("div#clock").style.display = "block";
         } else if (document.exitFullscreen) {
             document.exitFullscreen();
-            $("div#clock").style.display = "none";
         }
+        document.addEventListener("fullscreenchange", function () {
+            if (document.fullscreenElement) {
+                $("div#clock").style.display = "block";
+            } else {
+                $("div#clock").style.display = "none";
+            }
+        });
     }
     // ==================================
     // Add a clock in full screen mode
