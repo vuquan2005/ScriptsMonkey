@@ -17,6 +17,10 @@
     const $ = (selector, scope = document) => scope.querySelector(selector);
     const $$ = (selector, scope = document) => scope.querySelectorAll(selector);
     // ==================================
+    const positionOfOverlay = $("div.image-section");
+    const chapterNavigationTab = $("div.top-move-pannel");
+    const positionOfOpacityBtn = $("div > div:nth-child(2) > div > div", chapterNavigationTab);
+    // ==================================
     // Scroll function
     function Enhance_Scroll(
         element,
@@ -87,11 +91,11 @@
         center2.dataset.index = 2;
         center.appendChild(center2);
         overlay.appendChild(center);
-        // Create the right div
         const right = document.createElement("div");
         right.className = "grid-right";
         overlay.appendChild(right);
-        $("div.image-section").appendChild(overlay);
+        // Add overlay to DOOM
+        positionOfOverlay.appendChild(overlay);
         GM_addStyle(`
             img.image.finished {
                 z-index: 5 !important;
@@ -111,7 +115,6 @@
                 grid-template-rows: 1fr 1fr 1fr;
             }
         `);
-        const chapterNavigationTab = $("div.top-move-pannel");
         let showChapterNavigationTab;
         function chapterNavigationTabVisible() {
             showChapterNavigationTab = chapterNavigationTab.style.display == "block" ? true : false;
@@ -146,9 +149,6 @@
                 behavior: "smooth",
             });
         }
-        // $$();
-        // function handleDblClick() {
-        // }
         Enhance_Scroll(left, handleClick_scrollDown);
         Enhance_Scroll(right, handleClick_scrollDown);
         Enhance_Scroll(center0, handleClick_scrollUp);
@@ -164,6 +164,7 @@
         setTimeout(() => {
             overlay.style.top = `145px`;
         }, 50);
+        // Event scroll
         document.addEventListener("scroll", function () {
             if (window.scrollY > 145) {
                 chapterNavigationTab.style.display = "none";
@@ -175,16 +176,17 @@
             const rectBottom = chapterNavigationTabBottom.getBoundingClientRect();
 
             console.log("rectBottom", rectBottom.top.toFixed());
-            
-            if (rectTop.bottom.toFixed() >= 0)
-            {
+            console.log(window.innerHeight - rectBottom.top.toFixed());
+
+            if (rectTop.bottom.toFixed() > 0) {
                 overlay.style.top = `${rectTop.bottom.toFixed()}px`;
                 overlay.style.height = `calc(100vh - ${rectTop.bottom.toFixed()}px)`;
             }
-            if (window.innerHeight - rectTop.bottom.toFixed()>= 0)
-            {
-                overlay.style.bottom = `${rectTop.bottom.toFixed()}px`;
-                overlay.style.height = `calc(100vh - ${rectBottom.top.toFixed()}px)`;
+            if (window.innerHeight - rectBottom.top.toFixed() >= 0) {
+                overlay.style.top = `0px`;
+                overlay.style.bottom = `${rectBottom.top.toFixed()}px`;
+                overlay.style.height = `auto`;
+                //overlay.style.height = `calc(100vh - ${rectBottom.top.toFixed()}px)`;
             }
         });
     }
@@ -214,7 +216,7 @@
                 cursor: pointer;
                 }
         `);
-        const navGroupBtn = $("div.top-move-pannel > div > div:nth-child(2) > div > div");
+        const navGroupBtn = positionOfOpacityBtn;
         let divOpacityButton = `
             <div class="opacity-btn">
                 <button class="opacity-btn1">+</button>
