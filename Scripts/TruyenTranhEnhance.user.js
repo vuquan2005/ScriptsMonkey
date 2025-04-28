@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GocTruyenTranhEnhance
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.1.1
+// @version      2.1.2
 // @description  Enhance your Manga reading experience
 // @author       QuanVu
 // @include      /https:\/\/goctruyentranhvui\d+\.com\/truyen\/.*/
@@ -35,6 +35,11 @@
         let isLongPress = false;
         const delay = 200;
         const longPressDelay = 400;
+        //
+        element.addEventListener("mousedown", onMouseDown);
+        element.addEventListener("mouseup", onMouseUp);
+        element.addEventListener("touchstart", onMouseDown);
+        element.addEventListener("touchend", onMouseUp);
         // Event mosuse down
         element.onmousedown = function (event) {
             isLongPress = false;
@@ -44,10 +49,12 @@
                 isLongPress = true;
                 clickCount = 0;
             }, longPressDelay);
+            console.log("mousedown");
             event.stopPropagation();
         };
         // Event mouse up
         element.onmouseup = function (event) {
+            console.log("mouseup");
             clearTimeout(longPressTimer);
             if (isLongPress) {
                 return;
@@ -199,8 +206,8 @@
                 top: 0px;
                 left: 0px;
                 font-size: 12px;
-                background-color: rgba(0, 0, 0, 0.3);
-                color: rgba(255, 255, 255, 0.5);
+                background-color: rgba(0, 0, 0, 0.5);
+                color: rgba(255, 255, 255, 0.8);
                 padding: 4px 6px;
                 border-radius: 8px;
             }
