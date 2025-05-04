@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GocTruyenTranhEnhance
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.8.3
+// @version      2.8.4
 // @description  Enhance your Manga reading experience
 // @author       QuanVu
 // @include      /https:\/\/goctruyentranhvui\d+\.com\/truyen\/.*/
@@ -146,7 +146,7 @@
         let showChapterNavigationTab;
         // Event
         function handleClick_scrollDown() {
-            const scrollY = window.innerHeight * 0.55;
+            const scrollY = window.innerHeight * 0.6;
             window.scrollBy({
                 top: scrollY,
                 behavior: "smooth",
@@ -269,6 +269,7 @@
                 color: rgba(255, 255, 255, 0.9);
                 padding: 4px 6px;
                 border-radius: 8px;
+                z-index: 1000;
             }
         `);
         const clock = document.createElement("div");
