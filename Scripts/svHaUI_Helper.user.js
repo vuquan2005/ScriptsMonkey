@@ -5,7 +5,7 @@
 // @description  Do some things on sv.haui.edu.vn
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
-// @updateURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
+// @updateURL    https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
 // @match        https://sv.haui.edu.vn/*
 // @grant        none
 // ==/UserScript==
