@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GocTruyenTranhEnhance
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.10.0
+// @version      2.11.0
 // @description  Enhance your Manga reading experience
 // @author       QuanVu
 // @include      /https:\/\/goctruyentranhvui\d+\.com\/truyen\/.*/
@@ -20,6 +20,8 @@
     const positionOfOverlay = $("div.image-section");
     const selectorImagesTruyen = "img.image.finished";
     const chapterNavigationTab = $("div.top-move-pannel");
+    const settingsTab = $("div.setting");
+    const switchServer = $("div.switch-server");
     const positionOfOpacityBtn = $("div > div:nth-child(2) > div > div", chapterNavigationTab);
     // ==================================
     // Scroll function
@@ -155,21 +157,29 @@
         // Set the width of the center cell to match the width of the center div
         center0.style.width = center.getBoundingClientRect().width.toFixed() + "px";
         let showChapterNavigationTab;
+        //let showSettingsTab;
         // Event
         function chapterNavigationTabVisible() {
             showChapterNavigationTab = chapterNavigationTab.style.display == "block" ? true : false;
+            //showSettingsTab = settingsTab.style.display == "block" ? true : false;
             if (showChapterNavigationTab && window.scrollY > 145) {
                 showChapterNavigationTab = false;
                 console.log("showChapterNavigationTab", showChapterNavigationTab);
                 // Hide the chapter navigation tab
                 chapterNavigationTab.style.display = "none";
                 chapterNavigationTab.classList.remove("fixed-toggle");
+                // Hide the settings tab, switch server
+                settingsTab.style.display = "none";
+                switchServer.style.display = "none";
             } else if (!showChapterNavigationTab && window.scrollY > 145) {
                 showChapterNavigationTab = true;
                 console.log("showChapterNavigationTab", showChapterNavigationTab);
                 // Show the chapter navigation tab
                 chapterNavigationTab.style.display = "block";
                 chapterNavigationTab.classList.add("fixed-toggle");
+                // Show the settings tab, switch server
+                settingsTab.style.display = "flex";
+                switchServer.style.display = "block";
             }
         }
         function handleClick_scrollDown() {
@@ -186,11 +196,11 @@
                 behavior: "smooth",
             });
         }
-        function handleHoldToNextChapter() {
+        function handleHold_NextChapter() {
             $("button.nav-next.nav-btn").click();
             console.log(" Prev chapter");
         }
-        function handleHoldToPrevChapter() {
+        function handleHold_PrevChapter() {
             $("button.nav-prev.nav-btn").click();
             console.log(" Prev chapter");
         }
@@ -235,7 +245,7 @@
             left,
             handleClick_scrollDown,
             () => {},
-            handleHoldToPrevChapter,
+            handleHold_PrevChapter,
             handleDblClick,
             handleTriClick
         );
@@ -243,7 +253,7 @@
             right,
             handleClick_scrollDown,
             () => {},
-            handleHoldToNextChapter,
+            handleHold_NextChapter,
             handleDblClick,
             handleTriClick
         );
@@ -274,9 +284,13 @@
         // Hide the chapter navigation tab when scroll down
         if (window.scrollY > 145) {
             chapterNavigationTab.style.display = "none";
+            settingsTab.style.display = "none";
+            switchServer.style.display = "none";
         } else {
             chapterNavigationTab.style.display = "block";
             chapterNavigationTab.classList.remove("fixed-toggle");
+            settingsTab.style.display = "flex";
+            switchServer.style.display = "block";
         }
         // Hide the overlay when scroll to chapter navigation tab bottom
         const rectBottom = chapterNavigationTabBottom.getBoundingClientRect();
@@ -294,11 +308,12 @@
         } else if (document.exitFullscreen) {
             document.exitFullscreen();
         }
+        const clock = $("div#clock");
         document.addEventListener("fullscreenchange", function () {
             if (document.fullscreenElement) {
-                $("div#clock").style.display = "block";
+                clock.style.display = "block";
             } else {
-                $("div#clock").style.display = "none";
+                clock.style.display = "none";
             }
         });
     }
