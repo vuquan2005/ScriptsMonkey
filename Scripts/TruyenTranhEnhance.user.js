@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GocTruyenTranhEnhance
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.8.5
+// @version      2.9.0
 // @description  Enhance your Manga reading experience
 // @author       QuanVu
 // @include      /https:\/\/goctruyentranhvui\d+\.com\/truyen\/.*/
@@ -27,34 +27,39 @@
         element,
         clickHandler = () => {},
         longPressHandler = () => {},
+        holdHandler = () => {},
         dblClickHandler = () => {},
         triClickHandler = () => {}
     ) {
         let clickCount = 0;
         let clickTimer = null;
         let dblClickTimer = null;
-        let longPressTimer = null;
-        let isLongPress = false;
+        let holdTimer = null;
+        let pointDownTimer = null;
+        let pointUpTimer = null;
+        let isHold = false;
         let startX = 0;
         let startY = 0;
         let moved = false;
         const delay = 250;
         const longPressDelay = 400;
+        const holdDelay = 1000;
         const moveThreshold = 10; // pixel - nếu di chuyển quá 10px thì coi như vuốt
 
         element.onpointerdown = function (event) {
-            isLongPress = false;
+            isHold = false;
             moved = false;
             startX = event.clientX;
             startY = event.clientY;
-            longPressTimer = setTimeout(() => {
+            pointDownTimer = new Date().getTime();
+            holdTimer = setTimeout(() => {
                 if (!moved) {
-                    longPressHandler();
-                    console.log(element.className, "Long Press");
-                    isLongPress = true;
+                    holdHandler();
+                    console.log(element.className, "Hold");
+                    isHold = true;
                     clickCount = 0;
                 }
-            }, longPressDelay);
+            }, holdDelay);
             console.log("pointerdown");
             event.stopPropagation();
         };
@@ -63,16 +68,23 @@
             const dy = event.clientY - startY;
             if (Math.abs(dx) > moveThreshold || Math.abs(dy) > moveThreshold) {
                 moved = true;
-                clearTimeout(longPressTimer); // Nếu di chuyển, huỷ luôn long press
+                clearTimeout(holdTimer);
             }
         };
         element.onpointerup = function (event) {
             console.log("pointerup");
-            clearTimeout(longPressTimer);
-            if (isLongPress || moved) {
+            clearTimeout(holdTimer);
+            if (isHold || moved) {
                 return;
             }
             clickCount++;
+            pointUpTimer = new Date().getTime();
+            if (pointUpTimer - pointDownTimer > longPressDelay)
+            {
+                longPressHandler();
+                console.log(" Long press");
+                clickCount = 0;
+            }
             if (clickCount === 1) {
                 clickTimer = setTimeout(() => {
                     clickHandler();
@@ -212,10 +224,10 @@
                 chapterNavigationTab.classList.add("fixed-toggle");
             }
         }
-        Enhance_Scroll(left, handleClick_scrollDown, () => {}, handleDblClick, handleTriClick);
-        Enhance_Scroll(right, handleClick_scrollDown, () => {}, handleDblClick, handleTriClick);
-        Enhance_Scroll(center, handleClick_scrollUp, () => {}, handleDblClick, handleTriClick);
-        Enhance_Scroll(center0, chapterNavigationTabVisible, toggleFullScreen, handleDblClick, handleTriClick);
+        Enhance_Scroll(left, handleClick_scrollDown, () => {}, () => {}, handleDblClick, handleTriClick);
+        Enhance_Scroll(right, handleClick_scrollDown, () => {}, () => {}, handleDblClick, handleTriClick);
+        Enhance_Scroll(center, handleClick_scrollUp, () => {}, () => {}, handleDblClick, handleTriClick);
+        Enhance_Scroll(center0, chapterNavigationTabVisible, toggleFullScreen, () => {}, handleDblClick, handleTriClick);
     }
     // ==================================
     // Overlay update
@@ -263,7 +275,7 @@
                 display: none;
                 position: fixed;
                 top: 0px;
-                left: 0px;
+                left: 5px;
                 font-size: 13px;
                 background-color: rgba(0, 0, 0, 0.2);
                 color: rgba(255, 255, 255, 0.6);
