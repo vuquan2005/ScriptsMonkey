@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GocTruyenTranhEnhance
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.9.0
+// @version      2.10.0
 // @description  Enhance your Manga reading experience
 // @author       QuanVu
 // @include      /https:\/\/goctruyentranhvui\d+\.com\/truyen\/.*/
@@ -43,7 +43,7 @@
         let moved = false;
         const delay = 250;
         const longPressDelay = 400;
-        const holdDelay = 1000;
+        const holdDelay = 1500;
         const moveThreshold = 10; // pixel - nếu di chuyển quá 10px thì coi như vuốt
 
         element.onpointerdown = function (event) {
@@ -79,8 +79,7 @@
             }
             clickCount++;
             pointUpTimer = new Date().getTime();
-            if (pointUpTimer - pointDownTimer > longPressDelay)
-            {
+            if (pointUpTimer - pointDownTimer > longPressDelay) {
                 longPressHandler();
                 console.log(" Long press");
                 clickCount = 0;
@@ -157,57 +156,6 @@
         center0.style.width = center.getBoundingClientRect().width.toFixed() + "px";
         let showChapterNavigationTab;
         // Event
-        function handleClick_scrollDown() {
-            const scrollY = window.innerHeight * 0.6;
-            window.scrollBy({
-                top: scrollY,
-                behavior: "smooth",
-            });
-        }
-        function handleClick_scrollUp() {
-            const scrollY = window.innerHeight * -0.55;
-            window.scrollBy({
-                top: scrollY,
-                behavior: "smooth",
-            });
-        }
-        let zoomTruyen = 1;
-        function handleDblClick() {
-            let imagesTruyen = $$(selectorImagesTruyen);
-            if (zoomTruyen == 1) {
-                zoomTruyen = 1.5;
-                imagesTruyen.forEach(image => {
-                    image.style.width = 150 + "%";
-                    //image.style.left = "-25%";
-                    console.log("Zoom 1.5", image.style.width);
-                });
-            } else {
-                zoomTruyen = 1;
-                imagesTruyen.forEach(image => {
-                    image.style.width = 100 + "%";
-                    image.style.left = "0%";
-                    console.log("Zoom 1.0", image.style.width);
-                });
-            }
-        }
-        function handleTriClick() {
-            let imagesTruyen = $$(selectorImagesTruyen);
-            if (zoomTruyen == 1) {
-                zoomTruyen = 0.5;
-                imagesTruyen.forEach(image => {
-                    image.style.width = 50 + "%";
-                    image.style.left = "25%";
-                    console.log("Zoom 0.5", image.style.width);
-                });
-            } else {
-                zoomTruyen = 1;
-                imagesTruyen.forEach(image => {
-                    image.style.width = 100 + "%";
-                    image.style.left = "0%";
-                    console.log("Zoom 1.0", image.style.width);
-                });
-            }
-        }
         function chapterNavigationTabVisible() {
             showChapterNavigationTab = chapterNavigationTab.style.display == "block" ? true : false;
             if (showChapterNavigationTab && window.scrollY > 145) {
@@ -224,10 +172,97 @@
                 chapterNavigationTab.classList.add("fixed-toggle");
             }
         }
-        Enhance_Scroll(left, handleClick_scrollDown, () => {}, () => {}, handleDblClick, handleTriClick);
-        Enhance_Scroll(right, handleClick_scrollDown, () => {}, () => {}, handleDblClick, handleTriClick);
-        Enhance_Scroll(center, handleClick_scrollUp, () => {}, () => {}, handleDblClick, handleTriClick);
-        Enhance_Scroll(center0, chapterNavigationTabVisible, toggleFullScreen, () => {}, handleDblClick, handleTriClick);
+        function handleClick_scrollDown() {
+            const scrollY = window.innerHeight * 0.6;
+            window.scrollBy({
+                top: scrollY,
+                behavior: "smooth",
+            });
+        }
+        function handleClick_scrollUp() {
+            const scrollY = window.innerHeight * -0.55;
+            window.scrollBy({
+                top: scrollY,
+                behavior: "smooth",
+            });
+        }
+        function handleHoldToNextChapter() {
+            $("button.nav-next.nav-btn").click();
+            console.log(" Prev chapter");
+        }
+        function handleHoldToPrevChapter() {
+            $("button.nav-prev.nav-btn").click();
+            console.log(" Prev chapter");
+        }
+        let zoomTruyen = 1;
+        function handleDblClick() {
+            let imagesTruyen = $$(selectorImagesTruyen);
+            if (zoomTruyen == 1) {
+                zoomTruyen = 1.5;
+                imagesTruyen.forEach((image) => {
+                    image.style.width = 150 + "%";
+                    //image.style.left = "-25%";
+                    console.log("Zoom 1.5", image.style.width);
+                });
+            } else {
+                zoomTruyen = 1;
+                imagesTruyen.forEach((image) => {
+                    image.style.width = 100 + "%";
+                    image.style.left = "0%";
+                    console.log("Zoom 1.0", image.style.width);
+                });
+            }
+        }
+        function handleTriClick() {
+            let imagesTruyen = $$(selectorImagesTruyen);
+            if (zoomTruyen == 1) {
+                zoomTruyen = 0.5;
+                imagesTruyen.forEach((image) => {
+                    image.style.width = 50 + "%";
+                    image.style.left = "25%";
+                    console.log("Zoom 0.5", image.style.width);
+                });
+            } else {
+                zoomTruyen = 1;
+                imagesTruyen.forEach((image) => {
+                    image.style.width = 100 + "%";
+                    image.style.left = "0%";
+                    console.log("Zoom 1.0", image.style.width);
+                });
+            }
+        }
+        Enhance_Scroll(
+            left,
+            handleClick_scrollDown,
+            () => {},
+            handleHoldToPrevChapter,
+            handleDblClick,
+            handleTriClick
+        );
+        Enhance_Scroll(
+            right,
+            handleClick_scrollDown,
+            () => {},
+            handleHoldToNextChapter,
+            handleDblClick,
+            handleTriClick
+        );
+        Enhance_Scroll(
+            center,
+            handleClick_scrollUp,
+            () => {},
+            () => {},
+            handleDblClick,
+            handleTriClick
+        );
+        Enhance_Scroll(
+            center0,
+            chapterNavigationTabVisible,
+            toggleFullScreen,
+            () => {},
+            handleDblClick,
+            handleTriClick
+        );
     }
     // ==================================
     // Overlay update
