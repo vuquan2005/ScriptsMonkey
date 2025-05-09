@@ -6,9 +6,9 @@
 
 | 🏷️ Tên Script                | 🔍 Mô tả                                       | 📝 Chi tiết                                   | ⚙️ Cài đặt                                                |
 | ---------------------------- | ---------------------------------------------- | --------------------------------------------- | --------------------------------------------------------- |
-| `EOP_Helper.user.js`         | Hỗ trợ nâng cao khi sử dụng trang web EOP      | [📖 Chi tiết](./Scripts/EOP_Helper.user.js.md)         | [📥 Install](Scripts/EOP_Helper.user.js?raw=true)         |
-| `TruyenTranhEnhance.user.js` | Tối ưu trải nghiệm đọc truyện tranh trực tuyến | [📖 Chi tiết](./Scripts/TruyenTranhEnhance.user.js.md) | [📥 Install](Scripts/TruyenTranhEnhance.user.js?raw=true) |
-| `svHaUI_Helper.user.js`      | Công cụ hỗ trợ cho sinh viên HaUI              | [📖 Chi tiết](./Scripts/svHaUI_Helper.user.js.md)      | [📥 Install](Scripts/svHaUI_Helper.user.js?raw=true)      |
+| `EOP_Helper.user.js`         | Hỗ trợ nâng cao khi sử dụng trang web EOP      | [📖 Chi tiết](./Docs/EOP_Helper.user.js.md)         | [📥 Install](Scripts/EOP_Helper.user.js?raw=true)         |
+| `TruyenTranhEnhance.user.js` | Tối ưu trải nghiệm đọc truyện tranh trực tuyến | [📖 Chi tiết](./Docs/TruyenTranhEnhance.user.js.md) | [📥 Install](Scripts/TruyenTranhEnhance.user.js?raw=true) |
+| `svHaUI_Helper.user.js`      | Công cụ hỗ trợ cho sinh viên HaUI              | [📖 Chi tiết](./Docs/svHaUI_Helper.user.js.md)      | [📥 Install](Scripts/svHaUI_Helper.user.js?raw=true)      |
 
 ## 🚀 Cài đặt Userscript
 
