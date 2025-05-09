@@ -2,7 +2,7 @@
 // @name         GocTruyenTranhEnhance
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
 // @version      2.11.0
-// @description  Enhance your Manga reading experience
+// @description  Tối ưu trải nghiệm đọc truyện tranh trực tuyến
 // @author       QuanVu
 // @include      /https:\/\/goctruyentranhvui\d+\.com\/truyen\/.*/
 // @updateURL    https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/TruyenTranhEnhance.user.js

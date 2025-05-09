@@ -2,7 +2,7 @@
 // @name         EOP Helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
 // @version      2.2.2
-// @description  A useful tool to use on the eop.edu.vn
+// @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
 // @updateURL    https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/EOP_Helper.user.js

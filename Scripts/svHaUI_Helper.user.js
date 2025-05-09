@@ -2,7 +2,7 @@
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
 // @version      2.3
-// @description  Do some things on sv.haui.edu.vn
+// @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
 // @updateURL    https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
