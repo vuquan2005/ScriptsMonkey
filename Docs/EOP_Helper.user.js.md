@@ -18,5 +18,12 @@
     -   Tô màu cho ô số tiết nghỉ <a href="/assets/images/EOP_Helper.user.js/Buoi_nghi_it.png" style="color:green">0</a> -> <a href="/assets/images/EOP_Helper.user.js/Buoi_nghi_nhieu.png" style="color:red">30</a>.
     -   Tính điểm thi cần thiết để đạt điểm mong muốn [🖼️](/assets/images/EOP_Helper.user.js/Buoi_nghi_it.png).
 -   Hiển thị các task trong Unit:
-    -   Đi đến task chưa làm [🖼️](assets/images/EOP_Helper.user.js/Some_task_dont_done.jpeg).
-    -   Hiển thị toàn bộ các task có trong unit nếu đã hoàn thành toàn bộ [🖼️](/assets/images/EOP_Helper.user.js/All_task_done.jpeg).
+    -   Đi đến task chưa làm [🖼️](/assets/images/EOP_Helper.user.js/Some_task_dont_done.png).
+    -   Hiển thị toàn bộ các task có trong unit nếu đã hoàn thành toàn bộ [🖼️](/assets/images/EOP_Helper.user.js/All_task_done.png).
+
+## 🖼️ **Hình ảnh minh hoạ**
+![⚠️](/assets/images/EOP_Helper.user.js/Buoi_nghi_it.png)
+![⚠️](/assets/images/EOP_Helper.user.js/Buoi_nghi_nhieu.png)
+![⚠️](/assets/images/EOP_Helper.user.js/Some_task_dont_done.png)
+![⚠️](/assets/images/EOP_Helper.user.js/All_task_done.png)
+
