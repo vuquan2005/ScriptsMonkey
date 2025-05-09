@@ -6,9 +6,9 @@
 
 | 🏷️ Tên Script                | 🔍 Mô tả                                       | 📝 Chi tiết                                   | ⚙️ Cài đặt                                                |
 | ---------------------------- | ---------------------------------------------- | --------------------------------------------- | --------------------------------------------------------- |
-| `EOP_Helper.user.js`         | Hỗ trợ nâng cao khi sử dụng trang web EOP      | [ℹ️](./Scripts/EOP_Helper.user.js.md)         | [⬇️ Install](Scripts/EOP_Helper.user.js?raw=true)         |
-| `TruyenTranhEnhance.user.js` | Tối ưu trải nghiệm đọc truyện tranh trực tuyến | [ℹ️](./Scripts/TruyenTranhEnhance.user.js.md) | [⬇️ Install](Scripts/TruyenTranhEnhance.user.js?raw=true) |
-| `svHaUI_Helper.user.js`      | Công cụ hỗ trợ cho sinh viên HaUI              | [ℹ️](./Scripts/svHaUI_Helper.user.js.md)      | [⬇️ Install](Scripts/svHaUI_Helper.user.js?raw=true)      |
+| `EOP_Helper.user.js`         | Hỗ trợ nâng cao khi sử dụng trang web EOP      | [📖 Chi tiết](./Scripts/EOP_Helper.user.js.md)         | [📥 Install](Scripts/EOP_Helper.user.js?raw=true)         |
+| `TruyenTranhEnhance.user.js` | Tối ưu trải nghiệm đọc truyện tranh trực tuyến | [📖 Chi tiết](./Scripts/TruyenTranhEnhance.user.js.md) | [📥 Install](Scripts/TruyenTranhEnhance.user.js?raw=true) |
+| `svHaUI_Helper.user.js`      | Công cụ hỗ trợ cho sinh viên HaUI              | [📖 Chi tiết](./Scripts/svHaUI_Helper.user.js.md)      | [📥 Install](Scripts/svHaUI_Helper.user.js?raw=true)      |
 
 ## 🚀 Cài đặt Userscript
 
@@ -16,17 +16,17 @@
 
 ### Bước 1: Cài đặt Tampermonkey
 
-1. Truy cập [Tampermonkey Official](https://www.tampermonkey.net/).
+1. Truy cập [Tampermonkey](https://www.tampermonkey.net/).
 2. Chọn trình duyệt bạn đang sử dụng và làm theo hướng dẫn cài đặt.
 
 ### Bước 2: Thêm Userscript từ ScriptsMonkey
 
 Có **3 cách** để cài đặt Userscript:
 
-#### ⬇️ **Cách 1: Cài đặt nhanh từ GitHub**
+#### 📥 **Cách 1: Cài đặt nhanh từ GitHub**
 
 1. Truy cập [Danh sách Userscript](#-Danh-sách-Userscript).
-2. Nhấn vào [⬇️ Install]() của script bạn muốn.
+2. Nhấn vào [📥 Install]() của script bạn muốn.
 3. Tampermonkey sẽ tự động nhận diện và yêu cầu xác nhận cài đặt.
 
 #### 🔗 **Cách 2: Cài đặt thông qua liên kết Raw**
@@ -49,7 +49,7 @@ Có **3 cách** để cài đặt Userscript:
 Bạn có thể đóng góp bằng cách:
 
 -   Gửi Pull Request với script mới hoặc nâng cấp các script hiện tại
--   Mở Issue để báo lỗi hoặc đề xuất ý tưởng
+-   Mở [Issue](issues) để báo lỗi hoặc đề xuất ý tưởng
 
 ## 📄 Giấy phép
 
