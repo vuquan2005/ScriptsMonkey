@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.2
+// @version      2.3
 // @description  Do some things on sv.haui.edu.vn
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -12,11 +12,19 @@
 
 (function () {
     "use strict";
+    // =====================================================================================
     // Change header
-    setTimeout(() => {
-        const newTitle = document.querySelector("div.panel-heading").textContent;
+    function changeHeader() {
+        if (!document.querySelector("div.panel-heading")) return;
+        let newTitle = document.querySelector("div.panel-heading").textContent;
+        console.log("Last title: ", newTitle);
+        newTitle = newTitle.replace("\n", "");
+        newTitle = newTitle.replace("\t", "");
+        newTitle = newTitle.replace("TRƯỜNG ĐẠI HỌC CÔNG NGHIỆP HÀ NỘI", "");
+        newTitle = newTitle.replace("Đại học công nghiệp Hà Nội", "");
+        newTitle = newTitle.replace("CHI TIẾT HỌC PHẦN CDIO: ", "");
         document.title = newTitle;
-    }, 700);
+    }
     // add Học kết hợp to sidebar
     const tabToAddElement = document.querySelector("ul.sidebar-elements > li:nth-child(2)");
     if (tabToAddElement) {
@@ -30,4 +38,9 @@
         `;
         tabToAddElement.insertAdjacentHTML("afterend", studyTabNext);
     }
+    // ======================================================================================
+    changeHeader();
+    setInterval(() => {
+        changeHeader();
+    }, 10000);
 })();
