@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      1.1
+// @version      2.0.0
 // @description  A useful tool to use on the eop.edu.vn
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -11,30 +11,116 @@
 // @grant        GM_getValue
 // ==/UserScript==
 
-(function() {
-    'use strict';
-    //* Bỏ chặn một số thứ *//
-    const events = ['copy', 'cut', 'paste', 'contextmenu', 'mousedown', 'mouseup', 'keydown', 'keypress', 'keyup'];
-    events.forEach(evt => {
-        window.addEventListener(evt, e => {
-            e.stopPropagation();
-        }, true);
-    });
-    //* Auto viết hoa captcha *//
+(function () {
+    "use strict";
+    const $ = (selector, scope = document) => scope.querySelector(selector);
+    const $$ = (selector, scope = document) => scope.querySelectorAll(selector);
     const currentURL = window.location.href;
-    // nếu web hiện tại có dạng https://eop.edu.vn/study/course/
-    if (currentURL.includes('/study/course/')) {
-        const captchaInput = document.querySelector("div.dgcaptcha > input#txtcaptcha");
+    // =====================================================================================
+    // Bỏ chặn một số thứ
+    function BoChan() {
+        const events = [
+            "copy",
+            "cut",
+            "paste",
+            "contextmenu",
+            "mousedown",
+            "mouseup",
+            "keydown",
+            "keypress",
+            "keyup",
+        ];
+        events.forEach((evt) => {
+            window.addEventListener(
+                evt,
+                (e) => {
+                    e.stopPropagation();
+                },
+                true
+            );
+        });
+    }
+    // =====================================================================================
+    // Auto viết hoa captcha
+    function autoUpperCaseCaptcha() {
+        const captchaInput = $("div.dgcaptcha > input#txtcaptcha");
         if (captchaInput) {
             // Dùng event input để tự động chuyển đổi chữ thường thành chữ hoa liên tục
-            captchaInput.addEventListener('input', function() {
+            captchaInput.addEventListener("input", function () {
                 this.value = this.value.toUpperCase();
             });
             // Tự động click vào nút xem kết quả học tập khi nhấn enter hoặc ngừng nhập,...
-            captchaInput.addEventListener('change', function() {
-                document.querySelector('button.btn.btn-info[title="Xem kết quả học tập"]').click();
+            captchaInput.addEventListener("change", function () {
+                $('button.btn.btn-info[title="Xem kết quả học tập"]').click();
             });
         }
     }
+    // =====================================================================================
+    // Hiển thị toàn bộ task trong unit hoặc đến task chưa hoàn thành nếu có
+    function showTasks() {
+        let areTasksFinished = true;
+        const taskElements = $$("a.dpop.allow");
+        taskElements.forEach((taskElement) => {
+            if (!taskElement.classList.contains("dgtaskdone")) {
+                areTasksFinished = false;
+            }
+        });
+        const vocabPanel = $("div#tpvocabulary");
+        const grammarPanel = $("div#tpgrammar");
+        const listeningPanel = $("div#tplistening");
+        const readingPanel = $("div#tpreading");
+        const writingPanel = $("div#tpwriting");
+        const speakingPanel = $("div#tpspeaking");
+        const panels = [
+            vocabPanel,
+            grammarPanel,
+            listeningPanel,
+            readingPanel,
+            writingPanel,
+            speakingPanel,
+        ];
+        if (!areTasksFinished) {
+            /* Nếu có task chưa done */ // Tìm task chưa hoàn thành đầu tiên
+            const firstUnfinishedTask = Array.from(taskElements).find((taskElement) => {
+                return !taskElement.classList.contains("dgtaskdone");
+            });
+            // Hook phần tử mẹ của firstUnfinishedTask
+            const parentElement = firstUnfinishedTask.closest("div.tab-pane");
+            // Ẩn toàn bộ task
+            panels.forEach((panel) => {
+                panel.classList.remove("active");
+            });
+            // Hiện task chưa hoàn thành đầu tiên
+            parentElement.classList.add("active");
+        } /* Nếu tất cả task đã done */ else {
+            const panelNames = [
+                "Vocabulary",
+                "Grammar",
+                "Listening",
+                "Reading",
+                "Writing",
+                "Speaking",
+            ];
+            for (let i = 0; i < panels.length && i < panelNames.length; i++) {
+                const insertElement = `<a class="dpop" style="color:rgb(32, 161, 32);"><b>${panelNames[i]}</b></br>========================================================================================================================================</a>`;
+                panels[i].insertAdjacentHTML("afterbegin", insertElement);
+                if (!panels[i].classList.contains("active")) {
+                    panels[i].classList.add("active");
+                }
+            }
+        }
+    }
+    // =====================================================================================
+    setTimeout(() => {
+        BoChan();
+        if (currentURL.includes("/study/unit/")) {
+            showTasks();
+            console.log("EOP Helper: showTasks()");
+        }
+        if (currentURL.includes("/study/course/")) {
+            autoUpperCaseCaptcha();
+            console.log("EOP Helper: autoUpperCaseCaptcha()");
+        }
+    }, 500);
     //
 })();
