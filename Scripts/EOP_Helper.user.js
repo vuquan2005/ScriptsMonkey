@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.2.1
+// @version      2.2.2
 // @description  A useful tool to use on the eop.edu.vn
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -51,8 +51,17 @@
                 this.value = this.value.toUpperCase();
             });
             // Tự động click vào nút xem kết quả học tập khi nhấn enter hoặc ngừng nhập,...
+            const btnCheck = $("button.btn.btn-info[title='Xem kết quả học tập']");
             captchaInput.addEventListener("change", function () {
-                $('button.btn.btn-info[title="Xem kết quả học tập"]').click();
+                btnCheck.click();
+            });
+            btnCheck.addEventListener("click", function () {
+                setTimeout(() => {
+                    console.log("EOP Helper: highlightAbsence()");
+                    highlightAbsence();
+                    console.log("EOP Helper: calculateScore()");
+                    calculateScore();
+                }, 500);
             });
         }
     }
@@ -158,13 +167,5 @@
             autoUpperCaseCaptcha();
         }
     }, 500);
-    $('button.btn.btn-info[title="Xem kết quả học tập"]').addEventListener("click", function () {
-        setTimeout(() => {
-            console.log("EOP Helper: highlightAbsence()");
-            highlightAbsence();
-            console.log("EOP Helper: calculateScore()");
-            calculateScore();
-        }, 500);
-    });
     //
 })();
