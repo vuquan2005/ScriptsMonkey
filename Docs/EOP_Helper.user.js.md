@@ -15,15 +15,14 @@
 -   Captcha:
     -   Tự động viết hoa khi điền captcha. 
     -   Tự động nhấn nút sau khi nhập xong và nhấn phím `Enter` hoặc nhấn chuột ra ngoài.
-    -   Tô màu cho ô số tiết nghỉ <span style="color:green">0</span> -> <span style="color:red">30</span>.
+    -   Tô màu cho ô số tiết nghỉ ![⚠️](/assets/images/EOP_Helper.user.js/Buoi_nghi_it.png "Số tiết nghỉ ít") --> ![⚠️](/assets/images/EOP_Helper.user.js/Buoi_nghi_nhieu.png "Số tiết nghỉ nhiều").
     -   Tính điểm thi cần thiết để đạt điểm mong muốn.
 -   Hiển thị các task trong Unit:
     -   Đi đến task chưa làm.
     -   Hiển thị toàn bộ các task có trong unit nếu đã hoàn thành toàn bộ.
 
 ## 🖼️ **Hình ảnh minh hoạ**
-![⚠️](/assets/images/EOP_Helper.user.js/Buoi_nghi_it.png "Số tiết nghỉ ít")
-![⚠️](/assets/images/EOP_Helper.user.js/Buoi_nghi_nhieu.png "Số tiết nghỉ nhiều")
+![⚠️](/assets/images/EOP_Helper.user.js/Diem.png "Điểm")
 ![⚠️](/assets/images/EOP_Helper.user.js/Some_task_dont_done.png "Có task chưa hoàn thành")
 ![⚠️](/assets/images/EOP_Helper.user.js/All_task_done.png "Đã hoàn thành unit")
 
