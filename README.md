@@ -1,18 +1,18 @@
-# 🐒 ScriptsMonkey – Bộ sưu tập Userscript tiện ích
+# 🐒 ScriptsMonkey
 
-**ScriptsMonkey** là tập hợp các userscript (.user.js) giúp cải thiện trải nghiệm người dùng trên các trang web phổ biến. Bạn có thể cài đặt và sử dụng trực tiếp thông qua trình quản lý như Tampermonkey hoặc Violentmonkey.
+**ScriptsMonkey** là tập hợp các userscript (.user.js) giúp cải thiện trải nghiệm trên một số trang web. Bạn có thể cài đặt và sử dụng trực tiếp thông qua trình quản lý như Tampermonkey hoặc Violentmonkey.
 
 ## 📂 Danh sách Userscript
 
 | Tên Script                   | Mô tả ngắn                                     | Chi tiết                                        | Cài đặt                                         |
 | ---------------------------- | ---------------------------------------------- | ----------------------------------------------- | ----------------------------------------------- |
-| `EOP_Helper.user.js`         | Hỗ trợ nâng cao khi sử dụng trang web EOP      | [ℹ️](./Scripts/EOP_Helper.user.js.md)         | [Cài đặt](./Scripts/EOP_Helper.user.js)         |
-| `TruyenTranhEnhance.user.js` | Tối ưu trải nghiệm đọc truyện tranh trực tuyến | [ℹ️](./Scripts/TruyenTranhEnhance.user.js.md) | [Cài đặt](./Scripts/TruyenTranhEnhance.user.js) |
-| `svHaUI_Helper.user.js`      | Công cụ hỗ trợ cho sinh viên HaUI              | [ℹ️](./Scripts/svHaUI_Helper.user.js.md)      | [Cài đặt](./Scripts/svHaUI_Helper.user.js)      |
+| `EOP_Helper.user.js`         | Hỗ trợ nâng cao khi sử dụng trang web EOP      | [ℹ️](./Scripts/EOP_Helper.user.js.md)         | [Cài đặt](.raw/main/Scripts/EOP_Helper.user.js)         |
+| `TruyenTranhEnhance.user.js` | Tối ưu trải nghiệm đọc truyện tranh trực tuyến | [ℹ️](./Scripts/TruyenTranhEnhance.user.js.md) | [Cài đặt](.raw/main/Scripts/TruyenTranhEnhance.user.js) |
+| `svHaUI_Helper.user.js`      | Công cụ hỗ trợ cho sinh viên HaUI              | [ℹ️](./Scripts/svHaUI_Helper.user.js.md)      | [Cài đặt](.raw/main/Scripts/svHaUI_Helper.user.js)      |
 
-## 🚀 Cài đặt Userscript vào Tampermonkey
+## 🚀 Cài đặt Userscript
 
-Để sử dụng các Userscript từ **ScriptsMonkey**, bạn cần cài đặt tiện ích [Tampermonkey](https://www.tampermonkey.net/) – trình quản lý Userscript phổ biến trên nhiều trình duyệt như Chrome, Firefox, Edge và Opera.
+Để sử dụng các Userscript từ **ScriptsMonkey**, bạn cần cài đặt tiện ích [Tampermonkey](https://www.tampermonkey.net/) hoặc một số trình quản lý user scripts khác.
 
 ### 🔹 Bước 1: Cài đặt Tampermonkey
 
