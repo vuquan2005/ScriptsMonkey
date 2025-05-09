@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         GocTruyenTranhEnhance
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.11.0
+// @version      2.11.1
 // @description  Tối ưu trải nghiệm đọc truyện tranh trực tuyến
 // @author       QuanVu
 // @include      /https:\/\/goctruyentranhvui\d+\.com\/truyen\/.*/
@@ -56,7 +56,7 @@
             pointDownTimer = new Date().getTime();
             holdTimer = setTimeout(() => {
                 if (!moved) {
-                    holdHandler();
+                    //holdHandler();
                     console.log(element.className, "Hold");
                     isHold = true;
                     clickCount = 0;
