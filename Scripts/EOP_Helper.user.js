@@ -45,6 +45,7 @@
     function autoUpperCaseCaptcha() {
         const captchaInput = $("div.dgcaptcha > input#txtcaptcha");
         if (captchaInput) {
+            captchaInput.setAttribute("lang", "en");
             // Dùng event input để tự động chuyển đổi chữ thường thành chữ hoa liên tục
             captchaInput.addEventListener("input", function () {
                 this.value = this.value.toUpperCase();
@@ -54,6 +55,19 @@
                 $('button.btn.btn-info[title="Xem kết quả học tập"]').click();
             });
         }
+    }
+    // =====================================================================================
+    // Tô màu số tiết nghỉ
+    function highlightAbsence() {
+        const absenceElements = $("div.diemht > table > tbody > tr > td:nth-child(1)");
+        const absenceCount = Number(absenceElements.innerText.trim());
+        console.log("Số tiết nghỉ", absenceCount);
+        const ratio = (absenceCount - 0) / (30 - 0);
+        let r = Math.floor(255 * ratio);
+        let g = Math.floor(255 * (1 - ratio));
+        let b = 0;
+        let rgb = `rgb(${r}, ${g}, ${b})`;
+        absenceElements.style.backgroundColor = rgb;
     }
     // =====================================================================================
     // Hiển thị toàn bộ task trong unit hoặc đến task chưa hoàn thành nếu có
@@ -114,13 +128,19 @@
     setTimeout(() => {
         BoChan();
         if (currentURL.includes("/study/unit/")) {
-            showTasks();
             console.log("EOP Helper: showTasks()");
+            showTasks();
         }
         if (currentURL.includes("/study/course/")) {
-            autoUpperCaseCaptcha();
             console.log("EOP Helper: autoUpperCaseCaptcha()");
+            autoUpperCaseCaptcha();
         }
     }, 500);
+    $('button.btn.btn-info[title="Xem kết quả học tập"]').addEventListener("click", function () {
+        setTimeout(() => {
+            console.log("EOP Helper: highlightAbsence()");
+            highlightAbsence();
+        }, 500);
+    });
     //
 })();
