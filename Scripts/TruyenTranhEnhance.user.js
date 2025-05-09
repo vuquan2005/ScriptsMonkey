@@ -276,7 +276,7 @@
     }
     // ==================================
     // Overlay update
-    function UpdateOverlay() {
+    function UpdateOverlayWhileScroll() {
         // Selector elements
         const overlayCenter0 = $("div.center-cell");
         const chapterNavigationTab = $("div.top-move-pannel");
