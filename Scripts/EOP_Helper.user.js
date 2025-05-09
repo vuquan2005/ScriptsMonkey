@@ -81,13 +81,13 @@
         const scoreElement = document.createElement("p");
         // 4, 4.7, 5.5, 6.2, 7, 7.7, 8.5
         scoreElement.innerHTML = `Điểm tổng chưa tính điểm thi: ${tolalScore.toFixed(1)}<br>
-        Điểm thi cần để đạt D : ${((4 - tolalScore) / 0.6).toFixed(1)}<br>
-        Điểm thi cần để đạt D+: ${((4.7 - tolalScore) / 0.6).toFixed(1)}<br>
-        Điểm thi cần để đạt C : ${((5.5 - tolalScore) / 0.6).toFixed(1)}<br>
-        Điểm thi cần để đạt C+: ${((6.2 - tolalScore) / 0.6).toFixed(1)}<br>
-        Điểm thi cần để đạt B : ${((7 - tolalScore) / 0.6).toFixed(1)}<br>
-        Điểm thi cần để đạt B+: ${((7.7 - tolalScore) / 0.6).toFixed(1)}<br>
-        Điểm thi cần để đạt A : ${((8.5 - tolalScore) / 0.6).toFixed(1)}<br>
+        Điểm thi cần để đạt D&nbsp;&nbsp;: ${((4 - tolalScore) / 0.6).toFixed(1)} > ${Math.ceil(((4 - tolalScore) / 0.6).toFixed(1) * 2) / 2}<br>
+        Điểm thi cần để đạt D+: ${((4.7 - tolalScore) / 0.6).toFixed(1)} > ${Math.ceil(((4.7 - tolalScore) / 0.6).toFixed(1) * 2) / 2}<br>
+        Điểm thi cần để đạt C&nbsp;&nbsp;: ${((5.5 - tolalScore) / 0.6).toFixed(1)} > ${Math.ceil(((5.5 - tolalScore) / 0.6).toFixed(1) * 2) / 2}<br>
+        Điểm thi cần để đạt C+: ${((6.2 - tolalScore) / 0.6).toFixed(1)} > ${Math.ceil(((6.2 - tolalScore) / 0.6).toFixed(1) * 2) / 2}<br>
+        Điểm thi cần để đạt B&nbsp;&nbsp;: ${((7 - tolalScore) / 0.6).toFixed(1)} > ${Math.ceil(((7 - tolalScore) / 0.6).toFixed(1) * 2) / 2}<br>
+        Điểm thi cần để đạt B+: ${((7.7 - tolalScore) / 0.6).toFixed(1)} > ${Math.ceil(((7.7 - tolalScore) / 0.6).toFixed(1) * 2) / 2}<br>
+        Điểm thi cần để đạt A&nbsp;&nbsp;: ${((8.5 - tolalScore) / 0.6).toFixed(1)} > ${Math.ceil(((8.5 - tolalScore) / 0.6).toFixed(1) * 2) / 2}<br>
         `;
         totalScoreElement.appendChild(scoreElement);
     }
