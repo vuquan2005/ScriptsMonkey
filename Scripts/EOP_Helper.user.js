@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.1.0
+// @version      2.2.0
 // @description  A useful tool to use on the eop.edu.vn
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -68,6 +68,28 @@
         let b = 0;
         let rgb = `rgb(${r}, ${g}, ${b})`;
         absenceElements.style.backgroundColor = rgb;
+    }
+    // =====================================================================================
+    // Tính điểm
+    function calculateScore() {
+        const TX1 = Number($("div.diemht > table > tbody > tr > td:nth-child(4)").innerText.trim());
+        const TX2 = Number($("div.diemht > table > tbody > tr > td:nth-child(5)").innerText.trim());
+        const GK = Number($("div.diemht > table > tbody > tr > td:nth-child(7)").innerText.trim());
+        let tolalScore = TX1*0.1 + TX2*0.1 + GK*0.2;
+        const totalScoreElement = $("div.diemht");
+        // Tạo một phần tử mới để hiển thị điểm
+        const scoreElement = document.createElement("p");
+        // 4, 4.7, 5.5, 6.2, 7, 7.7, 8.5
+        scoreElement.innerHTML = `Điểm tổng chưa tính điểm thi: ${tolalScore.toFixed(1)}<br>
+        Điểm thi cần để đạt D : ${((4 - tolalScore) / 0.6).toFixed(1)}<br>
+        Điểm thi cần để đạt D+: ${((4.7 - tolalScore) / 0.6).toFixed(1)}<br>
+        Điểm thi cần để đạt C : ${((5.5 - tolalScore) / 0.6).toFixed(1)}<br>
+        Điểm thi cần để đạt C+: ${((6.2 - tolalScore) / 0.6).toFixed(1)}<br>
+        Điểm thi cần để đạt B : ${((7 - tolalScore) / 0.6).toFixed(1)}<br>
+        Điểm thi cần để đạt B+: ${((7.7 - tolalScore) / 0.6).toFixed(1)}<br>
+        Điểm thi cần để đạt A : ${((8.5 - tolalScore) / 0.6).toFixed(1)}<br>
+        `;
+        totalScoreElement.appendChild(scoreElement);
     }
     // =====================================================================================
     // Hiển thị toàn bộ task trong unit hoặc đến task chưa hoàn thành nếu có
@@ -140,6 +162,8 @@
         setTimeout(() => {
             console.log("EOP Helper: highlightAbsence()");
             highlightAbsence();
+            console.log("EOP Helper: calculateScore()");
+            calculateScore();
         }, 500);
     });
     //
