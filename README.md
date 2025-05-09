@@ -1,46 +1,55 @@
-# ScriptsMonkey
+# 🐒 ScriptsMonkey – Bộ sưu tập Userscript tiện ích
 
-**ScriptsMonkey** là repo chưa các userscript được viết để cải thiện trải nghiệm duyệt web của bạn.
+**ScriptsMonkey** là tập hợp các userscript (.user.js) giúp cải thiện trải nghiệm người dùng trên các trang web phổ biến. Bạn có thể cài đặt và sử dụng trực tiếp thông qua trình quản lý như Tampermonkey hoặc Violentmonkey.
 
-## 🚀 Cài đặt userscript vào Tampermonkey
+## 📂 Danh sách Userscript
 
-Để sử dụng các script từ repo này, bạn cần cài đặt tiện ích [Tampermonkey](https://www.tampermonkey.net/) trên trình duyệt của mình (Chrome, Firefox, Edge,...).
+| Tên Script                   | Mô tả ngắn                                     | Chi tiết                                        | Cài đặt                                         |
+| ---------------------------- | ---------------------------------------------- | ----------------------------------------------- | ----------------------------------------------- |
+| `EOP_Helper.user.js`         | Hỗ trợ nâng cao khi sử dụng trang web EOP      | [ℹ️](./Scripts/EOP_Helper.user.js.md)         | [Cài đặt](./Scripts/EOP_Helper.user.js)         |
+| `TruyenTranhEnhance.user.js` | Tối ưu trải nghiệm đọc truyện tranh trực tuyến | [ℹ️](./Scripts/TruyenTranhEnhance.user.js.md) | [Cài đặt](./Scripts/TruyenTranhEnhance.user.js) |
+| `svHaUI_Helper.user.js`      | Công cụ hỗ trợ cho sinh viên HaUI              | [ℹ️](./Scripts/svHaUI_Helper.user.js.md)      | [Cài đặt](./Scripts/svHaUI_Helper.user.js)      |
 
-### Bước 1: Cài đặt Tampermonkey
+## 🚀 Cài đặt Userscript vào Tampermonkey
 
-- Truy cập [https://www.tampermonkey.net/](https://www.tampermonkey.net/)
-- Chọn trình duyệt bạn đang sử dụng và cài đặt tiện ích theo hướng dẫn.
+Để sử dụng các Userscript từ **ScriptsMonkey**, bạn cần cài đặt tiện ích [Tampermonkey](https://www.tampermonkey.net/) – trình quản lý Userscript phổ biến trên nhiều trình duyệt như Chrome, Firefox, Edge và Opera.
 
-### Bước 2: Thêm userscript
+### 🔹 Bước 1: Cài đặt Tampermonkey
 
-Có 2 cách để thêm userscript từ repo:
+1. Truy cập [Tampermonkey Official](https://www.tampermonkey.net/).
+2. Chọn trình duyệt bạn đang sử dụng và làm theo hướng dẫn cài đặt.
 
-#### 🔗 Cách 1: Cài đặt trực tiếp từ GitHub
+### 🔹 Bước 2: Thêm Userscript từ ScriptsMonkey
 
-1. Truy cập vào: [Scripts](https://github.com/vuquan2005/ScriptsMonkey/tree/main/Scripts)
-2. Vào thư mục scripts, chọn file <user-scripts> bạn muốn cài (file `.user.js`)
-3. Click vào nút **Raw** của file script
-4. Tampermonkey sẽ dẫn hướng bạn đến trang cài scripts, nếu không hãy thực hiện bước 5,6 hoặc cách 2.
-5. Trình duyệt sẽ dẫn hướng đến file raw của scripts, hãy copy đường dẫn đó
-6. Mở Tampermonkey -> các tiện ích -> Cài từ URL	-> dán link vào rồi ấn "Cài đặt"
+Có **3 cách** để cài đặt Userscript:
 
-#### 📥 Cách 2: Copy-paste thủ công
+#### 🔗 **Cách 1: Cài đặt nhanh từ GitHub**
 
-1. Mở Tampermonkey
-2. Chọn **Create a new script**
-3. Xoá toàn bộ nội dung mặc định
-4. Truy cập vào: [Scripts](https://github.com/vuquan2005/ScriptsMonkey/tree/main/Scripts)
-5. Copy toàn bộ nội dung file rồi dán vào Tampermonkey
-6. Lưu lại bằng cách nhấn **File → Save** hoặc `Ctrl + S`
+1. Truy cập [Danh sách Userscript](#-Danh-sách-Userscript).
+2. Nhấn vào liên kết "Cài đặt" của script bạn muốn.
+3. Tampermonkey sẽ tự động nhận diện và yêu cầu xác nhận cài đặt.
+
+#### 🔗 **Cách 2: Cài đặt thông qua liên kết Raw**
+
+1. Truy cập vào thư mục [Scripts](./Scripts).
+2. Chọn file `.user.js` bạn muốn cài.
+3. Nhấn nút **Raw** để mở file ở chế độ thô.
+4. Tampermonkey sẽ tự động hiển thị giao diện cài đặt, bạn chỉ cần nhấn **Install**.
+
+#### 📥 **Cách 3: Copy-Paste thủ công**
+
+1. Mở Tampermonkey → **Create a new script**.
+2. Xóa toàn bộ nội dung mặc định.
+3. Copy toàn bộ nội dung từ file `.user.js` trên GitHub.
+4. Dán vào trình chỉnh sửa của Tampermonkey.
+5. Lưu lại bằng cách nhấn **File → Save** hoặc `Ctrl + S`.
 
 ## 🛠 Đóng góp
 
 Bạn có thể đóng góp bằng cách:
 
-- Gửi Pull Request với script mới hoặc nâng cấp các script hiện tại
-- Mở Issue để báo lỗi hoặc đề xuất ý tưởng
-
----
+-   Gửi Pull Request với script mới hoặc nâng cấp các script hiện tại
+-   Mở Issue để báo lỗi hoặc đề xuất ý tưởng
 
 ## 📄 Giấy phép
 
