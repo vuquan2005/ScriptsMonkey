@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.2.0
+// @version      2.2.1
 // @description  A useful tool to use on the eop.edu.vn
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
