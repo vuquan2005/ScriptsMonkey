@@ -23,7 +23,7 @@
 
 Có **3 cách** để cài đặt Userscript:
 
-#### 📥 **Cách 1: Cài đặt nhanh từ GitHub**
+#### ⚡ **Cách 1: Cài đặt nhanh từ GitHub**
 
 1. Truy cập [Danh sách Userscript](#-Danh-sách-Userscript).
 2. Nhấn vào [📥 Install]() của script bạn muốn.
