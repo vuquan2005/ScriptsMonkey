@@ -46,7 +46,7 @@
         const delay = 250;
         const longPressDelay = 400;
         const holdDelay = 1500;
-        const moveThreshold = 10; // pixel - nếu di chuyển quá 10px thì coi như vuốt
+        const moveThreshold = 5; // pixel - nếu di chuyển quá 10px thì coi như vuốt
 
         element.onpointerdown = function (event) {
             isHold = false;
