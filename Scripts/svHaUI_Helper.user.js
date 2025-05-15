@@ -26,20 +26,94 @@
         document.title = newTitle;
     }
     // add Học kết hợp to sidebar
-    const tabToAddElement = document.querySelector("ul.sidebar-elements > li:nth-child(2)");
-    if (tabToAddElement) {
-        let studyTabNext = `
-            <li>
-                <a href="/sso/blearning">
-                    <i class="fa flaticon-science1 icon"></i>
-                    <span>Học kết hợp!</span>
-                </a>
-            </li>
-        `;
-        tabToAddElement.insertAdjacentHTML("afterend", studyTabNext);
+    function addStudyTab() {
+        const beLeftSidebar = document.querySelector("div.be-left-sidebar");
+        if (beLeftSidebar) {
+            let studyTabNext = `
+                <div class="be-content">
+                    <div class="main-content container-fluid">
+                        <form name="frmMain" id="frmMain" data-toggle="validator" role="form">
+                            <div class="panel panel-default panel-border-color panel-border-color-primary">
+                                <style>
+                                    #add-them-tab {
+                                        display: block;
+                                    }
+                                    #add-them-tab > p {
+                                        font-size: 20px;
+                                        margin: 10px;
+                                        padding: 10px;
+                                        color: #3d3d3d;
+                                        border-radius: 10px;
+                                        border: 1px solid #3d3d3d;
+                                        line-height: 2;
+                                    }
+                                    #add-them-tab > p > a {
+                                        color: #3d3d3d;
+                                    }
+                                    #add-them-tab > p > a:hover {
+                                        background-color: #d0f0db;
+                                        color: #000000;
+                                    }
+                                    #add-them-tab > p > a > i {
+                                        margin-right: 10px;
+                                        scale: 1.5;
+                                    }
+                                </style>
+                                <div id="add-them-tab">
+                                    <p>Một số chức năng chính</p>
+                                    <p>
+                                        <a href="/sso/blearning">
+                                            <i class="fa flaticon-science1 icon"></i>
+                                            <span>Học kết hợp</span>
+                                        </a>
+                                    </p>
+                                    <p>
+                                        <a href="/training/viewcourseindustry">
+                                            <i class="icon mdi mdi-book"></i>
+                                            <span>Khung chương trình</span>
+                                        </a>
+                                        <br />
+                                        <a href="/training/programmodulessemester">
+                                            <i class="icon mdi mdi-book"></i>
+                                            <span>Khung theo kỳ</span>
+                                        </a>
+                                    </p>
+                                    <p>
+                                        <a href="/register/dangkyhocphan">
+                                            <i class="icon mdi mdi-calendar-note"></i>
+                                            <span>ĐK HP dự kiến</span>
+                                        </a>
+                                        <br />
+                                        <a href="/register/">
+                                            <i class="fa flaticon-a10 icon"></i>
+                                            <span>Đăng ký học phần</span>
+                                        </a>
+                                    </p>
+                                    <p>
+                                        <a href="/student/result/studyresults">
+                                            <i class="fa flaticon-a10 icon"></i>
+                                            <span>Kết quả học tập</span>
+                                        </a>
+                                        <br />
+                                        <a href="/student/result/examresult">
+                                            <i class="fa flaticon-a10 icon"></i>
+                                            <span>Kết quả thi</span>
+                                        </a>
+                                    </p>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            `;
+            beLeftSidebar.insertAdjacentHTML("afterend", studyTabNext);
+        }
     }
     // ======================================================================================
     changeHeader();
+    if (window.location.href == "https://sv.haui.edu.vn/") {
+        addStudyTab();
+    }
     setInterval(() => {
         changeHeader();
     }, 10000);
