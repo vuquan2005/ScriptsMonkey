@@ -1,5 +1,7 @@
 # 🛠 EOP_Helper.user.js
 
+Xem hướng dẫn cài đặt [tại đây](/README.md#-cài-đặt-userscript).
+
 ## 🌐 **Trang web hỗ trợ**
 
 -   [eop.edu.vn](https://eop.edu.vn/)
