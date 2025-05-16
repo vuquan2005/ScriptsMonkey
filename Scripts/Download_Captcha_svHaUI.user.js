@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Download captcha svHaUI
 // @namespace    http://tampermonkey.net/
-// @version      1.0
+// @version      1.1
 // @description  Tự động tải captcha của svHaUI
 // @match        https://sv.haui.edu.vn/*
 // @grant        none
@@ -59,7 +59,7 @@
     function downloadCaptcha(labelCaptcha) {
         const tagaDownload = document.createElement("a");
         tagaDownload.href = canvas.toDataURL("image/jpeg");
-        tagaDownload.download = `${labelCaptcha}.jpg`;
+        tagaDownload.download = `(captcha svHaUI)${labelCaptcha}.jpg`;
         document.body.appendChild(tagaDownload);
         tagaDownload.click();
     }
