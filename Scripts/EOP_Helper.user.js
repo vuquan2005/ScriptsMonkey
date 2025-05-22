@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.2.2
+// @version      2.2.3
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -54,15 +54,25 @@
             const btnCheck = $("button.btn.btn-info[title='Xem kết quả học tập']");
             captchaInput.addEventListener("change", function () {
                 btnCheck.click();
+                const intervalCheckDiemht = setInterval(() => {
+                    if ($$("div.diemht").length > 0) {
+                        console.log("EOP Helper: highlightAbsence()");
+                        highlightAbsence();
+                        console.log("EOP Helper: calculateScore()");
+                        calculateScore();
+                        clearInterval(intervalCheckDiemht);
+                    }
+                }, 50);
             });
-            btnCheck.addEventListener("click", function () {
-                setTimeout(() => {
+            setInterval(() => {
+                if ($$("div.diemht").length > 0) {
                     console.log("EOP Helper: highlightAbsence()");
                     highlightAbsence();
                     console.log("EOP Helper: calculateScore()");
                     calculateScore();
-                }, 500);
-            });
+                    clearInterval(intervalCheckDiemht);
+                }
+            }, 2500);
         }
     }
     // =====================================================================================
@@ -84,19 +94,41 @@
         const TX1 = Number($("div.diemht > table > tbody > tr > td:nth-child(4)").innerText.trim());
         const TX2 = Number($("div.diemht > table > tbody > tr > td:nth-child(5)").innerText.trim());
         const GK = Number($("div.diemht > table > tbody > tr > td:nth-child(7)").innerText.trim());
-        let tolalScore = TX1*0.1 + TX2*0.1 + GK*0.2;
+        let tolalScore = TX1 * 0.1 + TX2 * 0.1 + GK * 0.2;
         const totalScoreElement = $("div.diemht");
+        // Xóa các phần tử trước đó
+        const existingScoreElements = totalScoreElement.querySelectorAll(".tinhDiem");
+        existingScoreElements.forEach((element) => {
+            element.remove();
+        });
         // Tạo một phần tử mới để hiển thị điểm
         const scoreElement = document.createElement("p");
+        scoreElement.className = "tinhDiem";
+        scoreElement.style.fontSize = "16px";
         // 4, 4.7, 5.5, 6.2, 7, 7.7, 8.5
         scoreElement.innerHTML = `Điểm tổng chưa tính điểm thi: ${tolalScore.toFixed(1)}<br>
-        Điểm thi cần để đạt D&nbsp;&nbsp;: ${((4 - tolalScore) / 0.6).toFixed(1)} > ${Math.ceil(((4 - tolalScore) / 0.6).toFixed(1) * 2) / 2}<br>
-        Điểm thi cần để đạt D+: ${((4.7 - tolalScore) / 0.6).toFixed(1)} > ${Math.ceil(((4.7 - tolalScore) / 0.6).toFixed(1) * 2) / 2}<br>
-        Điểm thi cần để đạt C&nbsp;&nbsp;: ${((5.5 - tolalScore) / 0.6).toFixed(1)} > ${Math.ceil(((5.5 - tolalScore) / 0.6).toFixed(1) * 2) / 2}<br>
-        Điểm thi cần để đạt C+: ${((6.2 - tolalScore) / 0.6).toFixed(1)} > ${Math.ceil(((6.2 - tolalScore) / 0.6).toFixed(1) * 2) / 2}<br>
-        Điểm thi cần để đạt B&nbsp;&nbsp;: ${((7 - tolalScore) / 0.6).toFixed(1)} > ${Math.ceil(((7 - tolalScore) / 0.6).toFixed(1) * 2) / 2}<br>
-        Điểm thi cần để đạt B+: ${((7.7 - tolalScore) / 0.6).toFixed(1)} > ${Math.ceil(((7.7 - tolalScore) / 0.6).toFixed(1) * 2) / 2}<br>
-        Điểm thi cần để đạt A&nbsp;&nbsp;: ${((8.5 - tolalScore) / 0.6).toFixed(1)} > ${Math.ceil(((8.5 - tolalScore) / 0.6).toFixed(1) * 2) / 2}<br>
+        Điểm thi cần để đạt:<br>
+        D&nbsp;&nbsp;: ${((4 - tolalScore) / 0.6).toFixed(1)} => ${
+            Math.ceil(((4 - tolalScore) / 0.6).toFixed(1) * 2) / 2
+        }<br>
+        D+: ${((4.7 - tolalScore) / 0.6).toFixed(1)} => ${
+            Math.ceil(((4.7 - tolalScore) / 0.6).toFixed(1) * 2) / 2
+        }<br>
+        C&nbsp;&nbsp;: ${((5.5 - tolalScore) / 0.6).toFixed(1)} => ${
+            Math.ceil(((5.5 - tolalScore) / 0.6).toFixed(1) * 2) / 2
+        }<br>
+        C+: ${((6.2 - tolalScore) / 0.6).toFixed(1)} => ${
+            Math.ceil(((6.2 - tolalScore) / 0.6).toFixed(1) * 2) / 2
+        }<br>
+        B&nbsp;&nbsp;: ${((7 - tolalScore) / 0.6).toFixed(1)} => ${
+            Math.ceil(((7 - tolalScore) / 0.6).toFixed(1) * 2) / 2
+        }<br>
+        B+: ${((7.7 - tolalScore) / 0.6).toFixed(1)} => ${
+            Math.ceil(((7.7 - tolalScore) / 0.6).toFixed(1) * 2) / 2
+        }<br>
+        A&nbsp;&nbsp;: ${((8.5 - tolalScore) / 0.6).toFixed(1)} => ${
+            Math.ceil(((8.5 - tolalScore) / 0.6).toFixed(1) * 2) / 2
+        }<br>
         `;
         totalScoreElement.appendChild(scoreElement);
     }
@@ -166,6 +198,6 @@
             console.log("EOP Helper: autoUpperCaseCaptcha()");
             autoUpperCaseCaptcha();
         }
-    }, 500);
+    }, 100);
     //
 })();
