@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.2.4
+// @version      2.2.5
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -72,15 +72,21 @@
             const btnCheck = $("button.btn.btn-info[title='Xem kết quả học tập']");
             captchaInput.addEventListener("change", function () {
                 btnCheck.click();
-                const intervalCheckDiemht0 = setInterval(() => {
-                    if ($("div.modal.fade.dgmodal.in")) {
-                        clearInterval(intervalCheckDiemht0);
-                        intervalCheckDiemht1.stop();
-                    } else if ($("div.diemht")) {
-                        intervalCheckDiemht1.start(2500, true);
-                        clearInterval(intervalCheckDiemht0);
-                    }
-                }, 50);
+                intervalCheckDiemht0.start(50);
+            });
+            // khi click vào nút xem kết quả học tập
+            btnCheck.addEventListener("click", function () {
+                intervalCheckDiemht0.start(200, false);
+            });
+
+            const intervalCheckDiemht0 = controlInterval(() => {
+                if ($("div.modal.fade.dgmodal.in")) {
+                    intervalCheckDiemht0.stop();
+                    intervalCheckDiemht1.stop();
+                } else if ($("div.diemht")) {
+                    intervalCheckDiemht1.start(2500, true);
+                    intervalCheckDiemht0.stop();
+                }
             });
             const intervalCheckDiemht1 = controlInterval(() => {
                 console.log("EOP Helper: highlightAbsence()");
@@ -111,10 +117,10 @@
         let tolalScore = TX1 * 0.1 + TX2 * 0.1 + GK * 0.2;
         const totalScoreElement = $("div.diemht");
         // Xóa các phần tử trước đó
-        const existingScoreElements = totalScoreElement.querySelectorAll(".tinhDiem");
-        existingScoreElements.forEach((element) => {
-            element.remove();
-        });
+        const existingScoreElements = $("p.tinhDiem");
+        if (existingScoreElements) {
+            existingScoreElements.remove();
+        }
         // Tạo một phần tử mới để hiển thị điểm
         const scoreElement = document.createElement("p");
         scoreElement.className = "tinhDiem";
