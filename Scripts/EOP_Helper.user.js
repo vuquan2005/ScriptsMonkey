@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.3.0
+// @version      2.4.0
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -224,6 +224,14 @@
             `);
     }
     // =====================================================================================
+    // Tắt tiếng khi làm buổi tối
+    function turnOffDoneSound() {
+        const doneSound = $("a#dsound");
+        if (doneSound && new Date().getHours() >= 22 && doneSound.classList.contains("dsoundon")) {
+            doneSound.click();
+        }
+    }
+    // =====================================================================================
     const waitWebLoad = setInterval(() => {
         if ($("div.panel-body")) {
             clearInterval(waitWebLoad);
@@ -236,6 +244,10 @@
             if (currentURL.includes("/study/course/")) {
                 console.log("EOP Helper: autoUpperCaseCaptcha()");
                 autoUpperCaseCaptcha();
+            }
+            if (currentURL.includes("/study/task/")) {
+                console.log("EOP Helper: turnOffDoneSound()");
+                turnOffDoneSound();
             }
         }
     }, 50);
