@@ -41,6 +41,25 @@
     let timeToLoad = 0;
     let mbody = null;
     let taskContent = null;
+    GM_addStyle(`
+        [translated_content]::after {
+            content: attr(translated_content);
+            position: fixed;
+            left: 5px;
+            top: 5px;
+            background-color: #ccc;
+            color: #000;
+            padding: 3px;
+            border-radius: 5px;
+            opacity: 0;
+            visibility: hidden;
+            z-index: 99;
+        }
+        [translated_content]:hover::after {
+            visibility: visible;
+            opacity: 0.9;
+        }
+    `);
     // ====================================================================================
     // Wait to web load
     const waitWebLoad = controlInterval(() => {
@@ -93,11 +112,7 @@
         }
         // Fill grammar word blank
         if (taskType[0] === "dquestion" && taskType[1] === "fill-grammar-word-blank") {
-            if ($("div#dtts1.djaudio.dtts")) {
-                doQuestionFillListening();
-            } else {
-                doQuestionFillGrammar();
-            }
+            doQuestionFillGrammar();
         }
     }
     // Send to LLM
@@ -116,6 +131,27 @@
         const data = await response.json();
         return data.choices[0].message.content;
     }
+    // Translate content by LLM
+    async function translateByLLM(content) {
+        const prompt = `Translate the following content to Vietnamese: "${content}" /no_think`;
+        let translatedContent = await sendToLLM(prompt) + "";
+        translatedContent = translatedContent.replace(`<think>\n\n</think>\n\n`, "");
+        translatedContent = translatedContent.replaceAll(`\"`, "");
+        return translatedContent;
+    }
+    // Select all leaf node in taskContent
+    function selectAllLeafNode(selector) {
+        const allElements = $$("p", selector);
+        return allElements;
+    }
+    // Translate all leaf node in taskContent
+    async function translateAllLeafNode(selector) {
+        const leafElements = selectAllLeafNode(selector);
+        for (const leafElement of leafElements) {
+            let translatedContent = await translateByLLM(leafElement.textContent);
+            leafElement.setAttribute("translated_content", translatedContent);
+        }
+    }
     // ====================================================================================
     // Do task
     function doVocabularyDefault() {
@@ -126,6 +162,7 @@
     }
     function doContent() {
         console.log("Can't do content");
+        //translateAllLeafNode(taskContent);
     }
     function doUploadContent() {
         console.log("Can't do upload content");
