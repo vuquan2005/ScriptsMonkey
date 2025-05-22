@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.2.6
+// @version      2.3.0
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -9,6 +9,7 @@
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/EOP_Helper.user.js
 // @grant        GM_setValue
 // @grant        GM_getValue
+// @grant        GM_addStyle
 // ==/UserScript==
 
 (function () {
@@ -207,19 +208,35 @@
             }
         }
     }
+    function showTaskType() {
+        const taskElements = $$("a.dpop.allow");
+            for (let taskElement of taskElements) {
+                let taskType = $("b", taskElement).title;
+                taskType = taskType.replaceAll("/", " -> ");
+                taskType = taskType.replaceAll("-", " ");
+                $("em", taskElement).textContent = " --- " + taskType;
+            };
+            GM_addStyle(`
+                em {
+                    color:#dfdfdf;
+                    font-weight: italic;
+                }
+            `);
+    }
     // =====================================================================================
     const waitWebLoad = setInterval(() => {
         if ($("div.panel-body")) {
+            clearInterval(waitWebLoad);
             BoChan();
             if (currentURL.includes("/study/unit/")) {
                 console.log("EOP Helper: showTasks()");
                 showTasks();
+                showTaskType();
             }
             if (currentURL.includes("/study/course/")) {
                 console.log("EOP Helper: autoUpperCaseCaptcha()");
                 autoUpperCaseCaptcha();
             }
-            clearInterval(waitWebLoad);
         }
     }, 50);
     //
