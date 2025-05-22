@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.2.3
+// @version      2.2.4
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -16,6 +16,24 @@
     const $ = (selector, scope = document) => scope.querySelector(selector);
     const $$ = (selector, scope = document) => scope.querySelectorAll(selector);
     const currentURL = window.location.href;
+    function controlInterval(func, delayDefault = 1000) {
+        let intervalId = null;
+        return {
+            start: (delay = delayDefault, startImmediate = false) => {
+                if (intervalId) {
+                    clearInterval(intervalId);
+                }
+                intervalId = setInterval(func, delay);
+                if (startImmediate) {
+                    func();
+                }
+            },
+            stop: () => {
+                clearInterval(intervalId);
+                intervalId = null;
+            },
+        };
+    }
     // =====================================================================================
     // Bỏ chặn một số thứ
     function BoChan() {
@@ -54,25 +72,22 @@
             const btnCheck = $("button.btn.btn-info[title='Xem kết quả học tập']");
             captchaInput.addEventListener("change", function () {
                 btnCheck.click();
-                const intervalCheckDiemht = setInterval(() => {
-                    if ($$("div.diemht").length > 0) {
-                        console.log("EOP Helper: highlightAbsence()");
-                        highlightAbsence();
-                        console.log("EOP Helper: calculateScore()");
-                        calculateScore();
-                        clearInterval(intervalCheckDiemht);
+                const intervalCheckDiemht0 = setInterval(() => {
+                    if ($("div.modal.fade.dgmodal.in")) {
+                        clearInterval(intervalCheckDiemht0);
+                        intervalCheckDiemht1.stop();
+                    } else if ($("div.diemht")) {
+                        intervalCheckDiemht1.start(2500, true);
+                        clearInterval(intervalCheckDiemht0);
                     }
                 }, 50);
             });
-            setInterval(() => {
-                if ($$("div.diemht").length > 0) {
-                    console.log("EOP Helper: highlightAbsence()");
-                    highlightAbsence();
-                    console.log("EOP Helper: calculateScore()");
-                    calculateScore();
-                    clearInterval(intervalCheckDiemht);
-                }
-            }, 2500);
+            const intervalCheckDiemht1 = controlInterval(() => {
+                console.log("EOP Helper: highlightAbsence()");
+                highlightAbsence();
+                console.log("EOP Helper: calculateScore()");
+                calculateScore();
+            });
         }
     }
     // =====================================================================================
@@ -80,7 +95,6 @@
     function highlightAbsence() {
         const absenceElements = $("div.diemht > table > tbody > tr > td:nth-child(1)");
         const absenceCount = Number(absenceElements.innerText.trim());
-        console.log("Số tiết nghỉ", absenceCount);
         const ratio = (absenceCount - 0) / (30 - 0);
         let r = Math.floor(255 * ratio);
         let g = Math.floor(255 * (1 - ratio));
@@ -188,16 +202,19 @@
         }
     }
     // =====================================================================================
-    setTimeout(() => {
-        BoChan();
-        if (currentURL.includes("/study/unit/")) {
-            console.log("EOP Helper: showTasks()");
-            showTasks();
+    const waitWebLoad = setInterval(() => {
+        if ($("div.panel-body")) {
+            BoChan();
+            if (currentURL.includes("/study/unit/")) {
+                console.log("EOP Helper: showTasks()");
+                showTasks();
+            }
+            if (currentURL.includes("/study/course/")) {
+                console.log("EOP Helper: autoUpperCaseCaptcha()");
+                autoUpperCaseCaptcha();
+            }
+            clearInterval(waitWebLoad);
         }
-        if (currentURL.includes("/study/course/")) {
-            console.log("EOP Helper: autoUpperCaseCaptcha()");
-            autoUpperCaseCaptcha();
-        }
-    }, 100);
+    }, 50);
     //
 })();
