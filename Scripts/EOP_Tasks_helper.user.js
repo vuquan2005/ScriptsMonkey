@@ -66,14 +66,38 @@
     function handleTask() {
         let taskType = getTaskType();
         console.log("Task type: " + taskType[0] + " - " + taskType[1]);
+        // Vocabulary
         if (taskType[0] === "dvocabulary" && taskType[1] === "default") {
             doVocabularyDefault();
         }
+        // MCQ
         if (taskType[0] === "dmcq") {
             doMCQ();
         }
-        if (taskType[0] === "dquestion") {
-            doQuestion();
+        // Content
+        if (taskType[0] === "dcontent" && taskType[1] === "view-content") {
+            doContent();
+        }
+        // Upload content
+        if (taskType[0] === "dcontent" && taskType[1] === "upload-content") {
+            doUploadContent();
+        }
+        // Question
+        // Choose reading choose answer
+        if (taskType[0] === "dquestion" && taskType[1] === "choose-reading-choose-answer") {
+            doQuestionChooseReading();
+        }
+        // Choose listening choose answer
+        if (taskType[0] === "dquestion" && taskType[1] === "choose-listening-choose-answer") {
+            doQuestionChooseListening();
+        }
+        // Fill grammar word blank
+        if (taskType[0] === "dquestion" && taskType[1] === "fill-grammar-word-blank") {
+            if ($("div#dtts1.djaudio.dtts")) {
+                doQuestionFillListening();
+            } else {
+                doQuestionFillGrammar();
+            }
         }
     }
     // Send to LLM
@@ -100,8 +124,23 @@
     function doMCQ() {
         console.log("Can't do MCQ");
     }
-    function doQuestion() {
-        console.log("Can't do question");
+    function doContent() {
+        console.log("Can't do content");
+    }
+    function doUploadContent() {
+        console.log("Can't do upload content");
+    }
+    function doQuestionChooseReading() {
+        console.log("Can't do question choose reading");
+    }
+    function doQuestionChooseListening() {
+        console.log("Can't do question choose listening");
+    }
+    function doQuestionFillGrammar() {
+        console.log("Can't do question fill grammar");
+    }
+    function doQuestionFillListening() {
+        console.log("Can't do question fill listening");
     }
     // ====================================================================================
     // Run
@@ -111,6 +150,6 @@
     if (currentURL.includes("study/task/")) {
         waitWebLoad.start(25, false);
     }
-    if (currentURL.includes("study/unit/")) {        
+    if (currentURL.includes("study/unit/")) {
     }
 })();
