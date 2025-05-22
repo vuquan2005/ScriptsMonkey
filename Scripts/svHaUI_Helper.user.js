@@ -85,7 +85,7 @@
                                         </a>
                                         <br />
                                         <a href="/register/">
-                                            <i class="fa flaticon-a10 icon"></i>
+                                            <i class="fa flaticon-key105 icon"></i>
                                             <span>Đăng ký học phần</span>
                                         </a>
                                     </p>
