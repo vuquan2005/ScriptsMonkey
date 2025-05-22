@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.2.5
+// @version      2.2.6
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -72,7 +72,7 @@
             const btnCheck = $("button.btn.btn-info[title='Xem kết quả học tập']");
             captchaInput.addEventListener("change", function () {
                 btnCheck.click();
-                intervalCheckDiemht0.start(50);
+                intervalCheckDiemht0.start(50, false);
             });
             // khi click vào nút xem kết quả học tập
             btnCheck.addEventListener("click", function () {
