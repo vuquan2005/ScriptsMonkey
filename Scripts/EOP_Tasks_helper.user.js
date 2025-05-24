@@ -4,7 +4,7 @@
 // @version      0.0.1
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
-// @match        https://eop.edu.vn/study/*
+// @match        https://eop.edu.vn/study/task/*
 // @updateURL    https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/EOP_Tasks_helper.user.js
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/EOP_Tasks_helper.user.js
 // @grant        GM_addStyle
@@ -134,7 +134,7 @@
     // Translate content by LLM
     async function translateByLLM(content) {
         const prompt = `Translate the following content to Vietnamese: "${content}" /no_think`;
-        let translatedContent = await sendToLLM(prompt) + "";
+        let translatedContent = (await sendToLLM(prompt)) + "";
         translatedContent = translatedContent.replace(`<think>\n\n</think>\n\n`, "");
         translatedContent = translatedContent.replaceAll(`\"`, "");
         return translatedContent;
@@ -184,9 +184,5 @@
     function runTaskHelper() {
         handleTask();
     }
-    if (currentURL.includes("study/task/")) {
-        waitWebLoad.start(25, false);
-    }
-    if (currentURL.includes("study/unit/")) {
-    }
+    waitWebLoad.start(25, true);
 })();
