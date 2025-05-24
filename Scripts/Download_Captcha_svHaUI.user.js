@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         Download captcha svHaUI
-// @namespace    http://tampermonkey.net/
+// @namespace    https://github.com/vuquan2005/ScriptsMonkey
 // @version      1.1
 // @description  Tự động tải captcha của svHaUI
 // @match        https://sv.haui.edu.vn/*
@@ -65,7 +65,6 @@
     }
 
     setTimeout(() => {
-        console.log("setTimeout");
         // check web is login page or captcha page
         if (window.location.href.includes("https://sv.haui.edu.vn/AImages.aspx")) {
             captchaWeb();
