@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.4.1
+// @version      2.4.2
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -101,15 +101,19 @@
     // Tô màu số tiết nghỉ
     function highlightAbsence() {
         const absenceElements = $("div.diemht > table > tbody > tr > td:nth-child(1)");
-        const absenceCount = Number(absenceElements.innerText);
-        let rgb = 0;
-        if (value <= 4) rgb = "#00FF00";
-        else if (value <= 8) rgb = "#66FF00";
-        else if (value <= 13) rgb = "#CCFF00";
-        else if (value <= 17) rgb = "#FFFF00";
-        else if (value <= 21) rgb = "#FF9900";
-        else if (value <= 25) rgb = "#FF3300";
-        else if (value <= 30) rgb = "#FF0000";
+        const absenceCount = Number(absenceElements.innerText.replaceAll(/[^0-9.]/g, ""));
+        console.log("Số tiết nghỉ: ", absenceCount);
+        let rgb = "#FFFFFF";
+        if (absenceCount >= 30) {
+            rgb = "#9D00FF";
+            absenceElements.innerText = absenceElements.innerText.replaceAll(/[^0-9.]/g, "") + "💀";
+        } else if (absenceCount > 25) rgb = "#FF0000";
+        else if (absenceCount > 20) rgb = "#FF643D";
+        else if (absenceCount > 15) rgb = "#FF9900";
+        else if (absenceCount > 10) rgb = "#FFFF00";
+        else if (absenceCount > 5) rgb = "#CCFF00";
+        else if (absenceCount > 0) rgb = "#66FF00";
+        else if (absenceCount == 0) rgb = "#00FF00";
         absenceElements.style.backgroundColor = rgb;
     }
     // =====================================================================================
