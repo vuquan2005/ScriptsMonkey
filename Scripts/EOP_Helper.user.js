@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.4.0
+// @version      2.4.1
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -101,12 +101,15 @@
     // Tô màu số tiết nghỉ
     function highlightAbsence() {
         const absenceElements = $("div.diemht > table > tbody > tr > td:nth-child(1)");
-        const absenceCount = Number(absenceElements.innerText.trim());
-        const ratio = (absenceCount - 0) / (30 - 0);
-        let r = Math.floor(255 * ratio);
-        let g = Math.floor(255 * (1 - ratio));
-        let b = 0;
-        let rgb = `rgb(${r}, ${g}, ${b})`;
+        const absenceCount = Number(absenceElements.innerText);
+        let rgb = 0;
+        if (value <= 4) rgb = "#00FF00";
+        else if (value <= 8) rgb = "#66FF00";
+        else if (value <= 13) rgb = "#CCFF00";
+        else if (value <= 17) rgb = "#FFFF00";
+        else if (value <= 21) rgb = "#FF9900";
+        else if (value <= 25) rgb = "#FF3300";
+        else if (value <= 30) rgb = "#FF0000";
         absenceElements.style.backgroundColor = rgb;
     }
     // =====================================================================================
@@ -210,13 +213,13 @@
     }
     function showTaskType() {
         const taskElements = $$("a.dpop.allow");
-            for (let taskElement of taskElements) {
-                let taskType = $("b", taskElement).title;
-                taskType = taskType.replaceAll("/", " -> ");
-                taskType = taskType.replaceAll("-", " ");
-                $("em", taskElement).textContent = " --- " + taskType;
-            };
-            GM_addStyle(`
+        for (let taskElement of taskElements) {
+            let taskType = $("b", taskElement).title;
+            taskType = taskType.replaceAll("/", " -> ");
+            taskType = taskType.replaceAll("-", " ");
+            $("em", taskElement).textContent = " --- " + taskType;
+        }
+        GM_addStyle(`
                 em {
                     color:#dfdfdf;
                     font-weight: italic;
