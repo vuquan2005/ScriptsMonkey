@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      3.0
+// @version      3.1
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -136,10 +136,7 @@
     }
     // Tô màu điểm
     function highlightGradeScores() {
-        if (
-            !currentURL == "https://sv.haui.edu.vn//student/result/examresult" &&
-            !currentURL == "https://sv.haui.edu.vn//student/result/studyresults"
-        ) {
+        if (currentURL != "https://sv.haui.edu.vn/student/result/examresult") {
             return;
         }
         const mauODiem = {
@@ -166,8 +163,8 @@
             "IC6005", // Công nghệ thông tin cơ bản
             "IC6007", // Công nghệ thông tin nâng cao
         ];
-
         const hocPhan = $$("tr.kTableAltRow, tr.kTableRow");
+
         for (const row of hocPhan) {
             // Bỏ qua hpNotGPA
             if (hpNotGPA.some((hp) => row.children[1].textContent.includes(hp))) continue;
@@ -184,8 +181,20 @@
                 row.children[13].style.color = "#FFFFFF";
             }
         }
-
-        console.log(hocPhan);
+    }
+    // Tô màu điểm TX
+    function highlightTXScores() {
+        if (currentURL != "https://sv.haui.edu.vn/student/result/studyresults") {
+            return;
+        }
+        const hpToNext = ["FL6091OT.1"];
+        const hocPhan = $$("tr.kTableAltRow, tr.kTableRow");
+        console.log("hocPhan: ", hocPhan);
+        for (const row of hocPhan) {
+            if (hpToNext.some((hp) => row.children[2].textContent.includes(hp))) continue;
+            if (row.children[4].textContent.trim() == "")
+                row.children[4].style.backgroundColor = "#F1C40F";
+        }
     }
     // ======================================================================================
     const changeHeaderInterval = controlInterval(changeHeader, 5000);
@@ -195,5 +204,6 @@
         changeHeaderInterval.start(5000, true);
         addStudyTab();
         highlightGradeScores();
+        highlightTXScores();
     }, 50);
 })();
