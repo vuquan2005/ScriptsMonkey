@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      4.2
+// @version      4.3
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -143,21 +143,21 @@
             return;
         }
         const scoresBoxColor = {
-            4.0: "#2ECC40", // A
-            3.5: "#27AE60", // B+
-            3.0: "#3498DB", // B
-            2.5: "#F1C40F", // C+
-            2.0: "#E67E22", // C
-            1.5: "#D35400", // D+
-            1.0: "#E74C3C", // D
-            0.0: "#9D00FF", // F
+            4.0: "rgb(0, 255, 0)", // A
+            3.5: "rgb(49, 163, 255)", // B+
+            3.0: "rgb(20, 120, 230)", // B
+            2.5: "rgb(251, 140, 0)", // C+
+            2.0: "rgb(230, 100, 22)", // C
+            1.5: "rgb(255, 50, 0)", // D+
+            1.0: "rgb(200, 0, 0)", // D
+            0.0: "rgb(157, 0, 255)", // F
         };
         const creditsBoxColor = {
-            "5.0": "#E74C3C",
-            "4.0": "#D35400",
-            "3.0": "#E67E22",
-            "2.0": "#3498DB",
-            "1.0": "2ECC40",
+            "5.0": "rgb(200, 0, 100)",
+            "4.0": "rgb(255, 0, 0)",
+            "3.0": "rgb(255, 165, 0)",
+            "2.0": "rgb(0, 191, 255)",
+            "1.0": "rgb(46, 204, 64)",
         };
         const hpNotGPA = [
             "FL609", // Tiếng Anh cơ bản FL609x
@@ -166,15 +166,16 @@
             "IC6005", // Công nghệ thông tin cơ bản
             "IC6007", // Công nghệ thông tin nâng cao
         ];
-        const hocPhan = $$("tr.kTableAltRow, tr.kTableRow", $("div.kGrid"));
+        let hocPhan = $$("tr.kTableAltRow, tr.kTableRow", $("div.kGrid"));
 
         for (const row of hocPhan) {
             // Bỏ qua hpNotGPA
             if (hpNotGPA.some((hp) => row.children[1].textContent.includes(hp))) continue;
-            const oDiem = row.children[12];
-            const diemSo = 0.0 + Number(oDiem.textContent.trim());
+            let oDiem = row.children[12];
+            let diemSo = 0.0 + Number(oDiem.textContent.trim());
             // Bỏ qua những học phần không có điểm
-            row.children[5].style.backgroundColor = creditsBoxColor[row.children[5].textContent.trim()];
+            row.children[5].style.backgroundColor =
+                creditsBoxColor[row.children[5].textContent.trim()];
             row.children[5].style.color = "#FFFFFF";
             // Bỏ qua những học phần không có điểm
             if (oDiem.textContent.trim() == "") continue;
@@ -188,8 +189,8 @@
         if (currentURL != "https://sv.haui.edu.vn/student/result/studyresults") {
             return;
         }
-        const hpToNext = ["FL6091OT.1"];
-        const hocPhan = $$("tr.kTableAltRow, tr.kTableRow", $("div.kGrid"));
+        let hpToNext = ["FL6091OT.1"];
+        let hocPhan = $$("tr.kTableAltRow, tr.kTableRow", $("div.kGrid"));
         console.log("hocPhan: ", hocPhan);
         for (const row of hocPhan) {
             if (hpToNext.some((hp) => row.children[2].textContent.includes(hp))) continue;
@@ -203,7 +204,7 @@
             return;
         }
         // xắp xếp lịch thi
-        const examScheduleContainer = $("div.kGrid > div > table:nth-child(3) > tbody");
+        let examScheduleContainer = $("div.kGrid > div > table:nth-child(3) > tbody");
         let examSchedule = $$("tr.kTableAltRow, tr.kTableRow");
         console.log("examSchedule: ", examSchedule);
         for (let i = examSchedule.length - 1; i >= 0; i--) {
@@ -215,15 +216,15 @@
         if (currentURL != "https://sv.haui.edu.vn/student/schedulefees/transactionmodules") {
             return;
         }
-        const examSchedule = $$("tr.kTableAltRow, tr.kTableRow");
-        const today = new Date();
-        const todayDate = today.getDate();
-        const todayMonth = today.getMonth() + 1;
-        const todayYear = today.getFullYear();
+        let examSchedule = $$("tr.kTableAltRow, tr.kTableRow");
+        let today = new Date();
+        let todayDate = today.getDate();
+        let todayMonth = today.getMonth() + 1;
+        let todayYear = today.getFullYear();
         console.log(`today: ${todayDate}/${todayMonth}/${todayYear}, ${today}`);
         for (const row of examSchedule) {
             let examTime = row.children[2].textContent.trim();
-            const examDateArray = examTime.split("/");
+            let examDateArray = examTime.split("/");
             let examDate = examDateArray[0];
             let examMonth = examDateArray[1];
             let examYear = examDateArray[2];
