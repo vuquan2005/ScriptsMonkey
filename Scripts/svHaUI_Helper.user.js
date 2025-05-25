@@ -194,8 +194,8 @@
                 row.children[4].style.backgroundColor = "#F1C40F";
         }
     }
-    // Get, sort exam schedule
-    function getExamSchedule() {
+    // Sort exam schedule
+    function sortExamSchedule() {
         if (currentURL != "https://sv.haui.edu.vn/student/schedulefees/transactionmodules") {
             return;
         }
@@ -257,10 +257,15 @@
         changeHeaderInterval.start(5000, true);
         // Customize Home page
         customizeHomePage();
+
         // Highlight grade scores
         highlightGradeScores();
+
         // Highlight TX scores
         highlightTXScores();
+
+        // Sort exam schedule
+        sortExamSchedule();
         // Highlight exam schedule
         highlightExamSchedule();
     }, 1000);
