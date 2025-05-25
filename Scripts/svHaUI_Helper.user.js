@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      5.0
+// @version      5.1
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -58,7 +58,7 @@
         }
         const beLeftSidebar = $("div.be-left-sidebar");
         if (beLeftSidebar) {
-            let studyTabNext = `
+            const studyTabNext = `
                 <div class="be-content">
                     <div class="main-content container-fluid">
                         <form name="frmMain" id="frmMain" data-toggle="validator" role="form">
@@ -170,13 +170,13 @@
             "IC6005", // Công nghệ thông tin cơ bản
             "IC6007", // Công nghệ thông tin nâng cao
         ];
-        let hocPhan = $$("tr.kTableAltRow, tr.kTableRow", $("div.kGrid"));
+        const hocPhan = $$("tr.kTableAltRow, tr.kTableRow", $("div.kGrid"));
 
         for (const row of hocPhan) {
             // Bỏ qua hpNotGPA
             if (hpNotGPA.some((hp) => row.children[1].textContent.includes(hp))) continue;
-            let oDiem = row.children[12];
-            let diemSo = 0.0 + Number(oDiem.textContent.trim());
+            const oDiem = row.children[12];
+            const diemSo = 0.0 + Number(oDiem.textContent.trim());
             // Bỏ qua những học phần không có điểm
             row.children[5].style.backgroundColor =
                 creditsBoxColor[row.children[5].textContent.trim()];
@@ -193,8 +193,8 @@
         if (currentURL != "https://sv.haui.edu.vn/student/result/studyresults") {
             return;
         }
-        let hpToNext = ["FL6091OT.1"];
-        let hocPhan = $$("tr.kTableAltRow, tr.kTableRow", $("div.kGrid"));
+        const hpToNext = ["FL6091OT.1"];
+        const hocPhan = $$("tr.kTableAltRow, tr.kTableRow", $("div.kGrid"));
         console.log("hocPhan: ", hocPhan);
         for (const row of hocPhan) {
             if (hpToNext.some((hp) => row.children[2].textContent.includes(hp))) continue;
@@ -208,9 +208,9 @@
             return;
         }
         // xắp xếp lịch thi
-        let examScheduleContainer = $("div.kGrid > div > table:nth-child(3) > tbody");
-        let examSchedule = $$("tr.kTableAltRow, tr.kTableRow");
-        console.log("examSchedule: ", examSchedule);
+        const examScheduleContainer = $("div.kGrid > div > table:nth-child(3) > tbody");
+        const examSchedule = $$("tr.kTableAltRow, tr.kTableRow");
+        // console.log("examSchedule: ", examSchedule);
         for (let i = examSchedule.length - 1; i >= 0; i--) {
             examScheduleContainer.appendChild(examSchedule[i]);
         }
@@ -218,7 +218,7 @@
     // Convert date
     function convertDate(ddmmyyyy) {
         // Convert dd/mm/yy to d/m/yyyy
-        let dateArray = ddmmyyyy.split("/");
+        const dateArray = ddmmyyyy.split("/");
         if (dateArray[0].startsWith("0")) {
             dateArray[0] = dateArray[0].slice(1);
         }
@@ -229,13 +229,13 @@
     }
     // Check exam time
     function checkExamTime(examElement, cellIndex) {
-        console.log(`today: ${todayDate}/${todayMonth}/${todayYear}`);
+        // console.log(`today: ${todayDate}/${todayMonth}/${todayYear}`);
 
-        let examTime = examElement.children[cellIndex].textContent.trim();
-        let examDateArray = convertDate(examTime);
-        let examDate = examDateArray[0];
-        let examMonth = examDateArray[1];
-        let examYear = examDateArray[2];
+        const examTime = examElement.children[cellIndex].textContent.trim();
+        const examDateArray = convertDate(examTime);
+        const examDate = examDateArray[0];
+        const examMonth = examDateArray[1];
+        const examYear = examDateArray[2];
         // so sánh ngày thi
         if (examYear > todayYear) {
             return true;
@@ -254,7 +254,7 @@
         if (currentURL != "https://sv.haui.edu.vn/student/schedulefees/transactionmodules") {
             return;
         }
-        let examSchedule = $$("tr.kTableAltRow, tr.kTableRow");
+        const examSchedule = $$("tr.kTableAltRow, tr.kTableRow");
         for (const examElement of examSchedule) {
             if (checkExamTime(examElement, 2)) {
                 examElement.style.backgroundColor = "#F1C40F";
@@ -280,7 +280,7 @@
             // Parse the HTML response
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, "text/html");
-            let examScheduleResult = $(
+            const examScheduleResult = $(
                 "#ctl02_ctl00_viewResult > div > div > table > tbody > tr",
                 doc
             );
@@ -291,13 +291,13 @@
     }
     // Get hpCode
     function getHpCode(scope = document) {
-        let listHPCodeElement = $$(
+        const listHPCodeElement = $$(
             "div:nth-child(3) > div > div > table > tbody > tr > td:nth-child(2) > a",
             scope
         );
         let listHPCode = [];
         for (const element of listHPCodeElement) {
-            let hpCode = element.textContent.trim();
+            const hpCode = element.textContent.trim();
             if (hpCode) {
                 listHPCode.push(hpCode);
             }
@@ -353,5 +353,5 @@
 
         // Show exam plan
         showExamPlan();
-    }, 1000);
+    }, 500);
 })();
