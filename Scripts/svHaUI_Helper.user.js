@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      4.0
+// @version      4.1
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -47,8 +47,8 @@
         newTitle = newTitle.replace("CHI TIẾT HỌC PHẦN CDIO: ", "");
         document.title = newTitle;
     }
-    // Add Học kết hợp to sidebar
-    function addStudyTab() {
+    // Customize Home page
+    function customizeHomePage() {
         if (currentURL != "https://sv.haui.edu.vn/") {
             return;
         }
@@ -139,7 +139,7 @@
         if (currentURL != "https://sv.haui.edu.vn/student/result/examresult") {
             return;
         }
-        const mauODiem = {
+        const scoresBoxColor = {
             4.0: "#2ECC40", // A
             3.5: "#27AE60", // B+
             3.0: "#3498DB", // B
@@ -149,7 +149,7 @@
             1.0: "#E74C3C", // D
             0.0: "#C0392B", // F
         };
-        const mauOTin = {
+        const creditsBoxColor = {
             "5.0": "#E74C3C",
             "4.0": "#D35400",
             "3.0": "#E67E22",
@@ -163,7 +163,7 @@
             "IC6005", // Công nghệ thông tin cơ bản
             "IC6007", // Công nghệ thông tin nâng cao
         ];
-        const hocPhan = $$("tr.kTableAltRow, tr.kTableRow");
+        const hocPhan = $$("tr.kTableAltRow, tr.kTableRow", $("div.kGrid"));
 
         for (const row of hocPhan) {
             // Bỏ qua hpNotGPA
@@ -171,15 +171,13 @@
             const oDiem = row.children[12];
             const diemSo = 0.0 + Number(oDiem.textContent.trim());
             // Bỏ qua những học phần không có điểm
-            row.children[5].style.backgroundColor = mauOTin[row.children[5].textContent.trim()];
+            row.children[5].style.backgroundColor = creditsBoxColor[row.children[5].textContent.trim()];
             row.children[5].style.color = "#FFFFFF";
             // Bỏ qua những học phần không có điểm
             if (oDiem.textContent.trim() == "") continue;
             // Tô màu điểm
-            if (mauODiem[diemSo]) {
-                row.children[13].style.backgroundColor = mauODiem[diemSo];
-                row.children[13].style.color = "#FFFFFF";
-            }
+            row.children[13].style.backgroundColor = scoresBoxColor[diemSo];
+            row.children[13].style.color = "#FFFFFF";
         }
     }
     // Highlight TX scores
@@ -188,7 +186,7 @@
             return;
         }
         const hpToNext = ["FL6091OT.1"];
-        const hocPhan = $$("tr.kTableAltRow, tr.kTableRow");
+        const hocPhan = $$("tr.kTableAltRow, tr.kTableRow", $("div.kGrid"));
         console.log("hocPhan: ", hocPhan);
         for (const row of hocPhan) {
             if (hpToNext.some((hp) => row.children[2].textContent.includes(hp))) continue;
@@ -257,14 +255,12 @@
         console.log("sv.HaUI loaded: " + currentURL);
         // Change header
         changeHeaderInterval.start(5000, true);
-        // Add study tab
-        addStudyTab();
+        // Customize Home page
+        customizeHomePage();
         // Highlight grade scores
         highlightGradeScores();
         // Highlight TX scores
         highlightTXScores();
-        // Get exam schedule
-        getExamSchedule();
         // Highlight exam schedule
         highlightExamSchedule();
     }, 1000);
