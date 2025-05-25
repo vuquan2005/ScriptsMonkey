@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      7.0
+// @version      7.1
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -191,7 +191,7 @@
         }
         const hpToNext = ["FL6091OT.1"];
         const hocPhan = $$("tr.kTableAltRow, tr.kTableRow", $("div.kGrid"));
-        console.log("hocPhan: ", hocPhan);
+        // console.log("hocPhan: ", hocPhan);
         for (const row of hocPhan) {
             if (hpToNext.some((hp) => row.children[2].textContent.includes(hp))) continue;
             if (row.children[4].textContent.trim() == "")
@@ -220,17 +220,22 @@
         const examDate = examDateArray[0];
         const examMonth = examDateArray[1];
         const examYear = examDateArray[2];
+        // console.log(`${examElement}: ${examYear}/${examMonth}/${examDate}\nToday: ${todayYear}/${todayMonth}/${todayDate}`);
         // so sánh ngày thi
-        console.log(`${examElement}: ${examYear}/${examMonth}/${examDate}\nToday: ${todayYear}/${todayMonth}/${todayDate}`);
         if (examYear > todayYear) {
             return true;
         } else if (examYear == todayYear && examMonth > todayMonth) {
             return true;
         } else if (examYear == todayYear && examMonth == todayMonth && examDate >= todayDate) {
             return true;
-        } else if (examYear == todayYear && examMonth > (todayMonth - 1) && isOneMonthLate) {
+        } else if (examYear == todayYear && examMonth > todayMonth - 1 && isOneMonthLate) {
             return true;
-        } else if (examYear == todayYear && examMonth == (todayMonth - 1) && isOneMonthLate && examDate >= todayDate) {
+        } else if (
+            examYear == todayYear &&
+            examMonth == todayMonth - 1 &&
+            isOneMonthLate &&
+            examDate >= todayDate
+        ) {
             return true;
         } else {
             return false;
@@ -314,7 +319,7 @@
             }
             await delay(200);
         }
-        console.log("listExamPlan: ", listExamPlan);
+        // console.log("listExamPlan: ", listExamPlan);
     }
 
     // Create exam plan panel in home page
@@ -377,7 +382,7 @@
             }
             await delay(200);
         }
-        console.log("listExamPlan: ", listExamPlan);
+        // console.log("listExamPlan: ", listExamPlan);
         return listExamPlan;
     }
     // Show exam plan in home page
@@ -408,7 +413,6 @@
         }
         const examSchedule = $$("tr.kTableAltRow, tr.kTableRow");
         for (const examElement of examSchedule) {
-            console.log(examElement);
             if (checkExamTime(examElement, 2, false)) {
                 examElement.style.backgroundColor = "rgb(248,226,135)";
             }
@@ -475,7 +479,7 @@
                 addExamScheduleToPanel(examScheduleElement);
             }
         }
-        console.log("listExamSchedule: ", listExamSchedule);
+        // console.log("listExamSchedule: ", listExamSchedule);
         return listExamSchedule;
     }
     // Show exam schedule
