@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      3.1
+// @version      4.0
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -47,7 +47,7 @@
         newTitle = newTitle.replace("CHI TIẾT HỌC PHẦN CDIO: ", "");
         document.title = newTitle;
     }
-    // add Học kết hợp to sidebar
+    // Add Học kết hợp to sidebar
     function addStudyTab() {
         if (currentURL != "https://sv.haui.edu.vn/") {
             return;
@@ -134,7 +134,7 @@
                 `);
         }
     }
-    // Tô màu điểm
+    // Highlight grade scores
     function highlightGradeScores() {
         if (currentURL != "https://sv.haui.edu.vn/student/result/examresult") {
             return;
@@ -182,7 +182,7 @@
             }
         }
     }
-    // Tô màu điểm TX
+    // Highlight TX scores
     function highlightTXScores() {
         if (currentURL != "https://sv.haui.edu.vn/student/result/studyresults") {
             return;
@@ -196,14 +196,76 @@
                 row.children[4].style.backgroundColor = "#F1C40F";
         }
     }
+    // Get, sort exam schedule
+    function getExamSchedule() {
+        if (currentURL != "https://sv.haui.edu.vn/student/schedulefees/transactionmodules") {
+            return;
+        }
+        // xắp xếp lịch thi
+        const examScheduleContainer = $("div.kGrid > div > table:nth-child(3) > tbody");
+        let examSchedule = $$("tr.kTableAltRow, tr.kTableRow");
+        console.log("examSchedule: ", examSchedule);
+        for (let i = examSchedule.length - 1; i >= 0; i--) {
+            examScheduleContainer.appendChild(examSchedule[i]);
+        }
+    }
+    // Highlight exam schedule
+    function highlightExamSchedule() {
+        if (currentURL != "https://sv.haui.edu.vn/student/schedulefees/transactionmodules") {
+            return;
+        }
+        const examSchedule = $$("tr.kTableAltRow, tr.kTableRow");
+        const today = new Date();
+        const todayDate = today.getDate();
+        const todayMonth = today.getMonth() + 1;
+        const todayYear = today.getFullYear();
+        console.log(`today: ${todayDate}/${todayMonth}/${todayYear}, ${today}`);
+        for (const row of examSchedule) {
+            let examTime = row.children[2].textContent.trim();
+            const examDateArray = examTime.split("/");
+            let examDate = examDateArray[0];
+            let examMonth = examDateArray[1];
+            let examYear = examDateArray[2];
+            // loại bỏ số 0 ở đầu nếu có
+            if (examDate.startsWith("0")) {
+                examDate = examDate.slice(1);
+            }
+            if (examMonth.startsWith("0")) {
+                examMonth = examMonth.slice(1);
+            }
+            // so sánh ngày thi
+            if (examYear > todayYear) {
+                row.style.backgroundColor = "#F1C40F";
+                console.log(`${examYear} > ${todayYear}`);
+            } else if (examYear == todayYear) {
+                if (examMonth > todayMonth) {
+                    row.style.backgroundColor = "#F1C40F";
+                    console.log(`${examMonth} > ${todayMonth}`);
+                } else if (examMonth == todayMonth) {
+                    if (examDate >= todayDate) {
+                        row.style.backgroundColor = "#F1C40F";
+                        console.log(`${examDate} >= ${todayDate}`);
+                    }
+                }
+            }
+        }
+    }
     // ======================================================================================
     const changeHeaderInterval = controlInterval(changeHeader, 5000);
     setTimeout(() => {
         // Run
         console.log("sv.HaUI loaded: " + currentURL);
+        // Change header
         changeHeaderInterval.start(5000, true);
+        // Add study tab
         addStudyTab();
+        // Highlight grade scores
         highlightGradeScores();
+        // Highlight TX scores
         highlightTXScores();
-    }, 50);
+        // Get exam schedule
+        getExamSchedule();
+        // Highlight exam schedule
+        highlightExamSchedule();
+    }, 1000);
 })();
