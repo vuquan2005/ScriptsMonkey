@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      5.1
+// @version      6.0
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -56,66 +56,62 @@
         if (currentURL != "https://sv.haui.edu.vn/") {
             return;
         }
-        const beLeftSidebar = $("div.be-left-sidebar");
-        if (beLeftSidebar) {
+        const frmMain = $("form#frmMain");
+        if (frmMain) {
             const studyTabNext = `
-                <div class="be-content">
-                    <div class="main-content container-fluid">
-                        <form name="frmMain" id="frmMain" data-toggle="validator" role="form">
-                            <div class="panel panel-default panel-border-color panel-border-color-primary">
-                                <div id="add-them-tab">
-                                    <p>Một số chức năng chính</p>
-                                    <p>
-                                        <a href="/sso/blearning">
-                                            <i class="fa flaticon-science1 icon"></i>
-                                            <span>Học kết hợp</span>
-                                        </a>
-                                    </p>
-                                    <p>
-                                        <a href="/training/viewcourseindustry">
-                                            <i class="icon mdi mdi-book"></i>
-                                            <span>Khung chương trình</span>
-                                        </a>
-                                        <br />
-                                        <a href="/training/programmodulessemester">
-                                            <i class="icon mdi mdi-book"></i>
-                                            <span>Khung theo kỳ</span>
-                                        </a>
-                                    </p>
-                                    <p>
-                                        <a href="/register/dangkyhocphan">
-                                            <i class="icon mdi mdi-calendar-note"></i>
-                                            <span>ĐK HP dự kiến</span>
-                                        </a>
-                                        <br />
-                                        <a href="/register/">
-                                            <i class="fa flaticon-key105 icon"></i>
-                                            <span>Đăng ký học phần</span>
-                                        </a>
-                                    </p>
-                                    <p>
-                                        <a href="/student/result/studyresults">
-                                            <i class="fa flaticon-a10 icon"></i>
-                                            <span>Kết quả học tập</span>
-                                        </a>
-                                        <br />
-                                        <a href="/student/result/examresult">
-                                            <i class="fa flaticon-a10 icon"></i>
-                                            <span>Kết quả thi</span>
-                                        </a>
-                                    </p>
-                                </div>
-                            </div>
-                        </form>
+            <div class="panel panel-default panel-border-color panel-border-color-primary">
+                <div id="short-cut-panel">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Một số chức năng chính</h3>
                     </div>
+                    <p>
+                        <a href="/sso/blearning">
+                            <i class="fa flaticon-science1 icon"></i>
+                            <span>Học kết hợp</span>
+                        </a>
+                    </p>
+                    <p>
+                        <a href="/training/viewcourseindustry">
+                            <i class="icon mdi mdi-book"></i>
+                            <span>Khung chương trình</span>
+                        </a>
+                        <br />
+                        <a href="/training/programmodulessemester">
+                            <i class="icon mdi mdi-book"></i>
+                            <span>Khung theo kỳ</span>
+                        </a>
+                    </p>
+                    <p>
+                        <a href="/register/dangkyhocphan">
+                            <i class="icon mdi mdi-calendar-note"></i>
+                            <span>ĐK HP dự kiến</span>
+                        </a>
+                        <br />
+                        <a href="/register/">
+                            <i class="fa flaticon-key105 icon"></i>
+                            <span>Đăng ký học phần</span>
+                        </a>
+                    </p>
+                    <p>
+                        <a href="/student/result/studyresults">
+                            <i class="fa flaticon-a10 icon"></i>
+                            <span>Kết quả học tập</span>
+                        </a>
+                        <br />
+                        <a href="/student/result/examresult">
+                            <i class="fa flaticon-a10 icon"></i>
+                            <span>Kết quả thi</span>
+                        </a>
+                    </p>
                 </div>
+            </div>
             `;
-            beLeftSidebar.insertAdjacentHTML("afterend", studyTabNext);
+            frmMain.insertAdjacentHTML("beforeend", studyTabNext);
             GM_addStyle(`
-                #add-them-tab {
+                #short-cut-panel {
                     display: block;
                 }
-                #add-them-tab > p {
+                #short-cut-panel > p {
                     font-size: 20px;
                     margin: 10px;
                     padding: 10px;
@@ -124,14 +120,14 @@
                     border: 1px solid #3d3d3d;
                     line-height: 2;
                 }
-                #add-them-tab > p > a {
+                #short-cut-panel > p > a {
                     color: #3d3d3d;
                 }
-                #add-them-tab > p > a:hover {
+                #short-cut-panel > p > a:hover {
                     background-color: #d0f0db;
                     color: #000000;
                 }
-                #add-them-tab > p > a > i {
+                #short-cut-panel > p > a > i {
                     margin-right: 10px;
                     scale: 1.5;
                 }
@@ -261,34 +257,39 @@
             }
         }
     }
-    // Get exam plan
-    async function getExamPlan(getHPCode) {
+    // Fetch DOM
+    async function fetchDOM(url) {
         try {
-            const response = await fetch(
-                `https://sv.haui.edu.vn/student/schedulefees/examplant?code=${getHPCode}`,
-                {
-                    method: "GET",
-                    credentials: "include",
-                    headers: {
-                        accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-                        "accept-language": "vi,en-US;q=0.9,en;q=0.8",
-                        "upgrade-insecure-requests": "1",
-                    },
-                }
-            );
+            const response = await fetch(url, {
+                method: "GET",
+                credentials: "include",
+                headers: {
+                    accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                    "accept-language": "vi,en-US;q=0.9,en;q=0.8",
+                    "upgrade-insecure-requests": "1",
+                },
+            });
             const html = await response.text();
-            // Parse the HTML response
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, "text/html");
-            const examScheduleResult = $(
-                "#ctl02_ctl00_viewResult > div > div > table > tbody > tr",
-                doc
-            );
-            return examScheduleResult;
+            return doc;
+        } catch (err) {
+            console.error("Lỗi khi fetch dữ liệu:", err);
+            throw err;
+        }
+    }
+
+    // Get exam plan
+    async function getExamPlan(getHPCode) {
+        const url = `https://sv.haui.edu.vn/student/schedulefees/examplant?code=${getHPCode}`;
+        try {
+            const dom = await fetchDOM(url);
+            return $("#ctl02_ctl00_viewResult > div > div > table > tbody > tr", dom);
         } catch (err) {
             console.error(`Lỗi khi lấy lịch thi cho ${getHPCode}: `, err);
         }
     }
+
     // Get hpCode
     function getHpCode(scope = document) {
         const listHPCodeElement = $$(
@@ -314,21 +315,86 @@
         listHPCode = listHPCode.slice(0, 12);
         const hpNotExam = ["PE60", "OT"];
         const examScheduleResultTable = $("#ctl02_ctl00_viewResult > div > div > table > tbody");
-        let i = 1;
+        let i = 0;
         for (const hpCode of listHPCode) {
             if (hpNotExam.some((hp) => hpCode.includes(hp))) continue;
             let examPlan = await getExamPlan(hpCode);
-            // Nếu không dự kiến thì bỏ qua
+            // Nếu không có lịch
             if (examPlan == null) continue;
             // Nếu chưa đến ngày thi thì tô màu vàng
             if (checkExamTime(examPlan, 3)) {
+                i++;
                 examPlan.children[0].textContent = `${i}`;
                 examPlan.style.backgroundColor = "#F1C40F";
                 examScheduleResultTable.appendChild(examPlan);
-                i++;
             }
             await delay(200);
         }
+    }
+    // Create exam plan panel in home page
+    function createExamPlanPanelInHomePage() {
+        if (currentURL != "https://sv.haui.edu.vn/") {
+            return;
+        }
+        const examPlanPanelHtml = `
+            <div id="exam-plan-panel">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Kế hoạch thi</h3>
+                </div>
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr class="kTableHeader">
+                        <td>STT</td>
+                        <td>Mã lớp độc lập</td>
+                        <td>Tên học phần</td>
+                        <td>Ngày thi</td>
+                        <td>Ca thi</td>
+                        <td>Lần thi</td>
+                        <td>Lớp ưu tiên</td>
+                        <td>Khoa</td>
+                    </tr>
+                </thead>
+                <tbody id="exam-plan-body">
+                    </tbody>
+                </table>
+            </div>
+        `;
+        const mainPanel = $(
+            "form#frmMain > div.panel.panel-default.panel-border-color.panel-border-color-primary"
+        );
+        mainPanel.insertAdjacentHTML("beforeend", examPlanPanelHtml);
+        getExamPlanInHomePage();
+    }
+    // Get exam plan in home page
+    async function getExamPlanInHomePage() {
+        const examPlanDOM = await fetchDOM("https://sv.haui.edu.vn/student/schedulefees/examplant");
+        let listHPCode = getHpCode(examPlanDOM);
+        listHPCode = listHPCode.slice(0, 12);
+        const hpNotExam = ["PE60", "OT"];
+        let i = 0;
+        let listExamPlan = [];
+        for (const hpCode of listHPCode) {
+            if (hpNotExam.some((hp) => hpCode.includes(hp))) continue;
+            let examPlan = await getExamPlan(hpCode);
+            // Nếu không có lịch thì bỏ qua
+            if (examPlan == null) continue;
+            if (checkExamTime(examPlan, 3)) {
+                i++;
+                examPlan.children[0].textContent = `${i}`;
+                listExamPlan.push(examPlan);
+                addExamPlanToPanel(examPlan);
+            }
+            await delay(200);
+        }
+        console.log("listExamPlan: ", listExamPlan);
+        return listExamPlan;
+    }
+    // Show exam plan in home page
+    function addExamPlanToPanel(examPlan) {
+        const examPlanContainer = $("#exam-plan-body");
+        examPlanContainer.appendChild(examPlan);
+    }
+    // Create exam schedule panel in home page
     }
     // ======================================================================================
     const changeHeaderInterval = controlInterval(changeHeader, 5000);
