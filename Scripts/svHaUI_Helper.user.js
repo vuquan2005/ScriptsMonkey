@@ -198,19 +198,6 @@
                 row.children[4].style.backgroundColor = "#F1C40F";
         }
     }
-    // Sort exam schedule
-    function sortExamSchedule() {
-        if (currentURL != "https://sv.haui.edu.vn/student/schedulefees/transactionmodules") {
-            return;
-        }
-        // xắp xếp lịch thi
-        const examScheduleContainer = $("div.kGrid > div > table:nth-child(3) > tbody");
-        const examSchedule = $$("tr.kTableAltRow, tr.kTableRow");
-        // console.log("examSchedule: ", examSchedule);
-        for (let i = examSchedule.length - 1; i >= 0; i--) {
-            examScheduleContainer.appendChild(examSchedule[i]);
-        }
-    }
     // Convert date
     function convertDate(ddmmyyyy) {
         // Convert dd/mm/yy to d/m/yyyy
@@ -243,6 +230,19 @@
                     return true;
                 }
             }
+        }
+    }
+    // Sort exam schedule
+    function sortExamSchedule() {
+        if (currentURL != "https://sv.haui.edu.vn/student/schedulefees/transactionmodules") {
+            return;
+        }
+        // xắp xếp lịch thi
+        const examScheduleContainer = $("div.kGrid > div > table:nth-child(3) > tbody");
+        const examSchedule = $$("tr.kTableAltRow, tr.kTableRow");
+        // console.log("examSchedule: ", examSchedule);
+        for (let i = examSchedule.length - 1; i >= 0; i--) {
+            examScheduleContainer.appendChild(examSchedule[i]);
         }
     }
     // Highlight exam schedule
@@ -331,6 +331,7 @@
             await delay(200);
         }
     }
+    // Kế hoạch thi
     // Create exam plan panel in home page
     function createExamPlanPanelInHomePage() {
         if (currentURL != "https://sv.haui.edu.vn/") {
@@ -394,6 +395,7 @@
         const examPlanContainer = $("#exam-plan-body");
         examPlanContainer.appendChild(examPlan);
     }
+    // Lịch thi
     // Create exam schedule panel in home page
     }
     // ======================================================================================
