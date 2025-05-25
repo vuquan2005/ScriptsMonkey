@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      4.1
+// @version      4.2
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -136,7 +136,10 @@
     }
     // Highlight grade scores
     function highlightGradeScores() {
-        if (currentURL != "https://sv.haui.edu.vn/student/result/examresult") {
+        if (
+            currentURL != "https://sv.haui.edu.vn/student/result/examresult" &&
+            !currentURL.includes("https://sv.haui.edu.vn/student/result/viewexamresult?code=")
+        ) {
             return;
         }
         const scoresBoxColor = {
@@ -147,7 +150,7 @@
             2.0: "#E67E22", // C
             1.5: "#D35400", // D+
             1.0: "#E74C3C", // D
-            0.0: "#C0392B", // F
+            0.0: "#9D00FF", // F
         };
         const creditsBoxColor = {
             "5.0": "#E74C3C",
