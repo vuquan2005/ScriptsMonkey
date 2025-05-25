@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      4.3
+// @version      4.4
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -143,11 +143,11 @@
             return;
         }
         const scoresBoxColor = {
-            4.0: "rgb(0, 255, 0)", // A
+            4.0: "rgb(64,212,81)", // A
             3.5: "rgb(49, 163, 255)", // B+
             3.0: "rgb(20, 120, 230)", // B
-            2.5: "rgb(251, 140, 0)", // C+
-            2.0: "rgb(230, 100, 22)", // C
+            2.5: "rgb(255,186,0)", // C+
+            2.0: "rgb(255,144,0)", // C
             1.5: "rgb(255, 50, 0)", // D+
             1.0: "rgb(200, 0, 0)", // D
             0.0: "rgb(157, 0, 255)", // F
