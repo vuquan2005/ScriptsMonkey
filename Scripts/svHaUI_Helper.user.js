@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      6.0
+// @version      7.0
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -195,9 +195,10 @@
         for (const row of hocPhan) {
             if (hpToNext.some((hp) => row.children[2].textContent.includes(hp))) continue;
             if (row.children[4].textContent.trim() == "")
-                row.children[4].style.backgroundColor = "#F1C40F";
+                row.children[4].style.backgroundColor = "rgb(248,226,135)";
         }
     }
+    // ======================================================================================
     // Convert date
     function convertDate(ddmmyyyy) {
         // Convert dd/mm/yy to d/m/yyyy
@@ -211,7 +212,7 @@
         return dateArray;
     }
     // Check exam time
-    function checkExamTime(examElement, cellIndex) {
+    function checkExamTime(examElement, cellIndex, isOneMonthLate = false) {
         // console.log(`today: ${todayDate}/${todayMonth}/${todayYear}`);
 
         const examTime = examElement.children[cellIndex].textContent.trim();
@@ -220,41 +221,19 @@
         const examMonth = examDateArray[1];
         const examYear = examDateArray[2];
         // so sánh ngày thi
+        console.log(`${examElement}: ${examYear}/${examMonth}/${examDate}\nToday: ${todayYear}/${todayMonth}/${todayDate}`);
         if (examYear > todayYear) {
             return true;
-        } else if (examYear == todayYear) {
-            if (examMonth > todayMonth) {
-                return true;
-            } else if (examMonth == todayMonth) {
-                if (examDate >= todayDate) {
-                    return true;
-                }
-            }
-        }
-    }
-    // Sort exam schedule
-    function sortExamSchedule() {
-        if (currentURL != "https://sv.haui.edu.vn/student/schedulefees/transactionmodules") {
-            return;
-        }
-        // xắp xếp lịch thi
-        const examScheduleContainer = $("div.kGrid > div > table:nth-child(3) > tbody");
-        const examSchedule = $$("tr.kTableAltRow, tr.kTableRow");
-        // console.log("examSchedule: ", examSchedule);
-        for (let i = examSchedule.length - 1; i >= 0; i--) {
-            examScheduleContainer.appendChild(examSchedule[i]);
-        }
-    }
-    // Highlight exam schedule
-    function highlightExamSchedule() {
-        if (currentURL != "https://sv.haui.edu.vn/student/schedulefees/transactionmodules") {
-            return;
-        }
-        const examSchedule = $$("tr.kTableAltRow, tr.kTableRow");
-        for (const examElement of examSchedule) {
-            if (checkExamTime(examElement, 2)) {
-                examElement.style.backgroundColor = "#F1C40F";
-            }
+        } else if (examYear == todayYear && examMonth > todayMonth) {
+            return true;
+        } else if (examYear == todayYear && examMonth == todayMonth && examDate >= todayDate) {
+            return true;
+        } else if (examYear == todayYear && examMonth > (todayMonth - 1) && isOneMonthLate) {
+            return true;
+        } else if (examYear == todayYear && examMonth == (todayMonth - 1) && isOneMonthLate && examDate >= todayDate) {
+            return true;
+        } else {
+            return false;
         }
     }
     // Fetch DOM
@@ -278,18 +257,8 @@
             throw err;
         }
     }
-
-    // Get exam plan
-    async function getExamPlan(getHPCode) {
-        const url = `https://sv.haui.edu.vn/student/schedulefees/examplant?code=${getHPCode}`;
-        try {
-            const dom = await fetchDOM(url);
-            return $("#ctl02_ctl00_viewResult > div > div > table > tbody > tr", dom);
-        } catch (err) {
-            console.error(`Lỗi khi lấy lịch thi cho ${getHPCode}: `, err);
-        }
-    }
-
+    // ======================================================================================
+    // Kế hoạch thi
     // Get hpCode
     function getHpCode(scope = document) {
         const listHPCodeElement = $$(
@@ -306,32 +275,48 @@
         listHPCode.reverse();
         return listHPCode;
     }
+    // Get exam plan
+    async function getExamPlan(getHPCode) {
+        const url = `https://sv.haui.edu.vn/student/schedulefees/examplant?code=${getHPCode}`;
+        try {
+            const dom = await fetchDOM(url);
+            return $("#ctl02_ctl00_viewResult > div > div > table > tbody > tr", dom);
+        } catch (err) {
+            console.error(`Lỗi khi lấy lịch thi cho ${getHPCode}: `, err);
+        }
+    }
     // Show list exam plan
     async function showExamPlan() {
         if (currentURL != "https://sv.haui.edu.vn/student/schedulefees/examplant") {
             return;
         }
         let listHPCode = getHpCode(document);
+        // Lấy 13 học phần gần nhất
         listHPCode = listHPCode.slice(0, 12);
         const hpNotExam = ["PE60", "OT"];
         const examScheduleResultTable = $("#ctl02_ctl00_viewResult > div > div > table > tbody");
         let i = 0;
+        let listExamPlan = [];
         for (const hpCode of listHPCode) {
             if (hpNotExam.some((hp) => hpCode.includes(hp))) continue;
             let examPlan = await getExamPlan(hpCode);
             // Nếu không có lịch
             if (examPlan == null) continue;
-            // Nếu chưa đến ngày thi thì tô màu vàng
-            if (checkExamTime(examPlan, 3)) {
+            listExamPlan.push(examPlan);
+            // Hiển thị kế hoạch thi 13 học phần gần nhất
+            if (checkExamTime(examPlan, 3, true)) {
                 i++;
                 examPlan.children[0].textContent = `${i}`;
-                examPlan.style.backgroundColor = "#F1C40F";
+                // Nếu chưa đến ngày thi thì tô màu vàng
+                if (checkExamTime(examPlan, 3, false))
+                    examPlan.style.backgroundColor = "rgb(248,226,135)";
                 examScheduleResultTable.appendChild(examPlan);
             }
             await delay(200);
         }
+        console.log("listExamPlan: ", listExamPlan);
     }
-    // Kế hoạch thi
+
     // Create exam plan panel in home page
     function createExamPlanPanelInHomePage() {
         if (currentURL != "https://sv.haui.edu.vn/") {
@@ -340,7 +325,9 @@
         const examPlanPanelHtml = `
             <div id="exam-plan-panel">
                 <div class="panel-heading">
-                    <h3 class="panel-title">Kế hoạch thi</h3>
+                    <h3 class="panel-title">
+                        <a href="/student/schedulefees/examplant">Kế hoạch thi</a>
+                    </h3>
                 </div>
                 <table class="table table-bordered table-striped">
                     <thead>
@@ -379,9 +366,12 @@
             let examPlan = await getExamPlan(hpCode);
             // Nếu không có lịch thì bỏ qua
             if (examPlan == null) continue;
-            if (checkExamTime(examPlan, 3)) {
+            if (checkExamTime(examPlan, 3, true)) {
                 i++;
                 examPlan.children[0].textContent = `${i}`;
+                // Nếu chưa đến ngày thi thì tô màu vàng
+                if (checkExamTime(examPlan, 3, false))
+                    examPlan.style.backgroundColor = "rgb(248,226,135)";
                 listExamPlan.push(examPlan);
                 addExamPlanToPanel(examPlan);
             }
@@ -395,8 +385,103 @@
         const examPlanContainer = $("#exam-plan-body");
         examPlanContainer.appendChild(examPlan);
     }
+
+    // ======================================================================================
     // Lịch thi
+    // Sort exam schedule
+    function sortExamSchedule() {
+        if (currentURL != "https://sv.haui.edu.vn/student/schedulefees/transactionmodules") {
+            return;
+        }
+        // xắp xếp lịch thi
+        const examScheduleContainer = $("div.kGrid > div > table:nth-child(3) > tbody");
+        const examSchedule = $$("tr.kTableAltRow, tr.kTableRow");
+        // console.log("examSchedule: ", examSchedule);
+        for (let i = examSchedule.length - 1; i >= 0; i--) {
+            examScheduleContainer.appendChild(examSchedule[i]);
+        }
+    }
+    // Highlight exam schedule
+    function highlightExamSchedule() {
+        if (currentURL != "https://sv.haui.edu.vn/student/schedulefees/transactionmodules") {
+            return;
+        }
+        const examSchedule = $$("tr.kTableAltRow, tr.kTableRow");
+        for (const examElement of examSchedule) {
+            console.log(examElement);
+            if (checkExamTime(examElement, 2, false)) {
+                examElement.style.backgroundColor = "rgb(248,226,135)";
+            }
+        }
+    }
+
     // Create exam schedule panel in home page
+    function createExamSchedulePanelInHomePage() {
+        if (currentURL != "https://sv.haui.edu.vn/") {
+            return;
+        }
+        const examSchedulePanelHtml = `
+            <div id="exam-schedule-panel">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        <a href="/student/schedulefees/transactionmodules">Lịch thi</a>
+                    </h3>
+                </div>
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <td>STT</td>
+                        <td>Môn thi</td>
+                        <td>Ngày thi</td>
+                        <td>Ca thi</td>
+                        <td>SBD</td>
+                        <td>Lần thi</td>
+                        <td>Vị trí thi</td>
+                        <td>Phòng thi</td>
+                        <td>Tòa nhà</td>
+                        <td>Cơ sở</td>
+                        <td>Tiền VP PVT</td>
+                        <td>Tham gia thi</td>
+                        <td>Tình trạng</td>
+                    </tr>
+                </thead>
+                <tbody id="exam-schedule-body">
+                    </tbody>
+                </table>
+            </div>
+        `;
+        const mainPanel = $(
+            "form#frmMain > div.panel.panel-default.panel-border-color.panel-border-color-primary"
+        );
+        mainPanel.insertAdjacentHTML("beforeend", examSchedulePanelHtml);
+        getExamSchedule();
+    }
+    // Get exam schedule
+    async function getExamSchedule() {
+        const examScheduleDOM = await fetchDOM(
+            "https://sv.haui.edu.vn/student/schedulefees/transactionmodules"
+        );
+        const examSchedule = $$("tr.kTableAltRow, tr.kTableRow", examScheduleDOM);
+        let i = 0;
+        let listExamSchedule = [];
+        for (const examScheduleElement of examSchedule) {
+            if (checkExamTime(examScheduleElement, 2, true)) {
+                i++;
+                examScheduleElement.children[13].remove();
+                examScheduleElement.children[0].textContent = `${i}`;
+                // Nếu chưa đến ngày thi thì tô màu vàng
+                if (checkExamTime(examScheduleElement, 2, false))
+                    examScheduleElement.style.backgroundColor = "rgb(248,226,135)";
+                listExamSchedule.push(examScheduleElement);
+                addExamScheduleToPanel(examScheduleElement);
+            }
+        }
+        console.log("listExamSchedule: ", listExamSchedule);
+        return listExamSchedule;
+    }
+    // Show exam schedule
+    function addExamScheduleToPanel(examSchedule) {
+        const examScheduleContainer = $("#exam-schedule-body");
+        examScheduleContainer.appendChild(examSchedule);
     }
     // ======================================================================================
     const changeHeaderInterval = controlInterval(changeHeader, 5000);
@@ -407,6 +492,10 @@
         changeHeaderInterval.start(5000, true);
         // Customize Home page
         customizeHomePage();
+        // Create exam schedule panel in home page
+        createExamSchedulePanelInHomePage();
+        // Create exam plan panel in home page
+        createExamPlanPanelInHomePage();
 
         // Highlight grade scores
         highlightGradeScores();
