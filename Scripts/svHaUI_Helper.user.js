@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      9.0
+// @version      9.1
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -505,28 +505,53 @@
         console.log("totalCredits: ", totalCreditsNumber);
     }
     // Show total credits
-    function showTotalCredits() {
+    function getDateSomeInfoInExamresult() {
         if (currentURL != "https://sv.haui.edu.vn/student/result/examresult") {
             return;
         }
         const currentCredits = $("div.kGrid > table > tbody > tr:last-child > td:first-child");
-        const currentCreditsSpan = $("span", currentCredits);
         const currentCreditsNumber = Number(
-            currentCreditsSpan.textContent.trim().match(/(\d+)(?:\.\d+)?/g)[0]
+            currentCredits.textContent.trim().match(/(\d+)(?:\.\d+)?/g)[0]
         );
-        currentCreditsSpan.textContent = currentCreditsSpan.textContent.replace(
-            /(\d+)\.0\b/g,
-            "$1"
-        );
+        GM_setValue("currentCredits", currentCreditsNumber);
+        console.log("currentCredits: ", currentCreditsNumber);
+
+        const currentGPA = $("div.kGrid > table > tbody > tr:nth-last-child(2) > td:nth-child(2)");
+        const currentGPAValue = Number(currentGPA.textContent.trim().match(/(\d+)(?:\.\d+)?/g)[0]);
+        GM_setValue("currentGPA", currentGPAValue);
+        console.log("currentGPA: ", currentGPAValue);
+    }
+    // Add some info in examresult
+    function addSomeInfoInExamresult() {
+        if (currentURL != "https://sv.haui.edu.vn/student/result/examresult") {
+            return;
+        }
+        getDateSomeInfoInExamresult();
+        const tableContainer = $("div.kGrid:last-child > div:last-child");
+        const newElement = document.createElement("span");
+        newElement.id = "info-examresult";
+        newElement.style.color = "Red";
+        newElement.style.fontWeight = "bold";
+        newElement.style.float = "left";
+        newElement.style.fontSize = "12px";
+        newElement.style.paddingLeft = "5px";
+        tableContainer.insertAdjacentElement("beforeend", newElement);
 
         const totalCredits = GM_getValue("totalCredits");
         if (totalCredits == null) {
             console.log("Không tìm thấy tổng số tín chỉ");
             return;
         }
-        currentCreditsSpan.innerHTML += ` / ${totalCredits}<br>
-            Số tín còn lại: ${totalCredits - currentCreditsNumber}
+        const currentCreditsNumber = GM_getValue("currentCredits");
+        newElement.innerHTML = `
+            <span>Số tín còn lại: ${totalCredits - currentCreditsNumber}</span>
         `;
+
+        const currentCreditsSpan = $("div.kGrid > table > tbody > tr:last-child > td:first-child > span");
+        currentCreditsSpan.textContent = currentCreditsSpan.textContent.replace(
+            /(\d+)\.0\b/g,
+            "$1"
+        );
     }
     // ======================================================================================
     // Toggle examresult and studyresults
@@ -586,7 +611,7 @@
         // Highlight grade scores
         highlightGradeScores();
         // Show the total credits
-        showTotalCredits();
+        addSomeInfoInExamresult();
 
         // Highlight studyresults scores
         highlightStudyresultsScores();
