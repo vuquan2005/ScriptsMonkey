@@ -1,13 +1,15 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      7.1
+// @version      8.1
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
 // @updateURL    https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
 // @match        https://sv.haui.edu.vn/*
 // @grant        GM_addStyle
+// @grant        GM_getValue
+// @grant        GM_setValue
 // ==/UserScript==
 
 (function () {
@@ -488,12 +490,49 @@
         examScheduleContainer.appendChild(examSchedule);
     }
     // ======================================================================================
+    // Check total credits
+    function checkTotalCredits() {
+        if (currentURL != "https://sv.haui.edu.vn/training/viewcourseindustry") {
+            return;
+        }
+        let totalCredits = $(
+            "#ctl02_dvList > tbody > tr:nth-child(7) > td.k-table-viewdetail"
+        ).textContent.trim();
+        totalCredits = totalCredits.replace("(tín chỉ)", "");
+        const totalCreditsNumber = Number(totalCredits);
+
+        GM_setValue("totalCredits", totalCreditsNumber);
+        console.log("totalCredits: ", totalCreditsNumber);
+    }
+    // Show total credits
+    function showTotalCredits() {
+        if (currentURL != "https://sv.haui.edu.vn/student/result/examresult") {
+            return;
+        }
+        const currentCredits = $("div.kGrid > table > tbody > tr:last-child > td:first-child");
+        const currentCreditsSpan = $("span", currentCredits);
+        const currentCreditsNumber = Number(
+            currentCreditsSpan.textContent.trim().match(/(\d+)(?:\.\d+)?/g)[0]
+        );
+        console.log("currentCreditsNumber: ", currentCreditsNumber);
+
+        const totalCredits = GM_getValue("totalCredits");
+        if (totalCredits == null) {
+            console.log("Không tìm thấy tổng số tín chỉ");
+            return;
+        }
+        currentCreditsSpan.innerHTML += ` / ${totalCredits}<br>
+            Số tín còn lại: ${totalCredits - currentCreditsNumber}
+        `;
+    }
+    // ======================================================================================
     const changeHeaderInterval = controlInterval(changeHeader, 5000);
     setTimeout(() => {
         // Run
         console.log("sv.HaUI loaded: " + currentURL);
         // Change header
         changeHeaderInterval.start(5000, true);
+
         // Customize Home page
         customizeHomePage();
         // Create exam schedule panel in home page
@@ -503,6 +542,8 @@
 
         // Highlight grade scores
         highlightGradeScores();
+        // Show the total credits
+        showTotalCredits();
 
         // Highlight TX scores
         highlightTXScores();
@@ -514,5 +555,8 @@
 
         // Show exam plan
         showExamPlan();
+
+        // Check total credits
+        checkTotalCredits();
     }, 500);
 })();
