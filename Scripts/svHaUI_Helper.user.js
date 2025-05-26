@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      12.0
+// @version      12.1
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -582,34 +582,49 @@
             $("div.kGrid")
         );
         const letterScore = {
-            "4": "A",
-            "3.5": "B+",
-            "3": "B",
-            "2.5": "C+",
-            "2": "C",
-            "1.5": "D+",
-            "1": "D",
-            "0": "F",
+            4: "A",
+            3.5: "B+",
+            3: "B",
+            2.5: "C+",
+            2: "C",
+            1.5: "D+",
+            1: "D",
+            0: "F",
         };
         // Lưu lại original-score
-        for (const oDiem of diemHocPhan) {
-            if (oDiem.getAttribute("original-score") == null)
-                oDiem.setAttribute("original-score", oDiem.textContent.trim());
+        for (const row of hocPhan) {
+            if (row.children[12].getAttribute("original-score") == null)
+                row.children[12].setAttribute(
+                    "original-score",
+                    row.children[12].textContent.trim()
+                );
         }
+
         if (!editScoreButton.checked) {
-            // Not checked, disable edit score
-            diemHocPhan.forEach((el) => el.setAttribute("contenteditable", "false"));
-            // Return original score
-            oDiem.textContent = oDiem.getAttribute("original-score");
+            // Not checked
+            for (const row of hocPhan) {
+                // Disable edit score
+                row.children[12].setAttribute("contenteditable", "false");
+                // Return original score
+                row.children[12].textContent = row.children[12].getAttribute("original-score");
+                row.children[13].textContent =
+                    letterScore[row.children[12].getAttribute("original-score")];
+                // Remove text content
+                row.children[16].textContent = "";
+            }
+            highlightGradeScores();
             return false;
         } else {
-            // Checked, enable edit score
-            diemHocPhan.forEach((el) => el.setAttribute("contenteditable", "true"));
+            // Checked
             for (const row of hocPhan) {
-                row.children[16].textContent = letterScore[row.children[12].getAttribute("original-score")];
+                // Enable edit score
+                row.children[12].setAttribute("contenteditable", "true");
+                // Refresh letter score
                 row.children[13].textContent = letterScore[row.children[12].textContent.trim()];
+                row.children[16].textContent =
+                    letterScore[row.children[12].getAttribute("original-score")];
             }
-
+            highlightGradeScores();
             return true;
         }
     }
@@ -652,7 +667,6 @@
             return;
         }
 
-        highlightGradeScores();
         const GPA = recalculateGPA();
 
         if ($("span#can-replace.info-examresult")) {
