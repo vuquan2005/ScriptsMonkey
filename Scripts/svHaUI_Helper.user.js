@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      11.0
+// @version      12.0
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -557,7 +557,7 @@
             <p>Các môn còn lại cần đạt: ${scoresToGPA25.toFixed(2)} để GPA 2.5</p>
             <p>Các môn còn lại cần đạt: ${scoresToGPA32.toFixed(2)} để GPA 3.2</p>
             <p>Các môn còn lại cần đạt: ${scoresToGPA36.toFixed(2)} để GPA 3.6</p>
-            <input type="checkbox" id="edit-score">Sửa điểm</input>
+            <input type="checkbox" id="edit-score"> Sửa điểm </input>
         `;
 
         const currentCreditsSpan = $(
@@ -569,7 +569,50 @@
         );
         currentCreditsSpan.textContent += ` / ${totalCredits}`;
     }
-    
+
+    // Check edit score is enable
+    function checkEditScoreIsEnable() {
+        if (currentURL != "https://sv.haui.edu.vn/student/result/examresult") {
+            return;
+        }
+        const editScoreButton = $("#edit-score");
+        const hocPhan = $$("tr.kTableAltRow, tr.kTableRow", $("div.kGrid"));
+        const diemHocPhan = $$(
+            "tr.kTableAltRow > td:nth-child(13), tr.kTableRow > td:nth-child(13)",
+            $("div.kGrid")
+        );
+        const letterScore = {
+            "4": "A",
+            "3.5": "B+",
+            "3": "B",
+            "2.5": "C+",
+            "2": "C",
+            "1.5": "D+",
+            "1": "D",
+            "0": "F",
+        };
+        // Lưu lại original-score
+        for (const oDiem of diemHocPhan) {
+            if (oDiem.getAttribute("original-score") == null)
+                oDiem.setAttribute("original-score", oDiem.textContent.trim());
+        }
+        if (!editScoreButton.checked) {
+            // Not checked, disable edit score
+            diemHocPhan.forEach((el) => el.setAttribute("contenteditable", "false"));
+            // Return original score
+            oDiem.textContent = oDiem.getAttribute("original-score");
+            return false;
+        } else {
+            // Checked, enable edit score
+            diemHocPhan.forEach((el) => el.setAttribute("contenteditable", "true"));
+            for (const row of hocPhan) {
+                row.children[16].textContent = letterScore[row.children[12].getAttribute("original-score")];
+                row.children[13].textContent = letterScore[row.children[12].textContent.trim()];
+            }
+
+            return true;
+        }
+    }
     // Recalculate GPA
     function recalculateGPA() {
         if (currentURL != "https://sv.haui.edu.vn/student/result/examresult") {
@@ -605,10 +648,10 @@
         if (currentURL != "https://sv.haui.edu.vn/student/result/examresult") {
             return;
         }
-        const editScoreButton = $("#edit-score");
-        if (!editScoreButton.checked) {
+        if (!checkEditScoreIsEnable()) {
             return;
         }
+
         highlightGradeScores();
         const GPA = recalculateGPA();
 
