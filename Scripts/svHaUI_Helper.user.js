@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      8.1
+// @version      8.2
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -514,7 +514,10 @@
         const currentCreditsNumber = Number(
             currentCreditsSpan.textContent.trim().match(/(\d+)(?:\.\d+)?/g)[0]
         );
-        console.log("currentCreditsNumber: ", currentCreditsNumber);
+        currentCreditsSpan.textContent = currentCreditsSpan.textContent.replace(
+            /(\d+)\.0\b/g,
+            "$1"
+        );
 
         const totalCredits = GM_getValue("totalCredits");
         if (totalCredits == null) {
