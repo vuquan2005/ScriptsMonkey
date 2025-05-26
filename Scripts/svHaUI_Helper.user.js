@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      8.2
+// @version      9.0
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -43,8 +43,8 @@
     // =====================================================================================
     // Change header
     function changeHeader() {
-        if (!$("div.panel-heading")) return;
-        let newTitle = $("div.panel-heading").textContent;
+        if (!$("span.k-panel-header-text:first-child")) return;
+        let newTitle = $("span.k-panel-header-text:first-child").textContent;
         //console.log("Last title: ", newTitle);
         newTitle = newTitle.replace("\n", "");
         newTitle = newTitle.replace("\t", "");
@@ -186,8 +186,8 @@
             row.children[13].style.color = "#FFFFFF";
         }
     }
-    // Highlight TX scores
-    function highlightTXScores() {
+    // Highlight studyresults scores
+    function highlightStudyresultsScores() {
         if (currentURL != "https://sv.haui.edu.vn/student/result/studyresults") {
             return;
         }
@@ -529,6 +529,46 @@
         `;
     }
     // ======================================================================================
+    // Toggle examresult and studyresults
+    function toggleExamresultAndStudyresults() {
+        if (
+            currentURL != "https://sv.haui.edu.vn/student/result/examresult" &&
+            currentURL != "https://sv.haui.edu.vn/student/result/studyresults" &&
+            !currentURL.includes("https://sv.haui.edu.vn/student/result/viewexamresultclass?id=") &&
+            !currentURL.includes("https://sv.haui.edu.vn/student/result/viewstudyresultclass?id=")
+        ) {
+            return;
+        }
+        const queryString = new URL(currentURL).search;
+        console.log("queryString: ", queryString);
+        const title = $("div.panel-heading");
+        const toggleLinkContainer = document.createElement("p");
+        const toggleLink = document.createElement("a");
+        toggleLink.style.color = "gray";
+        toggleLink.style.fontSize = "12px";
+        toggleLinkContainer.appendChild(toggleLink);
+
+        if (currentURL.includes("https://sv.haui.edu.vn/student/result/examresult")) {
+            toggleLink.textContent = "---Kết quả học tập---";
+            toggleLink.href = "https://sv.haui.edu.vn/student/result/studyresults";
+        } else if (currentURL.includes("https://sv.haui.edu.vn/student/result/studyresults")) {
+            toggleLink.textContent = "---Kết quả thi---";
+            toggleLink.href = "https://sv.haui.edu.vn/student/result/examresult";
+        } else if (
+            currentURL.includes("https://sv.haui.edu.vn/student/result/viewexamresultclass?id=")
+        ) {
+            toggleLink.textContent = "---Kết quả học tập---";
+            toggleLink.href = "https://sv.haui.edu.vn/student/result/viewstudyresultclass?id=" + queryString;
+        } else if (
+            currentURL.includes("https://sv.haui.edu.vn/student/result/viewstudyresultclass?id=")
+        ) {
+            toggleLink.textContent = "---Kết quả thi lớp---";
+            toggleLink.href = "https://sv.haui.edu.vn/student/result/viewexamresultclass?id=" + queryString;
+        }
+
+        title.appendChild(toggleLinkContainer);
+    }
+    // ======================================================================================
     const changeHeaderInterval = controlInterval(changeHeader, 5000);
     setTimeout(() => {
         // Run
@@ -548,8 +588,11 @@
         // Show the total credits
         showTotalCredits();
 
-        // Highlight TX scores
-        highlightTXScores();
+        // Highlight studyresults scores
+        highlightStudyresultsScores();
+
+        // Toggle examresult and studyresults
+        toggleExamresultAndStudyresults();
 
         // Sort exam schedule
         sortExamSchedule();
