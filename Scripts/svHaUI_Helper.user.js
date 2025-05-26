@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      9.1
+// @version      10.0
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -542,9 +542,17 @@
             console.log("Không tìm thấy tổng số tín chỉ");
             return;
         }
-        const currentCreditsNumber = GM_getValue("currentCredits");
+        const currentCredits = GM_getValue("currentCredits");
+        const currentGPA = GM_getValue("currentGPA");
+        const remainingCredits = totalCredits - currentCredits;
+        const scoresToGPA25 = (2.5 * totalCredits - currentGPA * currentCredits) / remainingCredits;
+        const scoresToGPA32 = (3.2 * totalCredits - currentGPA * currentCredits) / remainingCredits;
+        const scoresToGPA36 = (3.6 * totalCredits - currentGPA * currentCredits) / remainingCredits;
         newElement.innerHTML = `
-            <span>Số tín còn lại: ${totalCredits - currentCreditsNumber}</span>
+            <p>Số tín còn lại: ${remainingCredits}</p>
+            <p>Các môn còn lại cần đạt: ${scoresToGPA25.toFixed(2)} để GPA 2.5</p>
+            <p>Các môn còn lại cần đạt: ${scoresToGPA32.toFixed(2)} để GPA 3.2</p>
+            <p>Các môn còn lại cần đạt: ${scoresToGPA36.toFixed(2)} để GPA 3.6</p>
         `;
 
         const currentCreditsSpan = $("div.kGrid > table > tbody > tr:last-child > td:first-child > span");
@@ -552,6 +560,7 @@
             /(\d+)\.0\b/g,
             "$1"
         );
+        currentCreditsSpan.textContent += ` / ${totalCredits}`;
     }
     // ======================================================================================
     // Toggle examresult and studyresults
