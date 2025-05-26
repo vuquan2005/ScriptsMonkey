@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      10.0
+// @version      11.0
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -175,7 +175,7 @@
             if (hpNotGPA.some((hp) => row.children[1].textContent.includes(hp))) continue;
             const oDiem = row.children[12];
             const diemSo = 0.0 + Number(oDiem.textContent.trim());
-            // Bỏ qua những học phần không có điểm
+            // Tô màu tín chỉ
             row.children[5].style.backgroundColor =
                 creditsBoxColor[row.children[5].textContent.trim()];
             row.children[5].style.color = "#FFFFFF";
@@ -504,8 +504,8 @@
         GM_setValue("totalCredits", totalCreditsNumber);
         console.log("totalCredits: ", totalCreditsNumber);
     }
-    // Show total credits
-    function getDateSomeInfoInExamresult() {
+    // Get date some info in examresult
+    function getSomeInfoInExamresult() {
         if (currentURL != "https://sv.haui.edu.vn/student/result/examresult") {
             return;
         }
@@ -526,14 +526,18 @@
         if (currentURL != "https://sv.haui.edu.vn/student/result/examresult") {
             return;
         }
-        getDateSomeInfoInExamresult();
+        getSomeInfoInExamresult();
         const tableContainer = $("div.kGrid:last-child > div:last-child");
         const newElement = document.createElement("span");
-        newElement.id = "info-examresult";
-        newElement.style.color = "Red";
-        newElement.style.fontWeight = "bold";
-        newElement.style.float = "left";
-        newElement.style.fontSize = "12px";
+        newElement.className = "info-examresult";
+        GM_addStyle(`
+            .info-examresult {
+                color: Red;
+                font-weight: bold;
+                font-size: 12px;
+                padding-left: 5px;
+            }
+        `);
         newElement.style.paddingLeft = "5px";
         tableContainer.insertAdjacentElement("beforeend", newElement);
 
@@ -553,14 +557,86 @@
             <p>Các môn còn lại cần đạt: ${scoresToGPA25.toFixed(2)} để GPA 2.5</p>
             <p>Các môn còn lại cần đạt: ${scoresToGPA32.toFixed(2)} để GPA 3.2</p>
             <p>Các môn còn lại cần đạt: ${scoresToGPA36.toFixed(2)} để GPA 3.6</p>
+            <input type="checkbox" id="edit-score">Sửa điểm</input>
         `;
 
-        const currentCreditsSpan = $("div.kGrid > table > tbody > tr:last-child > td:first-child > span");
+        const currentCreditsSpan = $(
+            "div.kGrid > table > tbody > tr:last-child > td:first-child > span"
+        );
         currentCreditsSpan.textContent = currentCreditsSpan.textContent.replace(
             /(\d+)\.0\b/g,
             "$1"
         );
         currentCreditsSpan.textContent += ` / ${totalCredits}`;
+    }
+    
+    // Recalculate GPA
+    function recalculateGPA() {
+        if (currentURL != "https://sv.haui.edu.vn/student/result/examresult") {
+            return;
+        }
+        const hpNotGPA1 = [
+            "FL609", // Tiếng Anh cơ bản FL609x
+            "PE60", // Giáo dục thể chất PE60xx
+            "DC600", // Giáo dục quốc phòng DC600x
+            "IC6005", // Công nghệ thông tin cơ bản
+            "IC6007", // Công nghệ thông tin nâng cao
+        ];
+        const hocPhan = $$("tr.kTableAltRow, tr.kTableRow", $("div.kGrid"));
+
+        let diemTB = 0;
+        let tongTinChi = 0;
+        for (const row of hocPhan) {
+            // Bỏ qua hpNotGPA
+            if (hpNotGPA1.some((hp) => row.children[1].textContent.includes(hp))) continue;
+            const oDiem = row.children[12];
+            // Bỏ qua những học phần không có điểm
+            if (oDiem.textContent.trim() == "") continue;
+            const diemSo = Number(oDiem.textContent.trim());
+            const tinChi = Number(row.children[5].textContent.trim());
+            diemTB += diemSo * tinChi;
+            tongTinChi += tinChi;
+        }
+        const GPA = diemTB / tongTinChi;
+        return GPA;
+    }
+    // Show recalculated GPA
+    function showRecalculatedGPA() {
+        if (currentURL != "https://sv.haui.edu.vn/student/result/examresult") {
+            return;
+        }
+        const editScoreButton = $("#edit-score");
+        if (!editScoreButton.checked) {
+            return;
+        }
+        highlightGradeScores();
+        const GPA = recalculateGPA();
+
+        if ($("span#can-replace.info-examresult")) {
+            $("span#can-replace.info-examresult").remove();
+        }
+        const tableContainer = $("div.kGrid:last-child > div:last-child");
+        const newElement = document.createElement("span");
+        newElement.className = "info-examresult";
+        newElement.id = "can-replace";
+
+        const totalCredits = GM_getValue("totalCredits");
+        if (totalCredits == null) {
+            console.log("Không tìm thấy tổng số tín chỉ");
+            return;
+        }
+        const currentCredits = GM_getValue("currentCredits");
+        const remainingCredits = totalCredits - currentCredits;
+        const scoresToGPA25 = (2.5 * totalCredits - GPA * currentCredits) / remainingCredits;
+        const scoresToGPA32 = (3.2 * totalCredits - GPA * currentCredits) / remainingCredits;
+        const scoresToGPA36 = (3.6 * totalCredits - GPA * currentCredits) / remainingCredits;
+        newElement.innerHTML = `
+            <p>Tính lại: </p>
+            <p>Các môn còn lại cần đạt: ${scoresToGPA25.toFixed(2)} để GPA 2.5</p>
+            <p>Các môn còn lại cần đạt: ${scoresToGPA32.toFixed(2)} để GPA 3.2</p>
+            <p>Các môn còn lại cần đạt: ${scoresToGPA36.toFixed(2)} để GPA 3.6</p>
+        `;
+        tableContainer.insertAdjacentElement("beforeend", newElement);
     }
     // ======================================================================================
     // Toggle examresult and studyresults
@@ -592,23 +668,28 @@
             currentURL.includes("https://sv.haui.edu.vn/student/result/viewexamresultclass?id=")
         ) {
             toggleLink.textContent = "---Kết quả học tập---";
-            toggleLink.href = "https://sv.haui.edu.vn/student/result/viewstudyresultclass?id=" + queryString;
+            toggleLink.href =
+                "https://sv.haui.edu.vn/student/result/viewstudyresultclass?id=" + queryString;
         } else if (
             currentURL.includes("https://sv.haui.edu.vn/student/result/viewstudyresultclass?id=")
         ) {
             toggleLink.textContent = "---Kết quả thi lớp---";
-            toggleLink.href = "https://sv.haui.edu.vn/student/result/viewexamresultclass?id=" + queryString;
+            toggleLink.href =
+                "https://sv.haui.edu.vn/student/result/viewexamresultclass?id=" + queryString;
         }
 
         title.appendChild(toggleLinkContainer);
     }
     // ======================================================================================
     const changeHeaderInterval = controlInterval(changeHeader, 5000);
+    const showRecalculatedGPAInterval = controlInterval(showRecalculatedGPA, 1000);
     setTimeout(() => {
         // Run
         console.log("sv.HaUI loaded: " + currentURL);
         // Change header
         changeHeaderInterval.start(5000, true);
+        // Show recalculated GPA
+        showRecalculatedGPAInterval.start(1000, false);
 
         // Customize Home page
         customizeHomePage();
