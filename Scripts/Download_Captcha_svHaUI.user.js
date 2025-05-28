@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Download captcha svHaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.0
+// @version      2.1
 // @description  Tự động tải captcha của svHaUI
 // @match        https://sv.haui.edu.vn/*
 // @grant        none
@@ -53,7 +53,7 @@
     async function downloadCaptcha(captchaImgBase64, captchaLabel) {
         const a = document.createElement("a");
         a.href = captchaImgBase64;
-        a.download = `(captcha svHaUI)${captchaLabel}.jpg`;
+        a.download = `captcha_svHaUI__${captchaLabel}.jpg`;
         a.click();
         a.remove();
     }
