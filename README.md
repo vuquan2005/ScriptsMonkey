@@ -4,11 +4,11 @@
 
 ## 📂 Danh sách Userscript
 
-| 🏷️ Tên Script                | 🔍 Mô tả                                       | 📝 Chi tiết                                         | 📝 Mã nguồn                               | ⚙️ Cài đặt                                                |
-| ---------------------------- | ---------------------------------------------- | --------------------------------------------------- | ----------------------------------------- | --------------------------------------------------------- |
-| `EOP_Helper.user.js`         | Hỗ trợ nâng cao khi sử dụng trang web EOP      | [📖 Chi tiết](./Docs/EOP_Helper.user.js.md)         | [📝 Mã nguồn](Scripts/EOP_Helper.user.js) | [📥 Install](Scripts/EOP_Helper.user.js?raw=true)         |
-| `TruyenTranhEnhance.user.js` | Tối ưu trải nghiệm đọc truyện tranh trực tuyến | [📖 Chi tiết](./Docs/TruyenTranhEnhance.user.js.md) | [📝 Mã nguồn](Scripts/TruyenTranhEnhance.user.js) | [📥 Install](Scripts/TruyenTranhEnhance.user.js?raw=true) |
-| `svHaUI_Helper.user.js`      | Công cụ hỗ trợ cho sinh viên HaUI              | [📖 Chi tiết](./Docs/svHaUI_Helper.user.js.md)      | [📝 Mã nguồn](Scripts/svHaUI_Helper.user.js) | [📥 Install](Scripts/svHaUI_Helper.user.js?raw=true)      |
+| 🏷️ Tên Script                                                        | 🔍 Mô tả                                       | 📝 Chi tiết                                         | 📝 Mã nguồn                                       | ⚙️ Cài đặt                                                |
+| -------------------------------------------------------------------- | ---------------------------------------------- | --------------------------------------------------- | ------------------------------------------------- | --------------------------------------------------------- |
+| [`EOP_Helper.user.js`](./Docs/EOP_Helper.user.js.md)                 | Hỗ trợ nâng cao khi sử dụng trang web EOP      | [📖 Chi tiết](./Docs/EOP_Helper.user.js.md)         | [📝 Mã nguồn](Scripts/EOP_Helper.user.js)         | [📥 Install](Scripts/EOP_Helper.user.js?raw=true)         |
+| [`TruyenTranhEnhance.user.js`](./Docs/TruyenTranhEnhance.user.js.md) | Tối ưu trải nghiệm đọc truyện tranh trực tuyến | [📖 Chi tiết](./Docs/TruyenTranhEnhance.user.js.md) | [📝 Mã nguồn](Scripts/TruyenTranhEnhance.user.js) | [📥 Install](Scripts/TruyenTranhEnhance.user.js?raw=true) |
+| [`svHaUI_Helper.user.js`](./Docs/svHaUI_Helper.user.md)              | Công cụ hỗ trợ cho sinh viên HaUI              | [📖 Chi tiết](./Docs/svHaUI_Helper.user.js.md)      | [📝 Mã nguồn](Scripts/svHaUI_Helper.user.js)      | [📥 Install](Scripts/svHaUI_Helper.user.js?raw=true)      |
 
 ## 🚀 Cài đặt Userscript
 
@@ -19,7 +19,7 @@
 1. Truy cập [Tampermonkey](https://www.tampermonkey.net/).
 2. Chọn trình duyệt bạn đang sử dụng và làm theo hướng dẫn cài đặt.
 
-    (Lưu ý: Do google cập nhật Manifest V3 nên cần bật [`Chế độ nhà phát triển`](https://www.tampermonkey.net/faq.php?ext=iikm&version=5.3.3#Q209)) 
+    (Lưu ý: Do google cập nhật Manifest V3 nên cần bật [`Chế độ nhà phát triển`](https://www.tampermonkey.net/faq.php?ext=iikm&version=5.3.3#Q209))
 
 ### Bước 2: Thêm Userscript từ ScriptsMonkey
 

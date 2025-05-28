@@ -8,9 +8,9 @@ Xem hướng dẫn cài đặt [tại đây](/README.md#-cài-đặt-userscript)
 
 ## 🚀 **Cài đặt**
 
-| 🏷️ Tên Script           | 🔍 Mô tả                                     | 📖 Chi tiết                                 | 📝 Mã nguồn                                  | ⚙️ Cài đặt                                            |
-| ----------------------- | -------------------------------------------- | ------------------------------------------- | -------------------------------------------- | ----------------------------------------------------- |
-| `svHaUI_Helper.user.js` | Nghịch một chút với trang web sv.haui.edu.vn | [📖 Chi tiết](./Docs/svHaUI_Helper.user.md) | [📝 Mã nguồn](Scripts/svHaUI_Helper.user.js) | [📥 Install](.Scripts/svHaUI_Helper.user.js?raw=true) |
+| 🏷️ Tên Script                                           | 🔍 Mô tả                                     | 📖 Chi tiết                                 | 📝 Mã nguồn                                  | ⚙️ Cài đặt                                            |
+| ------------------------------------------------------- | -------------------------------------------- | ------------------------------------------- | -------------------------------------------- | ----------------------------------------------------- |
+| [`svHaUI_Helper.user.js`](./Docs/svHaUI_Helper.user.md) | Nghịch một chút với trang web sv.haui.edu.vn | [📖 Chi tiết](./Docs/svHaUI_Helper.user.md) | [📝 Mã nguồn](Scripts/svHaUI_Helper.user.js) | [📥 Install](.Scripts/svHaUI_Helper.user.js?raw=true) |
 
 ## ✨ **Tính năng nổi bật**
 

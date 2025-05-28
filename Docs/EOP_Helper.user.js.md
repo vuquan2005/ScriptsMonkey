@@ -10,7 +10,7 @@ Xem hướng dẫn cài đặt [tại đây](/README.md#-cài-đặt-userscript)
 
 | 🏷️ Tên Script        | 🔍 Mô tả                                  | 📖 Chi tiết                                 | 📝 Mã nguồn                               | ⚙️ Cài đặt                                         |
 | -------------------- | ----------------------------------------- | ------------------------------------------- | ----------------------------------------- | -------------------------------------------------- |
-| `EOP_Helper.user.js` | Hỗ trợ nâng cao khi sử dụng trang web EOP | [📖 Chi tiết](./Docs/EOP_Helper.user.js.md) | [📝 Mã nguồn](Scripts/EOP_Helper.user.js) | [📥 Install](.Scripts/EOP_Helper.user.js?raw=true) |
+| [`EOP_Helper.user.js`](./Docs/EOP_Helper.user.js.md) | Hỗ trợ nâng cao khi sử dụng trang web EOP | [📖 Chi tiết](./Docs/EOP_Helper.user.js.md) | [📝 Mã nguồn](Scripts/EOP_Helper.user.js) | [📥 Install](.Scripts/EOP_Helper.user.js?raw=true) |
 
 ## ✨ **Tính năng nổi bật**
 
