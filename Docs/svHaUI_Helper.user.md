@@ -19,6 +19,7 @@ Xem hướng dẫn cài đặt [tại đây](/README.md#-cài-đặt-userscript)
     -   Hiển thị các lối tắt trên trang chủ.
     -   Hiển thị lịch thi.
     -   Hiển thị kế hoạch thi.
+    -   Hiển thị khoảng cách ngày cho đến ngày thi/ đã thi.
 -   Customize trang kết quả học tập
     -   Tô màu cho các môn chưa có điểm TX.
 -   Customize trang kết quả thi
@@ -33,9 +34,11 @@ Xem hướng dẫn cài đặt [tại đây](/README.md#-cài-đặt-userscript)
 -   Customize trang lịch thi
     -   Sắp xếp lịch thi theo ngày.
     -   Tô màu cho các môn thi có lịch thi, nhưng chưa thi.
+    -   Hiển thị số ngày cho đến ngày thi.
 -   Customize trang kế hoạch thi
     -   Tự động check 13 học phần gần nhất
     -   Hiển thị kế hoạch thi kế tiếp và một tháng trước.
+    -   Hiển thị khoảng cách ngày cho đến ngày thi.
 
 ## 🖼️ **Hình ảnh minh hoạ**
 
