@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      12.6
+// @version      13.0
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -40,6 +40,7 @@
     const todayDate = today.getDate();
     const todayMonth = today.getMonth() + 1;
     const todayYear = today.getFullYear();
+    const todayDateString = `${todayDate}/${todayMonth}/${todayYear}`;
     // =====================================================================================
     // Change header
     function changeHeader() {
@@ -213,6 +214,17 @@
         }
         return dateArray;
     }
+    // Tính khoảng cách ngày giữa 2 ngày
+    function calculateDateDifference(date1, date2 = todayDateString) {
+        console.log(`date1: ${date1}, date2: ${date2}`);
+        const date1Array = convertDate(date1);
+        const date2Array = convertDate(date2);
+        console.log(`date1Array: ${date1Array}, date2Array: ${date2Array}`);
+        const d1 = new Date(date1Array[2], date1Array[1] - 1, date1Array[0]);
+        const d2 = new Date(date2Array[2], date2Array[1] - 1, date2Array[0]);
+        const difference = d1.getTime() - d2.getTime();
+        return difference / (1000 * 60 * 60 * 24);
+    }
     // Check exam time
     function checkExamTime(examElement, cellIndex, isOneMonthLate = false) {
         // console.log(`today: ${todayDate}/${todayMonth}/${todayYear}`);
@@ -314,11 +326,16 @@
             if (checkExamTime(examPlan, 3, true)) {
                 i++;
                 examPlan.children[0].textContent = `${i}`;
-                // Nếu chưa đến ngày thi thì tô màu vàng
-                if (checkExamTime(examPlan, 3, false))
-                    examPlan.style.backgroundColor = "rgb(248,226,135)";
-                examScheduleResultTable.appendChild(examPlan);
             }
+            if (checkExamTime(examPlan, 3, false)) {
+                // Nếu chưa đến ngày thi thì tô màu vàng
+                examPlan.style.backgroundColor = "rgb(248,226,135)";
+                // Hiển thị khoảng cách ngày
+                examPlan.children[3].innerHTML += `<br>(${calculateDateDifference(
+                    examPlan.children[3].textContent
+                )} ngày sau)`;
+            }
+            examScheduleResultTable.appendChild(examPlan);
             await delay(200);
         }
         // console.log("listExamPlan: ", listExamPlan);
@@ -376,9 +393,21 @@
             if (checkExamTime(examPlan, 3, true)) {
                 i++;
                 examPlan.children[0].textContent = `${i}`;
-                // Nếu chưa đến ngày thi thì tô màu vàng
-                if (checkExamTime(examPlan, 3, false))
+
+                if (checkExamTime(examPlan, 3, false)) {
+                    // Nếu chưa đến ngày thi thì tô màu vàng
                     examPlan.style.backgroundColor = "rgb(248,226,135)";
+                    // Hiển thị khoảng cách ngày
+                    examPlan.children[3].innerHTML += `<br>(${calculateDateDifference(
+                        examPlan.children[3].textContent
+                    )} ngày sau)`;
+                }
+                if (checkExamTime(examPlan, 3, true)) {
+                    // Hiển thị khoảng cách ngày
+                    examPlan.children[3].innerHTML += `<br>(${Math.abs(
+                        calculateDateDifference(examPlan.children[3].textContent)
+                    )} ngày trước)`;
+                }
                 listExamPlan.push(examPlan);
                 addExamPlanToPanel(examPlan);
             }
@@ -417,6 +446,10 @@
         for (const examElement of examSchedule) {
             if (checkExamTime(examElement, 2, false)) {
                 examElement.style.backgroundColor = "rgb(248,226,135)";
+                // Hiển thị khoảng cách ngày
+                examElement.children[2].innerHTML += `<br>(${calculateDateDifference(
+                    examElement.children[2].textContent
+                )} ngày sau)`;
             }
         }
     }
@@ -474,9 +507,21 @@
                 i++;
                 examScheduleElement.children[13].remove();
                 examScheduleElement.children[0].textContent = `${i}`;
-                // Nếu chưa đến ngày thi thì tô màu vàng
-                if (checkExamTime(examScheduleElement, 2, false))
+
+                if (checkExamTime(examScheduleElement, 2, false)) {
+                    // Nếu chưa đến ngày thi thì tô màu vàng
                     examScheduleElement.style.backgroundColor = "rgb(248,226,135)";
+                    // Hiển thị khoảng cách ngày
+                    examScheduleElement.children[2].innerHTML += `<br>(${calculateDateDifference(
+                        examScheduleElement.children[2].textContent
+                    )} ngày sau)`;
+                }
+                if (checkExamTime(examScheduleElement, 2, true)) {
+                    // Hiển thị khoảng cách ngày
+                    examScheduleElement.children[2].innerHTML += `<br>(${Math.abs(
+                        calculateDateDifference(examScheduleElement.children[2].textContent)
+                    )} ngày trước)`;
+                }
                 listExamSchedule.push(examScheduleElement);
                 addExamScheduleToPanel(examScheduleElement);
             }
