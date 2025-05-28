@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      12.2
+// @version      12.3
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -690,7 +690,7 @@
         const scoresToGPA32 = (3.2 * totalCredits - GPA * currentCredits) / remainingCredits;
         const scoresToGPA36 = (3.6 * totalCredits - GPA * currentCredits) / remainingCredits;
         newElement.innerHTML = `
-            <p>Tính lại: </p>
+            <p>Tính lại: ${GPA.toFixed(2)}</p>
             <p style="display: none;">Các môn còn lại cần đạt: ${scoresToGPA25.toFixed(
                 2
             )} để GPA 2.5</p>
@@ -741,7 +741,6 @@
 
         title.appendChild(toggleLinkContainer);
     }
-    // =======
     // ======================================================================================
     const changeHeaderInterval = controlInterval(changeHeader, 5000);
     const showRecalculatedGPAInterval = controlInterval(showRecalculatedGPA, 1000);
