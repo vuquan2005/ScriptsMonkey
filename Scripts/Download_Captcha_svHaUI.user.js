@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Download captcha svHaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.1
+// @version      2.2
 // @description  Tự động tải captcha của svHaUI
 // @match        https://sv.haui.edu.vn/*
 // @grant        none
@@ -56,6 +56,7 @@
         a.download = `captcha_svHaUI__${captchaLabel}.jpg`;
         a.click();
         a.remove();
+        GM_setValue("isLoginPassed", false);
     }
     async function captchaIsPassed() {
         const captchaImgBase64 = await GM_getValue("captchaImg", "");
