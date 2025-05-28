@@ -8,9 +8,9 @@ Xem hướng dẫn cài đặt [tại đây](/README.md#-cài-đặt-userscript)
 
 ## 🚀 **Cài đặt**
 
-| 🏷️ Tên Script           | 🔍 Mô tả                                             | 📖 Chi tiết                                 | 📝 Mã nguồn                                  | ⚙️ Cài đặt                                            |
-| ----------------------- | ---------------------------------------------------- | ------------------------------------------- | -------------------------------------------- | ----------------------------------------------------- |
-| `svHaUI_Helper.user.js` | Hỗ trợ nâng cao khi sử dụng trang web sv.haui.edu.vn | [📖 Chi tiết](./Docs/svHaUI_Helper.user.md) | [📝 Mã nguồn](Scripts/svHaUI_Helper.user.js) | [📥 Install](.Scripts/svHaUI_Helper.user.js?raw=true) |
+| 🏷️ Tên Script           | 🔍 Mô tả                                     | 📖 Chi tiết                                 | 📝 Mã nguồn                                  | ⚙️ Cài đặt                                            |
+| ----------------------- | -------------------------------------------- | ------------------------------------------- | -------------------------------------------- | ----------------------------------------------------- |
+| `svHaUI_Helper.user.js` | Nghịch một chút với trang web sv.haui.edu.vn | [📖 Chi tiết](./Docs/svHaUI_Helper.user.md) | [📝 Mã nguồn](Scripts/svHaUI_Helper.user.js) | [📥 Install](.Scripts/svHaUI_Helper.user.js?raw=true) |
 
 ## ✨ **Tính năng nổi bật**
 
@@ -34,12 +34,35 @@ Xem hướng dẫn cài đặt [tại đây](/README.md#-cài-đặt-userscript)
     -   Sắp xếp lịch thi theo ngày.
     -   Tô màu cho các môn thi có lịch thi, nhưng chưa thi.
 -   Customize trang kế hoạch thi
-    -   Tô màu cho các môn chưa có điểm TX.
-    -   Tô màu cho các môn chưa có điểm TX.
--   Customize trang kế hoạch thi
     -   Tự động check 13 học phần gần nhất
     -   Hiển thị kế hoạch thi kế tiếp và một tháng trước.
 
 ## 🖼️ **Hình ảnh minh hoạ**
 
+### Đổi tiêu đề trang web
 
+![⚠️](/assets/images/svHaUI_Helper.user.js/changeHeader.png "Đổi tiêu đề trang web")
+![⚠️](/assets/images/svHaUI_Helper.user.js/changeHeader1.png "Đổi tiêu đề trang web")
+
+### Trang chủ
+
+![⚠️](/assets/images/svHaUI_Helper.user.js/homePage.png "Trang chủ")
+
+### Kết quả học tập
+
+![⚠️](/assets/images/svHaUI_Helper.user.js/highlightStudyresultsScores.png "Tô màu cho các môn chưa có điểm TX")
+![⚠️](/assets/images/svHaUI_Helper.user.js/navigateToExamResults.png "Chuyển đến trang kết quả thi")
+
+### Kết quả thi
+
+[Bấm vào đây nếu video không thể load](/assets/images/svHaUI_Helper.user.js/customizeExamResults.mp4)
+![](/assets/images/svHaUI_Helper.user.js/customizeExamResults.gif "Customize trang kết quả thi")
+![⚠️](/assets/images/svHaUI_Helper.user.js/navigateToStudyResults.png "Chuyển đến trang kết quả học tập")
+
+### Lịch thi
+
+![⚠️](/assets/images/svHaUI_Helper.user.js/highlightExamSchedule.png "Tô màu cho các môn thi có lịch thi, nhưng chưa thi")
+
+### Kế hoạch thi
+
+![⚠️](/assets/images/svHaUI_Helper.user.js/showExamPlan.png "Customize trang kế hoạch thi")
