@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Download captcha svHaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.3
+// @version      2.4
 // @description  Tự động tải captcha của svHaUI
 // @match        https://sv.haui.edu.vn/*
 // @grant        none
@@ -80,10 +80,10 @@
         const isLoginPassed = await GM_getValue("isLoginPassed", false);
 
         if (currentURL == "https://sv.haui.edu.vn/AImages.aspx") {
-            console.log("Captcha web");
+            // console.log("Captcha web");
             setTimeout(captchaWeb, 300);
         } else if (currentURL.includes("https://sv.haui.edu.vn/sso?token=")) {
-            console.log("Login web");
+            // console.log("Login web");
             loginWeb();
         } else if (
             // currentURL == "https://sv.haui.edu.vn/" &&
@@ -93,14 +93,14 @@
         ) {
             captchaIsPassed();
         } else {
-            console.log(
-                "currentURL: ",
-                currentURL,
-                "\nisLoginPassed: ",
-                isLoginPassed,
-                "\nlastURL: ",
-                lastURL
-            );
+            // console.log(
+            //     "currentURL: ",
+            //     currentURL,
+            //     "\nisLoginPassed: ",
+            //     isLoginPassed,
+            //     "\nlastURL: ",
+            //     lastURL
+            // );
         }
     }
     setTimeout(run, 200);
