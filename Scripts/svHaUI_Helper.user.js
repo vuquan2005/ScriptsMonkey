@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      12.5
+// @version      12.6
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -580,18 +580,9 @@
 
     // Check edit score is enable
     function checkEditScoreIsEnable() {
-        if (
-            currentURL != "https://sv.haui.edu.vn/student/result/examresult" &&
-            !currentURL.includes("https://sv.haui.edu.vn/student/result/viewexamresult?code=")
-        ) {
-            return;
-        }
         const editScoreButton = $("#edit-score");
         const hocPhan = $$("tr.kTableAltRow, tr.kTableRow", $("div.kGrid"));
-        const diemHocPhan = $$(
-            "tr.kTableAltRow > td:nth-child(13), tr.kTableRow > td:nth-child(13)",
-            $("div.kGrid")
-        );
+
         const letterScore = {
             4: "A",
             3.5: "B+",
@@ -614,6 +605,7 @@
         if (!editScoreButton.checked) {
             // Not checked
             for (const row of hocPhan) {
+                console.log("row: ", row);
                 // Disable edit score
                 row.children[12].setAttribute("contenteditable", "false");
                 // Return original score
@@ -621,7 +613,7 @@
                 row.children[13].textContent =
                     letterScore[row.children[12].getAttribute("original-score")];
                 // Remove text content
-                row.children[16].textContent = "";
+                row.children[15].textContent = "";
             }
             highlightGradeScores();
             return false;
@@ -632,7 +624,7 @@
                 row.children[12].setAttribute("contenteditable", "true");
                 // Refresh letter score
                 row.children[13].textContent = letterScore[row.children[12].textContent.trim()];
-                row.children[16].textContent =
+                row.children[15].textContent =
                     letterScore[row.children[12].getAttribute("original-score")];
             }
             highlightGradeScores();
@@ -641,9 +633,6 @@
     }
     // Recalculate GPA
     function recalculateGPA() {
-        if (currentURL != "https://sv.haui.edu.vn/student/result/examresult") {
-            return;
-        }
         const hpNotGPA1 = [
             "FL609", // Tiếng Anh cơ bản FL609x
             "PE60", // Giáo dục thể chất PE60xx
@@ -671,7 +660,10 @@
     }
     // Show recalculated GPA
     function showRecalculatedGPA() {
-        if (currentURL != "https://sv.haui.edu.vn/student/result/examresult") {
+        if (
+            currentURL != "https://sv.haui.edu.vn/student/result/examresult" &&
+            !currentURL.includes("https://sv.haui.edu.vn/student/result/viewexamresult?code=")
+        ) {
             return;
         }
         if (!checkEditScoreIsEnable()) {
