@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      12.4
+// @version      12.5
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -505,29 +505,34 @@
         console.log("totalCredits: ", totalCreditsNumber);
     }
     // Get date some info in examresult
-    function getSomeInfoInExamresult() {
-        if (currentURL != "https://sv.haui.edu.vn/student/result/examresult") {
-            return;
-        }
-        const currentCredits = $("div.kGrid > table > tbody > tr:last-child > td:first-child");
+    function getSomeInfoInExamresult(tableContainer) {
+        const currentCredits = $("tbody > tr:last-child > td:first-child", tableContainer);
         const currentCreditsNumber = Number(
             currentCredits.textContent.trim().match(/(\d+)(?:\.\d+)?/g)[0]
         );
         GM_setValue("currentCredits", currentCreditsNumber);
         console.log("currentCredits: ", currentCreditsNumber);
 
-        const currentGPA = $("div.kGrid > table > tbody > tr:nth-last-child(2) > td:nth-child(2)");
+        const currentGPA = $("tbody > tr:nth-last-child(2) > td:nth-child(2)", tableContainer);
         const currentGPAValue = Number(currentGPA.textContent.trim().match(/(\d+)(?:\.\d+)?/g)[0]);
         GM_setValue("currentGPA", currentGPAValue);
         console.log("currentGPA: ", currentGPAValue);
     }
     // Add some info in examresult
     function addSomeInfoInExamresult() {
-        if (currentURL != "https://sv.haui.edu.vn/student/result/examresult") {
+        if (
+            currentURL != "https://sv.haui.edu.vn/student/result/examresult" &&
+            !currentURL.includes("https://sv.haui.edu.vn/student/result/viewexamresult?code=")
+        ) {
             return;
         }
-        getSomeInfoInExamresult();
-        const tableContainer = $("div.kGrid:last-child > div:last-child");
+        let tableContainer;
+        if (currentURL == "https://sv.haui.edu.vn/student/result/examresult") {
+            tableContainer = $("div.kGrid:last-child > table");
+        } else {
+            tableContainer = $("div.kGrid> div > table");
+        }
+        getSomeInfoInExamresult(tableContainer);
         const newElement = document.createElement("span");
         newElement.className = "info-examresult";
         GM_addStyle(`
@@ -539,7 +544,7 @@
             }
         `);
         newElement.style.paddingLeft = "5px";
-        tableContainer.insertAdjacentElement("beforeend", newElement);
+        tableContainer.insertAdjacentElement("afterend", newElement);
 
         const totalCredits = GM_getValue("totalCredits");
         if (totalCredits == null) {
@@ -563,7 +568,8 @@
         `;
 
         const currentCreditsSpan = $(
-            "div.kGrid > table > tbody > tr:last-child > td:first-child > span"
+            "tbody > tr:last-child > td:first-child > span",
+            tableContainer
         );
         currentCreditsSpan.textContent = currentCreditsSpan.textContent.replace(
             /(\d+)\.0\b/g,
@@ -574,7 +580,10 @@
 
     // Check edit score is enable
     function checkEditScoreIsEnable() {
-        if (currentURL != "https://sv.haui.edu.vn/student/result/examresult") {
+        if (
+            currentURL != "https://sv.haui.edu.vn/student/result/examresult" &&
+            !currentURL.includes("https://sv.haui.edu.vn/student/result/viewexamresult?code=")
+        ) {
             return;
         }
         const editScoreButton = $("#edit-score");
@@ -690,7 +699,8 @@
         const scoresToGPA32 = (3.2 * totalCredits - GPA * currentCredits) / remainingCredits;
         const scoresToGPA36 = (3.6 * totalCredits - GPA * currentCredits) / remainingCredits;
         newElement.innerHTML = `<hr>
-            <p>Tính lại: ${GPA.toFixed(2)}</p>
+            <p>Tính lại:</p>
+            <p>GPA: ${GPA.toFixed(2)}</p>
             <p style="display: none;">Các môn còn lại cần đạt: ${scoresToGPA25.toFixed(
                 2
             )} để GPA 2.5</p>
