@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      12.1
+// @version      12.2
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -55,7 +55,7 @@
     }
     // Customize Home page
     function customizeHomePage() {
-        if (currentURL != "https://sv.haui.edu.vn/") {
+        if (currentURL != "https://sv.haui.edu.vn/" || !$("span.user-name")) {
             return;
         }
         const frmMain = $("form#frmMain");
@@ -326,7 +326,7 @@
 
     // Create exam plan panel in home page
     function createExamPlanPanelInHomePage() {
-        if (currentURL != "https://sv.haui.edu.vn/") {
+        if (currentURL != "https://sv.haui.edu.vn/" || !$("span.user-name")) {
             return;
         }
         const examPlanPanelHtml = `
@@ -423,7 +423,7 @@
 
     // Create exam schedule panel in home page
     function createExamSchedulePanelInHomePage() {
-        if (currentURL != "https://sv.haui.edu.vn/") {
+        if (currentURL != "https://sv.haui.edu.vn/" || !$("span.user-name")) {
             return;
         }
         const examSchedulePanelHtml = `
@@ -554,7 +554,9 @@
         const scoresToGPA36 = (3.6 * totalCredits - currentGPA * currentCredits) / remainingCredits;
         newElement.innerHTML = `
             <p>Số tín còn lại: ${remainingCredits}</p>
-            <p>Các môn còn lại cần đạt: ${scoresToGPA25.toFixed(2)} để GPA 2.5</p>
+            <p style="display: none;">Các môn còn lại cần đạt: ${scoresToGPA25.toFixed(
+                2
+            )} để GPA 2.5</p>
             <p>Các môn còn lại cần đạt: ${scoresToGPA32.toFixed(2)} để GPA 3.2</p>
             <p>Các môn còn lại cần đạt: ${scoresToGPA36.toFixed(2)} để GPA 3.6</p>
             <input type="checkbox" id="edit-score"> Sửa điểm </input>
@@ -689,7 +691,9 @@
         const scoresToGPA36 = (3.6 * totalCredits - GPA * currentCredits) / remainingCredits;
         newElement.innerHTML = `
             <p>Tính lại: </p>
-            <p>Các môn còn lại cần đạt: ${scoresToGPA25.toFixed(2)} để GPA 2.5</p>
+            <p style="display: none;">Các môn còn lại cần đạt: ${scoresToGPA25.toFixed(
+                2
+            )} để GPA 2.5</p>
             <p>Các môn còn lại cần đạt: ${scoresToGPA32.toFixed(2)} để GPA 3.2</p>
             <p>Các môn còn lại cần đạt: ${scoresToGPA36.toFixed(2)} để GPA 3.6</p>
         `;
@@ -737,6 +741,7 @@
 
         title.appendChild(toggleLinkContainer);
     }
+    // =======
     // ======================================================================================
     const changeHeaderInterval = controlInterval(changeHeader, 5000);
     const showRecalculatedGPAInterval = controlInterval(showRecalculatedGPA, 1000);
