@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Download captcha svHaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.2
+// @version      2.3
 // @description  Tự động tải captcha của svHaUI
 // @match        https://sv.haui.edu.vn/*
 // @grant        none
@@ -86,7 +86,7 @@
             console.log("Login web");
             loginWeb();
         } else if (
-            currentURL == "https://sv.haui.edu.vn/" &&
+            // currentURL == "https://sv.haui.edu.vn/" &&
             $("span.user-name") &&
             isLoginPassed &&
             lastURL.includes("https://sv.haui.edu.vn/sso?token=")
