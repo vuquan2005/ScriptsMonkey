@@ -41,8 +41,8 @@ Xem hướng dẫn cài đặt [tại đây](/README.md#-cài-đặt-userscript)
 
 ### Đổi tiêu đề trang web
 
-![⚠️](/assets/images/svHaUI_Helper.user.js/changeHeader.png "Đổi tiêu đề trang web")
-![⚠️](/assets/images/svHaUI_Helper.user.js/changeHeader1.png "Đổi tiêu đề trang web")
+![⚠️](/assets/images/svHaUI_Helper.user.js/ChangeHeader.png "Đổi tiêu đề trang web")
+![⚠️](/assets/images/svHaUI_Helper.user.js/ChangeHeader1.png "Đổi tiêu đề trang web")
 
 ### Trang chủ
 
