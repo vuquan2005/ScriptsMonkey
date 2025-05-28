@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      12.3
+// @version      12.4
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -689,7 +689,7 @@
         const scoresToGPA25 = (2.5 * totalCredits - GPA * currentCredits) / remainingCredits;
         const scoresToGPA32 = (3.2 * totalCredits - GPA * currentCredits) / remainingCredits;
         const scoresToGPA36 = (3.6 * totalCredits - GPA * currentCredits) / remainingCredits;
-        newElement.innerHTML = `
+        newElement.innerHTML = `<hr>
             <p>Tính lại: ${GPA.toFixed(2)}</p>
             <p style="display: none;">Các môn còn lại cần đạt: ${scoresToGPA25.toFixed(
                 2
@@ -720,21 +720,21 @@
         toggleLinkContainer.appendChild(toggleLink);
 
         if (currentURL.includes("https://sv.haui.edu.vn/student/result/examresult")) {
-            toggleLink.textContent = "---Kết quả học tập---";
+            toggleLink.textContent = "---Điểm TX---";
             toggleLink.href = "https://sv.haui.edu.vn/student/result/studyresults";
         } else if (currentURL.includes("https://sv.haui.edu.vn/student/result/studyresults")) {
-            toggleLink.textContent = "---Kết quả thi---";
+            toggleLink.textContent = "---Điểm thi---";
             toggleLink.href = "https://sv.haui.edu.vn/student/result/examresult";
         } else if (
             currentURL.includes("https://sv.haui.edu.vn/student/result/viewexamresultclass?id=")
         ) {
-            toggleLink.textContent = "---Kết quả học tập---";
+            toggleLink.textContent = "---Điểm TX lớp---";
             toggleLink.href =
                 "https://sv.haui.edu.vn/student/result/viewstudyresultclass?id=" + queryString;
         } else if (
             currentURL.includes("https://sv.haui.edu.vn/student/result/viewstudyresultclass?id=")
         ) {
-            toggleLink.textContent = "---Kết quả thi lớp---";
+            toggleLink.textContent = "---Điểm thi lớp---";
             toggleLink.href =
                 "https://sv.haui.edu.vn/student/result/viewexamresultclass?id=" + queryString;
         }
