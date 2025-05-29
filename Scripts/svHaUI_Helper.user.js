@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      13.0
+// @version      13.1
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -223,7 +223,8 @@
         const d1 = new Date(date1Array[2], date1Array[1] - 1, date1Array[0]);
         const d2 = new Date(date2Array[2], date2Array[1] - 1, date2Array[0]);
         const difference = d1.getTime() - d2.getTime();
-        return difference / (1000 * 60 * 60 * 24);
+        const days = difference / (1000 * 60 * 60 * 24) - 1;
+        return days;
     }
     // Check exam time
     function checkExamTime(examElement, cellIndex, isOneMonthLate = false) {
