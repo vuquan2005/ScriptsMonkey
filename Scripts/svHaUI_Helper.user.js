@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      13.1
+// @version      13.2
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -41,6 +41,13 @@
     const todayMonth = today.getMonth() + 1;
     const todayYear = today.getFullYear();
     const todayDateString = `${todayDate}/${todayMonth}/${todayYear}`;
+    const hpNotGPA = [
+        "FL609", // Tiếng Anh cơ bản FL609x
+        "PE60", // Giáo dục thể chất PE60xx
+        "DC600", // Giáo dục quốc phòng DC600x
+        "IC6005", // Công nghệ thông tin cơ bản
+        "IC6007", // Công nghệ thông tin nâng cao
+    ];
     // =====================================================================================
     // Change header
     function changeHeader() {
@@ -162,13 +169,7 @@
             "2.0": "rgb(0, 191, 255)",
             "1.0": "rgb(46, 204, 64)",
         };
-        const hpNotGPA = [
-            "FL609", // Tiếng Anh cơ bản FL609x
-            "PE60", // Giáo dục thể chất PE60xx
-            "DC600", // Giáo dục quốc phòng DC600x
-            "IC6005", // Công nghệ thông tin cơ bản
-            "IC6007", // Công nghệ thông tin nâng cao
-        ];
+
         const hocPhan = $$("tr.kTableAltRow, tr.kTableRow", $("div.kGrid"));
 
         for (const row of hocPhan) {
@@ -651,11 +652,14 @@
         if (!editScoreButton.checked) {
             // Not checked
             for (const row of hocPhan) {
-                console.log("row: ", row);
-                // Disable edit score
+                // Vô hiệu hóa edit score
                 row.children[12].setAttribute("contenteditable", "false");
+                // Bỏ qua học phần không sửa
+                if (row.children[12].textContent == row.children[12].getAttribute("original-score"))
+                    continue;
                 // Return original score
                 row.children[12].textContent = row.children[12].getAttribute("original-score");
+                // Return original letter score
                 row.children[13].textContent =
                     letterScore[row.children[12].getAttribute("original-score")];
                 // Remove text content
@@ -666,10 +670,13 @@
         } else {
             // Checked
             for (const row of hocPhan) {
-                // Enable edit score
+                // Bật edit score
                 row.children[12].setAttribute("contenteditable", "true");
-                // Refresh letter score
+                if (row.children[12].textContent == row.children[12].getAttribute("original-score"))
+                    continue;
+                // Return original score
                 row.children[13].textContent = letterScore[row.children[12].textContent.trim()];
+                // Return original letter score
                 row.children[15].textContent =
                     letterScore[row.children[12].getAttribute("original-score")];
             }
@@ -679,33 +686,49 @@
     }
     // Recalculate GPA
     function recalculateGPA() {
-        const hpNotGPA1 = [
-            "FL609", // Tiếng Anh cơ bản FL609x
-            "PE60", // Giáo dục thể chất PE60xx
-            "DC600", // Giáo dục quốc phòng DC600x
-            "IC6005", // Công nghệ thông tin cơ bản
-            "IC6007", // Công nghệ thông tin nâng cao
-        ];
         const hocPhan = $$("tr.kTableAltRow, tr.kTableRow", $("div.kGrid"));
 
-        let diemTB = 0;
+        let diemTong = 0;
         let tongTinChi = 0;
         for (const row of hocPhan) {
             // Bỏ qua hpNotGPA
-            if (hpNotGPA1.some((hp) => row.children[1].textContent.includes(hp))) continue;
+            if (hpNotGPA.some((hp) => row.children[1].textContent.includes(hp))) continue;
             const oDiem = row.children[12];
             // Bỏ qua những học phần không có điểm
             if (oDiem.textContent.trim() == "") continue;
             const diemSo = Number(oDiem.textContent.trim());
             const tinChi = Number(row.children[5].textContent.trim());
-            diemTB += diemSo * tinChi;
+            diemTong += diemSo * tinChi;
             tongTinChi += tinChi;
         }
-        const GPA = diemTB / tongTinChi;
+        const GPA = diemTong / tongTinChi;
         return GPA;
     }
-    // Show recalculated GPA
-    function showRecalculatedGPA() {
+    // Tính điểm trung bình các môn đã sửa điểm
+    function calculateScoreAfterEditScore() {
+        const hocPhan = $$("tr.kTableAltRow, tr.kTableRow", $("div.kGrid"));
+        let diemTong = 0;
+        let tongTinChi = 0;
+        for (const row of hocPhan) {
+            // Bỏ qua hpNotGPA
+            if (hpNotGPA.some((hp) => row.children[1].textContent.includes(hp))) continue;
+            // Bỏ qua học phần không sửa
+            if (
+                row.children[12].getAttribute("original-score") ==
+                row.children[12].textContent.trim()
+            )
+                continue;
+
+            const diemSo = Number(row.children[12].textContent.trim());
+            const tinChi = Number(row.children[5].textContent.trim());
+            diemTong += diemSo * tinChi;
+            tongTinChi += tinChi;
+        }
+        const diemTB = diemTong / tongTinChi;
+        return diemTB;
+    }
+    // Show info after edit score
+    function showInfoAfterEditScore() {
         if (
             currentURL != "https://sv.haui.edu.vn/student/result/examresult" &&
             !currentURL.includes("https://sv.haui.edu.vn/student/result/viewexamresult?code=")
@@ -717,6 +740,7 @@
         }
 
         const GPA = recalculateGPA();
+        const diemTB = calculateScoreAfterEditScore();
 
         if ($("span#can-replace.info-examresult")) {
             $("span#can-replace.info-examresult").remove();
@@ -738,7 +762,7 @@
         const scoresToGPA36 = (3.6 * totalCredits - GPA * currentCredits) / remainingCredits;
         newElement.innerHTML = `<hr>
             <p>Tính lại:</p>
-            <p>GPA: ${GPA.toFixed(2)}</p>
+            <p>Trung bình điểm sửa: ${diemTB.toFixed(2)} | GPA: ${GPA.toFixed(2)}</p>
             <p style="display: none;">Các môn còn lại cần đạt: ${scoresToGPA25.toFixed(
                 2
             )} để GPA 2.5</p>
@@ -791,14 +815,14 @@
     }
     // ======================================================================================
     const changeHeaderInterval = controlInterval(changeHeader, 5000);
-    const showRecalculatedGPAInterval = controlInterval(showRecalculatedGPA, 1000);
+    const showInfoAfterEditScoreInterval = controlInterval(showInfoAfterEditScore, 1000);
     setTimeout(() => {
         // Run
         console.log("sv.HaUI loaded: " + currentURL);
         // Change header
         changeHeaderInterval.start(5000, true);
-        // Show recalculated GPA
-        showRecalculatedGPAInterval.start(1000, false);
+        // Show info after edit score
+        showInfoAfterEditScoreInterval.start(1000, false);
 
         // Customize Home page
         customizeHomePage();
