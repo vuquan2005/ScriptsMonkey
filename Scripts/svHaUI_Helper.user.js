@@ -65,7 +65,7 @@
         newTitle = newTitle.replace("Kết quả học tập các học phần", "🎯 Điểm TX");
         document.title = newTitle;
     }
-    // Customize Home page
+    // Trang chủ tuỳ biến
     function customizeHomePage() {
         if (currentURL != "https://sv.haui.edu.vn/" || !$("span.user-name")) {
             return;
@@ -148,7 +148,7 @@
             `);
         }
     }
-    // Highlight grade scores
+    // Tô điểm học phần
     function highlightGradeScores() {
         if (
             currentURL != "https://sv.haui.edu.vn/student/result/examresult" &&
@@ -348,7 +348,7 @@
         // console.log("listExamPlan: ", listExamPlan);
     }
 
-    // Create exam plan panel in home page
+    // Tạo panel kế hoạch thi trong trang chủ
     function createExamPlanPanelInHomePage() {
         if (currentURL != "https://sv.haui.edu.vn/" || !$("span.user-name")) {
             return;
@@ -461,7 +461,7 @@
         }
     }
 
-    // Create exam schedule panel in home page
+    // Tạo panel lịch thi trong trang chủ
     function createExamSchedulePanelInHomePage() {
         if (currentURL != "https://sv.haui.edu.vn/" || !$("span.user-name")) {
             return;
@@ -570,7 +570,7 @@
         GM_setValue("currentGPA", currentGPAValue);
         console.log("currentGPA: ", currentGPAValue);
     }
-    // Add some info in examresult
+    // Thêm thông tin vào trang kết quả thi
     function addSomeInfoInExamresult() {
         if (
             currentURL != "https://sv.haui.edu.vn/student/result/examresult" &&
@@ -777,7 +777,7 @@
         tableContainer.insertAdjacentElement("beforeend", newElement);
     }
     // ======================================================================================
-    // Toggle examresult and studyresults
+    // Chuyển đổi giữa kết quả thi và kết quả học tập
     function toggleExamresultAndStudyresults() {
         if (
             currentURL != "https://sv.haui.edu.vn/student/result/examresult" &&
@@ -798,21 +798,21 @@
         toggleLinkContainer.appendChild(toggleLink);
 
         if (currentURL.includes("https://sv.haui.edu.vn/student/result/examresult")) {
-            toggleLink.textContent = "---Điểm TX---";
+            toggleLink.textContent = "---Điểm Thi---> Điểm TX";
             toggleLink.href = "https://sv.haui.edu.vn/student/result/studyresults";
         } else if (currentURL.includes("https://sv.haui.edu.vn/student/result/studyresults")) {
-            toggleLink.textContent = "---Điểm thi---";
+            toggleLink.textContent = "---Điểm TX---> Điểm Thi";
             toggleLink.href = "https://sv.haui.edu.vn/student/result/examresult";
         } else if (
             currentURL.includes("https://sv.haui.edu.vn/student/result/viewexamresultclass?id=")
         ) {
-            toggleLink.textContent = "---Điểm TX lớp---";
+            toggleLink.textContent = "---Điểm thi lớp---> Điểm TX lớp";
             toggleLink.href =
                 "https://sv.haui.edu.vn/student/result/viewstudyresultclass" + queryString;
         } else if (
             currentURL.includes("https://sv.haui.edu.vn/student/result/viewstudyresultclass?id=")
         ) {
-            toggleLink.textContent = "---Điểm thi lớp---";
+            toggleLink.textContent = "---Điểm TX lớp---> Điểm thi lớp";
             toggleLink.href =
                 "https://sv.haui.edu.vn/student/result/viewexamresultclass" + queryString;
         }
@@ -863,13 +863,13 @@
 
         title.appendChild(toggleLinkContainer);
     }
-    // Di chuyển sang chi tiết học phần
+    // Di chuyển sang trang chi tiết học phần
     function moveToChiTietHocPhan() {
         if (
             currentURL != "https://sv.haui.edu.vn/student/result/examresult" &&
             currentURL != "https://sv.haui.edu.vn/student/result/studyresults" &&
-            !currentURL.includes("https://sv.haui.edu.vn/student/result/viewexamresultclass?id=") &&
-            !currentURL.includes("https://sv.haui.edu.vn/student/result/viewstudyresultclass?id=")
+            !currentURL.includes("https://sv.haui.edu.vn/student/result/viewexamresult?code=") &&
+            !currentURL.includes("https://sv.haui.edu.vn/student/result/viewstudyresult?code=")
         ) {
             return;
         }
@@ -970,7 +970,7 @@
                             (Number(row.children[tx1Index + i].textContent.trim()) *
                                 Number(heSoDiemRow[i])) /
                             100;
-                        console.log(row.children[tx1Index + i].textContent.trim());
+                        // console.log(row.children[tx1Index + i].textContent.trim());
                     }
                     row.children[tx1Index + 5].innerHTML = `Tx*Hs:<br>${tongDiem.toFixed(2)}`;
                     row.children[tx1Index + 5].style.backgroundColor = "rgb(255, 249, 227)";
@@ -979,7 +979,7 @@
         }
     }
     // Note Chi tiết học phần
-    function noteChiTietHocPhan() {
+    function showNoteChiTietHocPhan() {
         if (
             currentURL != "https://sv.haui.edu.vn/training/programmodulessemester" &&
             currentURL != "https://sv.haui.edu.vn/training/viewcourseindustry"
@@ -1020,7 +1020,7 @@
 		`);
     }
     window.changeNoteHP = function (element) {
-        console.log("changeNoteHP: ", element);
+        // console.log("changeNoteHP: ", element);
         let noteHP = GM_getValue("noteHP", {});
         const maHP = element.textContent.match(/([A-Z]{2})\d{4}/)[0];
 
@@ -1038,6 +1038,69 @@
         } else
             element.innerHTML = `<a class="note-hp" href="javascript:void(0);"
 				>${maHP}</a>`;
+    };
+    // Hiển thị ghi chú trong trang xem điểm
+    function showNoteHPStudyExxamResult() {
+        if (
+            currentURL != "https://sv.haui.edu.vn/student/result/examresult" &&
+            currentURL != "https://sv.haui.edu.vn/student/result/studyresults"
+        ) {
+            return;
+        }
+        let maHPIndex = 1;
+        if (currentURL.includes("https://sv.haui.edu.vn/student/result/studyresults")) {
+            maHPIndex = 2;
+        }
+
+        let noteHP = GM_getValue("noteHP", {});
+
+        const hocPhan = $$("tr.kTableAltRow, tr.kTableRow", $("div.kGrid"));
+        let dem = 0;
+        for (const row of hocPhan) {
+            console.log("row: ", row);
+            console.log("row0: ", row.children[0].innerHTML);
+
+            const maHP = row.children[maHPIndex].textContent.trim();
+            dem++;
+            if (noteHP[maHP] != null && noteHP[maHP] != undefined && noteHP[maHP] != "")
+                row.children[0].innerHTML = `<a class="note-hp" href="javascript:void(0);"
+					>${dem + "🔖"}</a>`;
+            else
+                row.children[0].innerHTML = `<a class="note-hp" href="javascript:void(0);"
+					>${dem}</a>`;
+
+            $("a.note-hp", maHPBox).addEventListener("click", function (event) {
+                changeNoteHPSEResult(row);
+            });
+        }
+        GM_addStyle(`
+			a.note-hp {
+				color: rgb(49, 49, 120);
+			}
+			a.note-hp:hover {
+				background-color: rgb(208, 240, 219)
+			}	
+		`);
+    }
+    window.changeNoteHPSEResult = function (element) {
+        // console.log("changeNoteHP: ", element);
+        let noteHP = GM_getValue("noteHP", {});
+        const maHP = element.children[maHPIndex].textContent.trim();
+
+        let notePrompt = prompt(`Nhập ghi chú cho học phần ${maHP}:`, noteHP[maHP]);
+
+        if (notePrompt != null && notePrompt != undefined && notePrompt != "") {
+            // Lưu lại note
+            noteHP[maHP] = notePrompt;
+            GM_setValue("noteHP", noteHP);
+        }
+
+        if (noteHP[maHP] != null && noteHP[maHP] != undefined && noteHP[maHP] != "")
+            element.children[0].innerHTML = `<a class="note-hp" href="javascript:void(0);"
+				>${element.children[0].textcontent.trim() + "🔖"}</a>`;
+        else
+            element.children[0].innerHTML = `<a class="note-hp" href="javascript:void(0);"
+				>${element.children[0].textcontent.trim()}</a>`;
     };
     // ======================================================================================
     const changeHeaderInterval = controlInterval(changeHeader, 5000);
@@ -1059,9 +1122,9 @@
 
         // Tô điểm học phần
         highlightGradeScores();
-        // Thêm thông tin vào kết quả thi
+        // Thêm thông tin vào trang kết quả thi
         addSomeInfoInExamresult();
-        // Di chuyển sang chi tiết học phần
+        // Di chuyển sang trang chi tiết học phần
         moveToChiTietHocPhan();
 
         // Tô điểm TX
@@ -1071,6 +1134,8 @@
 
         // Chuyển đổi giữa kết quả thi và kết quả học tập
         toggleExamresultAndStudyresults();
+        // Hiển thị ghi chú trong kết quả thi và kết quả học tập
+        // showNoteHPStudyExxamResult();
 
         // Sắp xếp lịch thi
         sortExamSchedule();
@@ -1082,12 +1147,12 @@
 
         // Kiểm tra tổng số tín chỉ
         checkTotalCredits();
+        // Ghi chú chi tiết học phần
+        showNoteChiTietHocPhan();
 
         // Chuyển đổi giữa chi tiết học phần và chi tiết học phần CDIO
         toggleChiTietHocPhan();
         // Kiểm tra hệ số điểm trong chi tiết học phần CDIO
         checkHeSoDiemCDIO();
-        // Ghi chú chi tiết học phần
-        noteChiTietHocPhan();
     }, 500);
 })();
