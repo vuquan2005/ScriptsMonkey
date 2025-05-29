@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      15.0
+// @version      15.1
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -790,7 +790,7 @@
         console.log("queryString: ", queryString);
         const title = $("div.panel-heading");
         const toggleLinkContainer = document.createElement("p");
-		toggleLinkContainer.id = "toggle-link-container";
+        toggleLinkContainer.id = "toggle-link-container";
         const toggleLink = document.createElement("a");
         toggleLink.style.color = "gray";
         toggleLink.style.fontSize = "12px";
@@ -834,7 +834,7 @@
         // console.log("queryString: ", queryString);
         const title = $("div.panel-heading");
         const toggleLinkContainer = document.createElement("p");
-		toggleLinkContainer.id = "toggle-link-container";
+        toggleLinkContainer.id = "toggle-link-container";
         const toggleLink = document.createElement("a");
         toggleLink.style.color = "gray";
         toggleLink.style.fontSize = "12px";
@@ -914,20 +914,33 @@
         ) {
             return;
         }
+        const title = $("div.panel-heading");
+        const maHP = title.textContent.match(/([A-Z]{2})\d{4}/)[0];
         const scoresType = $$("td.k-table-viewdetail > table > tbody:nth-child(2) > tr > td.tdTh1");
-		const heSoDiem = $$("td.k-table-viewdetail > table > tbody:nth-child(2) > tr > td.tdTh2");
-		const elementContainer = document.createElement("p");
-		elementContainer.id = "he-so-diem";
-		elementContainer.style.fontSize = "14px";
-		let elementHtml = "";
+        const heSoDiem = $$("td.k-table-viewdetail > table > tbody:nth-child(2) > tr > td.tdTh2");
+        const elementContainer = document.createElement("p");
+        elementContainer.id = "he-so-diem";
+        elementContainer.style.fontSize = "14px";
+        // Get hệ số điểm
+        let saveHeSo = GM_getValue("heSoDiemCDIO", {});
+        // reset hp hiện tại
+        saveHeSo[maHP] = "";
+        let elementHtml = "";
         for (let i = 0; i < scoresType.length; i++) {
-			const type = scoresType[i].textContent.trim();
-			const heSo = heSoDiem[i].textContent.trim();
-			elementHtml += `${type}: ${heSo}<br>`;
-			console.log(`${type}: ${heSo}`);
-		}
-		elementContainer.innerHTML = elementHtml;
-		$("div.panel-heading").appendChild(elementContainer);
+            const type = scoresType[i].textContent.trim();
+            const heSo = heSoDiem[i].textContent.trim();
+            elementHtml += `${type}: ${heSo}<br>`;
+            saveHeSo[maHP] += heSo + " | ";
+            console.log(`${type}: ${heSo}`);
+        }
+        elementContainer.innerHTML = elementHtml;
+        title.appendChild(elementContainer);
+        // Xử lý lại chuỗi
+        saveHeSo[maHP] = saveHeSo[maHP].slice(0, -3);
+        saveHeSo[maHP].replace(/\s+/g, "");
+        console.log("saveHeSo: ", saveHeSo[maHP]);
+        // Lưu lại hệ số điểm
+        GM_setValue("heSoDiemCDIO", saveHeSo);
     }
     // ======================================================================================
     const changeHeaderInterval = controlInterval(changeHeader, 5000);
@@ -973,7 +986,7 @@
 
         // Chuyển đổi giữa chi tiết học phần và chi tiết học phần CDIO
         toggleChiTietHocPhan();
-		// Kiểm tra hệ số điểm trong chi tiết học phần CDIO
-		checkHeSoDiemCDIO();
+        // Kiểm tra hệ số điểm trong chi tiết học phần CDIO
+        checkHeSoDiemCDIO();
     }, 500);
 })();
