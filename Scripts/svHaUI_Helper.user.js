@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      13.3
+// @version      13.4
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -328,7 +328,7 @@
             // Nếu không có lịch
             if (examPlan == null) continue;
             listExamPlan.push(examPlan);
-            // Hiển thị kế hoạch thi 13 học phần gần nhất
+            // Hiển thị kế hoạch thi
             if (checkExamTime(examPlan, 3, true)) {
                 i++;
                 examPlan.children[0].textContent = `${i}`;
@@ -812,12 +812,34 @@
         ) {
             toggleLink.textContent = "---Điểm thi lớp---";
             toggleLink.href =
-                "https://sv.haui.edu.vn/student/result/viewexamresultclass?id=" + queryString;
                 "https://sv.haui.edu.vn/student/result/viewexamresultclass" + queryString;
         }
 
         title.appendChild(toggleLinkContainer);
     }
+    // Toggle Chi tiết học phần
+    function toggleChiTietHocPhan() {
+        if (
+            !currentURL.includes("https://sv.haui.edu.vn/training/viewmodulescdiosv/xem-chi-tiet-hoc-phan.htm?id=") &&
+            !currentURL.includes("https://sv.haui.edu.vn/training/viewcourseindustry2/xem-chi-tiet-hoc-phan.htm?id=")
+        ) {
+            return;
+        }
+        const queryString = new URL(currentURL).search;
+        console.log("queryString: ", queryString);
+        const title = $("div.panel-heading");
+        const toggleLinkContainer = document.createElement("p");
+        const toggleLink = document.createElement("a");
+        toggleLink.style.color = "gray";
+        toggleLink.style.fontSize = "12px";
+        toggleLinkContainer.appendChild(toggleLink);
+
+        if (currentURL.includes("https://sv.haui.edu.vn/training/viewmodulescdiosv/xem-chi-tiet-hoc-phan.htm?id=")) {
+            toggleLink.textContent = "---Chi tiết học phần---";
+            toggleLink.href = "https://sv.haui.edu.vn/training/viewcourseindustry2/xem-chi-tiet-hoc-phan.htm" + queryString;
+        } else if (currentURL.includes("https://sv.haui.edu.vn/training/viewcourseindustry2/xem-chi-tiet-hoc-phan.htm?id=")) {
+            toggleLink.textContent = "---Chi tiết học phần CDIO---";
+            toggleLink.href = "https://sv.haui.edu.vn/training/viewmodulescdiosv/xem-chi-tiet-hoc-phan.htm" + queryString;
         }
 
         title.appendChild(toggleLinkContainer);
@@ -861,5 +883,8 @@
 
         // Check total credits
         checkTotalCredits();
+
+        // Toggle Chi tiết học phần
+        toggleChiTietHocPhan();
     }, 500);
 })();
