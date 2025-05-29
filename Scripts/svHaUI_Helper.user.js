@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      18.3
+// @version      18.4
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -200,10 +200,10 @@
         ) {
             return;
         }
-		let tx1Index = 4;
-		if (currentURL.includes("https://sv.haui.edu.vn/student/result/viewstudyresult?code=")) {
-			tx1Index = 3;
-		}
+        let tx1Index = 4;
+        if (currentURL.includes("https://sv.haui.edu.vn/student/result/viewstudyresult?code=")) {
+            tx1Index = 3;
+        }
         const hpToNext = ["FL6091OT.1"];
         const hocPhan = $$("tr.kTableAltRow, tr.kTableRow", $("div.kGrid"));
         // console.log("hocPhan: ", hocPhan);
@@ -834,8 +834,7 @@
         // Bạn
         if (currentURL.includes("https://sv.haui.edu.vn/student/result/viewexamresult?code=")) {
             toggleLink.textContent = "---Điểm thi---> Điểm TX";
-            toggleLink.href =
-                "https://sv.haui.edu.vn/student/result/viewstudyresult" + queryString;
+            toggleLink.href = "https://sv.haui.edu.vn/student/result/viewstudyresult" + queryString;
         } else if (currentURL.includes("https://sv.haui.edu.vn/student/result/viewstudyresult")) {
             toggleLink.textContent = "---Điểm TX---> Điểm thi";
             toggleLink.href = "https://sv.haui.edu.vn/student/result/viewexamresult" + queryString;
@@ -1023,12 +1022,8 @@
             const maHP = maHPBox.textContent.trim();
             if (!regexMaHP.test(maHP)) continue;
 
-            if (noteHP[maHP] != null && noteHP[maHP] != undefined && noteHP[maHP] != "")
-                maHPBox.innerHTML = `<a class="note-hp" href="javascript:void(0);"
-				>${"🔖" + maHP}</a>`;
-            else
-                maHPBox.innerHTML = `<a class="note-hp" href="javascript:void(0);"
-				>${maHP}</a>`;
+            const label = noteHP[maHP] ? `${maHP}🔖` : maHP;
+            maHPBox.innerHTML = `<a class="note-hp" href="javascript:void(0);">${label}</a>`;
 
             $("a.note-hp", maHPBox).addEventListener("click", function (event) {
                 changeNoteHP(this);
@@ -1048,20 +1043,19 @@
         let noteHP = GM_getValue("noteHP", {});
         const maHP = element.textContent.match(/([A-Z]{2})\d{4}/)[0];
 
-        let notePrompt = prompt(`Nhập ghi chú cho học phần ${maHP}:`, noteHP[maHP]);
+        let notePrompt = prompt(`Nhập ghi chú cho học phần ${maHP}:`, noteHP[maHP] || "");
+		console.log("notePrompt: ", notePrompt);
 
-        if (notePrompt != null && notePrompt != undefined && notePrompt != "") {
-            // Lưu lại note
+		if (notePrompt === "") {
+            delete noteHP[maHP];
+        } else if (notePrompt !== null) {
             noteHP[maHP] = notePrompt;
-            GM_setValue("noteHP", noteHP);
         }
-        if (noteHP[maHP] != null && noteHP[maHP] != undefined && noteHP[maHP] != "") {
-            // Thêm bookmark
-            element.innerHTML = `<a class="note-hp" href="javascript:void(0);"
-				>${"🔖" + maHP}</a>`;
-        } else
-            element.innerHTML = `<a class="note-hp" href="javascript:void(0);"
-				>${maHP}</a>`;
+
+        GM_setValue("noteHP", noteHP);
+
+        const label = noteHP[maHP] ? `${maHP}🔖` : maHP;
+        element.innerHTML = `<a class="note-hp" href="javascript:void(0);">${label}</a>`;
     };
     // Hiển thị ghi chú trong trang xem điểm
     function showNoteHPStudyExxamResult() {
@@ -1081,20 +1075,16 @@
         const hocPhan = $$("tr.kTableAltRow, tr.kTableRow", $("div.kGrid"));
         let dem = 0;
         for (const row of hocPhan) {
-            console.log("row: ", row);
-            console.log("row0: ", row.children[0].innerHTML);
-
-            const maHP = row.children[maHPIndex].textContent.trim();
+            const maHP = row.children[maHPIndex].textContent.match(/([A-Z]{2})\d{4}/)[0];
             dem++;
-            if (noteHP[maHP] != null && noteHP[maHP] != undefined && noteHP[maHP] != "")
-                row.children[0].innerHTML = `<a class="note-hp" href="javascript:void(0);"
-					>${dem + "🔖"}</a>`;
-            else
-                row.children[0].innerHTML = `<a class="note-hp" href="javascript:void(0);"
-					>${dem}</a>`;
 
-            $("a.note-hp", maHPBox).addEventListener("click", function (event) {
-                changeNoteHPSEResult(row);
+            const label = noteHP[maHP] ? `${dem}🔖` : dem;
+            row.children[0].innerHTML = `<a class="note-hp" href="javascript:void(0);"
+				>${label}</a>`;
+
+            $("a.note-hp", row).addEventListener("click", function (event) {
+                const rowIndex = dem;
+                changeNoteHPSEResult(row, maHPIndex, rowIndex);
             });
         }
         GM_addStyle(`
@@ -1106,25 +1096,23 @@
 			}	
 		`);
     }
-    window.changeNoteHPSEResult = function (element) {
+    window.changeNoteHPSEResult = function (element, maHPIndex, rowIndex) {
         // console.log("changeNoteHP: ", element);
         let noteHP = GM_getValue("noteHP", {});
-        const maHP = element.children[maHPIndex].textContent.trim();
+        const maHP = element.children[maHPIndex].textContent.match(/([A-Z]{2})\d{4}/)[0];
 
-        let notePrompt = prompt(`Nhập ghi chú cho học phần ${maHP}:`, noteHP[maHP]);
+        let notePrompt = prompt(`Nhập ghi chú cho học phần ${maHP}:`, noteHP[maHP] || "");
 
-        if (notePrompt != null && notePrompt != undefined && notePrompt != "") {
-            // Lưu lại note
+		if (notePrompt === "") {
+            delete noteHP[maHP];
+        } else if (notePrompt !== null) {
             noteHP[maHP] = notePrompt;
-            GM_setValue("noteHP", noteHP);
         }
 
-        if (noteHP[maHP] != null && noteHP[maHP] != undefined && noteHP[maHP] != "")
-            element.children[0].innerHTML = `<a class="note-hp" href="javascript:void(0);"
-				>${element.children[0].textcontent.trim() + "🔖"}</a>`;
-        else
-            element.children[0].innerHTML = `<a class="note-hp" href="javascript:void(0);"
-				>${element.children[0].textcontent.trim()}</a>`;
+        GM_setValue("noteHP", noteHP);
+        const label = noteHP[maHP] ? `${rowIndex}🔖` : rowIndex;
+        element.children[0].innerHTML = `<a class="note-hp" href="javascript:void(0);"
+			>${label}</a>`;
     };
     // ======================================================================================
     const changeHeaderInterval = controlInterval(changeHeader, 5000);
@@ -1159,7 +1147,7 @@
         // Di chuyển sang trang chi tiết học phần
         moveToChiTietHocPhan();
         // Hiển thị ghi chú trong kết quả thi và kết quả học tập
-        // showNoteHPStudyExxamResult();
+        showNoteHPStudyExxamResult();
 
         // Sắp xếp lịch thi
         sortExamSchedule();
