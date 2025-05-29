@@ -1148,8 +1148,6 @@
         highlightGradeScores();
         // Thêm thông tin vào trang kết quả học phần
         addSomeInfoInExamresult();
-        // Di chuyển sang trang chi tiết học phần
-        moveToChiTietHocPhan();
 
         // Tô điểm TX
         highlightStudyresultsScores();
@@ -1158,6 +1156,8 @@
 
         // Chuyển đổi giữa kết quả thi và kết quả học tập
         toggleExamresultAndStudyresults();
+        // Di chuyển sang trang chi tiết học phần
+        moveToChiTietHocPhan();
         // Hiển thị ghi chú trong kết quả thi và kết quả học tập
         // showNoteHPStudyExxamResult();
 
