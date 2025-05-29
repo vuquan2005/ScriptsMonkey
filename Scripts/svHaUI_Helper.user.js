@@ -957,7 +957,7 @@
         for (const row of hocPhan) {
             const maHP = row.children[2].textContent.match(/([A-Z]{2})\d{4}/)[0];
             if (heSoDiem[maHP] != "" && heSoDiem[maHP] != undefined) {
-				// Hiển thị hệ số điểm vào cột cuối cùng
+                // Hiển thị hệ số điểm vào cột cuối cùng
                 $("td:last-child", row).textContent = heSoDiem[maHP];
                 // Nếu có điểm giữ kỳ thì bỏ qua
                 if (row.children[gk1Index].textContent.trim() != "") continue;
@@ -973,7 +973,7 @@
                         console.log(row.children[tx1Index + i].textContent.trim());
                     }
                     row.children[tx1Index + 5].innerHTML = `Tx*Hs:<br>${tongDiem.toFixed(2)}`;
-					row.children[tx1Index + 5].style.backgroundColor = "rgb(255, 249, 227)";
+                    row.children[tx1Index + 5].style.backgroundColor = "rgb(255, 249, 227)";
                 }
             }
         }
