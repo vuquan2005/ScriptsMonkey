@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      13.4
+// @version      13.5
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -50,19 +50,19 @@
     ];
     // =====================================================================================
     // Change header
-    async function changeHeader() {
+    function changeHeader() {
         if (!$("span.k-panel-header-text:first-child")) {
-            await delay(50);
-            changeHeader();
+            document.title = "sv.HaUI";
             return;
         }
         let newTitle = $("span.k-panel-header-text:first-child").textContent;
-        //console.log("Last title: ", newTitle);
-        newTitle = newTitle.replace("\n", "");
-        newTitle = newTitle.replace("\t", "");
-        newTitle = newTitle.replace("TRƯỜNG ĐẠI HỌC CÔNG NGHIỆP HÀ NỘI", "");
-        newTitle = newTitle.replace("Đại học công nghiệp Hà Nội", "");
-        newTitle = newTitle.replace("CHI TIẾT HỌC PHẦN ", "");
+
+        newTitle = newTitle.replace("TRƯỜNG ĐẠI HỌC CÔNG NGHIỆP HÀ NỘI", "🏫");
+        newTitle = newTitle.replace("Đại học công nghiệp Hà Nội", "🏫");
+        newTitle = newTitle.replace("CHI TIẾT HỌC PHẦN", "ℹ️");
+        newTitle = newTitle.replace("CHI TIẾT", "ℹ️");
+        newTitle = newTitle.replace("Kết quả thi các môn", "🎯 Điểm học phần");
+        newTitle = newTitle.replace("Kết quả học tập các học phần", "🎯 Điểm TX");
         document.title = newTitle;
     }
     // Customize Home page
