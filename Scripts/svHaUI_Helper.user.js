@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      18.4
+// @version      18.5
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -1044,9 +1044,9 @@
         const maHP = element.textContent.match(/([A-Z]{2})\d{4}/)[0];
 
         let notePrompt = prompt(`Nhập ghi chú cho học phần ${maHP}:`, noteHP[maHP] || "");
-		console.log("notePrompt: ", notePrompt);
+        console.log("notePrompt: ", notePrompt);
 
-		if (notePrompt === "") {
+        if (notePrompt === "") {
             delete noteHP[maHP];
         } else if (notePrompt !== null) {
             noteHP[maHP] = notePrompt;
@@ -1055,18 +1055,23 @@
         GM_setValue("noteHP", noteHP);
 
         const label = noteHP[maHP] ? `${maHP}🔖` : maHP;
-        element.innerHTML = `<a class="note-hp" href="javascript:void(0);">${label}</a>`;
+        element.textContent = `${label}`;
     };
     // Hiển thị ghi chú trong trang xem điểm
     function showNoteHPStudyExamResult() {
         if (
             currentURL != "https://sv.haui.edu.vn/student/result/examresult" &&
-            currentURL != "https://sv.haui.edu.vn/student/result/studyresults"
+            currentURL != "https://sv.haui.edu.vn/student/result/studyresults" &&
+            !currentURL.includes("https://sv.haui.edu.vn/student/result/viewexamresult?code=") &&
+            !currentURL.includes("https://sv.haui.edu.vn/student/result/viewstudyresult?code=")
         ) {
             return;
         }
         let maHPIndex = 1;
-        if (currentURL.includes("https://sv.haui.edu.vn/student/result/studyresults")) {
+        if (
+            currentURL.includes("https://sv.haui.edu.vn/student/result/studyresults") ||
+            currentURL.includes("https://sv.haui.edu.vn/student/result/viewstudyresult?code=")
+        ) {
             maHPIndex = 2;
         }
 
@@ -1083,8 +1088,7 @@
 				>${label}</a>`;
 
             $("a.note-hp", row).addEventListener("click", function (event) {
-                const rowIndex = dem + 0;
-                changeNoteHPSEResult(row, maHPIndex, rowIndex);
+                changeNoteHPSEResult(row, maHPIndex);
             });
         }
         GM_addStyle(`
@@ -1096,23 +1100,24 @@
 			}	
 		`);
     }
-    window.changeNoteHPSEResult = function (element, maHPIndex, rowIndex) {
+    window.changeNoteHPSEResult = function (element, maHPIndex) {
         // console.log("changeNoteHP: ", element);
         let noteHP = GM_getValue("noteHP", {});
         const maHP = element.children[maHPIndex].textContent.match(/([A-Z]{2})\d{4}/)[0];
 
         let notePrompt = prompt(`Nhập ghi chú cho học phần ${maHP}:`, noteHP[maHP] || "");
 
-		if (notePrompt === "") {
+        if (notePrompt === "") {
             delete noteHP[maHP];
         } else if (notePrompt !== null) {
             noteHP[maHP] = notePrompt;
         }
 
         GM_setValue("noteHP", noteHP);
+        const noteElement = $("a.note-hp", element);
+        const rowIndex = noteElement.textContent.trim().match(/\d+/)[0];
         const label = noteHP[maHP] ? `${rowIndex}🔖` : rowIndex;
-        element.children[0].innerHTML = `<a class="note-hp" href="javascript:void(0);"
-			>${label}</a>`;
+        noteElement.textContent = `${label}`;
     };
     // ======================================================================================
     const changeHeaderInterval = controlInterval(changeHeader, 5000);
