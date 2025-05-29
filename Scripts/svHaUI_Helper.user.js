@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      18.7
+// @version      18.8
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -730,9 +730,9 @@
                 row.children[12].textContent.trim()
             )
                 continue;
-			// Đánh dấu điểm đã sửa
-			row.children[12].style.color = "red";
-			row.children[12].style.fontWeight = "bold";
+            // Đánh dấu điểm đã sửa
+            row.children[12].style.color = "red";
+            row.children[12].style.fontWeight = "bold";
             const diemSo = Number(row.children[12].textContent.trim());
             const tinChi = Number(row.children[5].textContent.trim());
             diemTong += diemSo * tinChi;
@@ -954,7 +954,11 @@
         elementContainer.id = "he-so-diem";
         elementContainer.style.fontSize = "14px";
         // Get hệ số điểm
-        let saveHeSo = GM_getValue("heSoDiemCDIO", {});
+        let saveHeSo = {};
+        const isHPNotGPA = hpNotGPA.some((hp) => maHP.includes(hp));
+        if (!isHPNotGPA) {
+            saveHeSo = GM_getValue("heSoDiemCDIO", {});
+        }
         // reset hp hiện tại
         saveHeSo[maHP] = "";
         let elementHtml = "";
@@ -967,6 +971,7 @@
         }
         elementContainer.innerHTML = elementHtml;
         title.appendChild(elementContainer);
+        if (isHPNotGPA) return;
         // Xử lý lại chuỗi
         saveHeSo[maHP] = saveHeSo[maHP].slice(0, -3);
         saveHeSo[maHP].replace(/\s+/g, "");
