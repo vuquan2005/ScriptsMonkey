@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      18.0
+// @version      18.1
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -138,14 +138,14 @@
                     color: #3d3d3d;
                 }
                 #short-cut-panel > p > a:hover {
-                    background-color: #d0f0db;
+                    background-color: rgb(208, 240, 219);
                     color: #000000;
                 }
                 #short-cut-panel > p > a > i {
                     margin-right: 10px;
                     scale: 1.5;
                 }
-                `);
+            `);
         }
     }
     // Highlight grade scores
@@ -1010,6 +1010,14 @@
                 changeNoteHP(this);
             });
         }
+        GM_addStyle(`
+			a.note-hp {
+				color: rgb(49, 49, 120);
+			}
+			a.note-hp:hover {
+				background-color: rgb(208, 240, 219)
+			}	
+		`);
     }
     window.changeNoteHP = function (element) {
         console.log("changeNoteHP: ", element);
