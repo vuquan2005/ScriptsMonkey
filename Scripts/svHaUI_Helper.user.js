@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      13.2
+// @version      13.3
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -50,15 +50,19 @@
     ];
     // =====================================================================================
     // Change header
-    function changeHeader() {
-        if (!$("span.k-panel-header-text:first-child")) return;
+    async function changeHeader() {
+        if (!$("span.k-panel-header-text:first-child")) {
+            await delay(50);
+            changeHeader();
+            return;
+        }
         let newTitle = $("span.k-panel-header-text:first-child").textContent;
         //console.log("Last title: ", newTitle);
         newTitle = newTitle.replace("\n", "");
         newTitle = newTitle.replace("\t", "");
         newTitle = newTitle.replace("TRƯỜNG ĐẠI HỌC CÔNG NGHIỆP HÀ NỘI", "");
         newTitle = newTitle.replace("Đại học công nghiệp Hà Nội", "");
-        newTitle = newTitle.replace("CHI TIẾT HỌC PHẦN CDIO: ", "");
+        newTitle = newTitle.replace("CHI TIẾT HỌC PHẦN ", "");
         document.title = newTitle;
     }
     // Customize Home page
@@ -802,13 +806,18 @@
         ) {
             toggleLink.textContent = "---Điểm TX lớp---";
             toggleLink.href =
-                "https://sv.haui.edu.vn/student/result/viewstudyresultclass?id=" + queryString;
+                "https://sv.haui.edu.vn/student/result/viewstudyresultclass" + queryString;
         } else if (
             currentURL.includes("https://sv.haui.edu.vn/student/result/viewstudyresultclass?id=")
         ) {
             toggleLink.textContent = "---Điểm thi lớp---";
             toggleLink.href =
                 "https://sv.haui.edu.vn/student/result/viewexamresultclass?id=" + queryString;
+                "https://sv.haui.edu.vn/student/result/viewexamresultclass" + queryString;
+        }
+
+        title.appendChild(toggleLinkContainer);
+    }
         }
 
         title.appendChild(toggleLinkContainer);
