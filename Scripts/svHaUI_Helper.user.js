@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      14.0
+// @version      15.0
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -790,6 +790,7 @@
         console.log("queryString: ", queryString);
         const title = $("div.panel-heading");
         const toggleLinkContainer = document.createElement("p");
+		toggleLinkContainer.id = "toggle-link-container";
         const toggleLink = document.createElement("a");
         toggleLink.style.color = "gray";
         toggleLink.style.fontSize = "12px";
@@ -830,9 +831,10 @@
             return;
         }
         const queryString = new URL(currentURL).search;
-        console.log("queryString: ", queryString);
+        // console.log("queryString: ", queryString);
         const title = $("div.panel-heading");
         const toggleLinkContainer = document.createElement("p");
+		toggleLinkContainer.id = "toggle-link-container";
         const toggleLink = document.createElement("a");
         toggleLink.style.color = "gray";
         toggleLink.style.fontSize = "12px";
@@ -903,6 +905,30 @@
             }
         }
     }
+    // Check hệ số điểm trong xem chi tiết học phần CDIO
+    function checkHeSoDiemCDIO() {
+        if (
+            !currentURL.includes(
+                "https://sv.haui.edu.vn/training/viewmodulescdiosv/xem-chi-tiet-hoc-phan.htm?id="
+            )
+        ) {
+            return;
+        }
+        const scoresType = $$("td.k-table-viewdetail > table > tbody:nth-child(2) > tr > td.tdTh1");
+		const heSoDiem = $$("td.k-table-viewdetail > table > tbody:nth-child(2) > tr > td.tdTh2");
+		const elementContainer = document.createElement("p");
+		elementContainer.id = "he-so-diem";
+		elementContainer.style.fontSize = "14px";
+		let elementHtml = "";
+        for (let i = 0; i < scoresType.length; i++) {
+			const type = scoresType[i].textContent.trim();
+			const heSo = heSoDiem[i].textContent.trim();
+			elementHtml += `${type}: ${heSo}<br>`;
+			console.log(`${type}: ${heSo}`);
+		}
+		elementContainer.innerHTML = elementHtml;
+		$("div.panel-heading").appendChild(elementContainer);
+    }
     // ======================================================================================
     const changeHeaderInterval = controlInterval(changeHeader, 5000);
     const showInfoAfterEditScoreInterval = controlInterval(showInfoAfterEditScore, 1000);
@@ -947,5 +973,7 @@
 
         // Chuyển đổi giữa chi tiết học phần và chi tiết học phần CDIO
         toggleChiTietHocPhan();
+		// Kiểm tra hệ số điểm trong chi tiết học phần CDIO
+		checkHeSoDiemCDIO();
     }, 500);
 })();
