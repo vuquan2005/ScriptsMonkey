@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      17.0
+// @version      18.0
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -978,6 +978,59 @@
             }
         }
     }
+    // Note Chi tiết học phần
+    function noteChiTietHocPhan() {
+        if (
+            currentURL != "https://sv.haui.edu.vn/training/programmodulessemester" &&
+            currentURL != "https://sv.haui.edu.vn/training/viewcourseindustry"
+        ) {
+            return;
+        }
+        let noteHP = GM_getValue("noteHP", {});
+
+        const parent = $("table.table.table-bordered.table-striped");
+        let hp;
+        if (currentURL == "https://sv.haui.edu.vn/training/viewcourseindustry")
+            hp = $$("tbody > tr.kTableRow > td:nth-child(2)", parent);
+        else hp = $$("tbody > tr > td:nth-child(2)", parent);
+
+        const regexMaHP = /([A-Z]{2})\d{4}/;
+        for (const maHPBox of hp) {
+            const maHP = maHPBox.textContent.trim();
+            if (!regexMaHP.test(maHP)) continue;
+
+            if (noteHP[maHP] != null && noteHP[maHP] != undefined && noteHP[maHP] != "")
+                maHPBox.innerHTML = `<a class="note-hp" href="javascript:void(0);"
+				>${"🔖" + maHP}</a>`;
+            else
+                maHPBox.innerHTML = `<a class="note-hp" href="javascript:void(0);"
+				>${maHP}</a>`;
+
+            $("a.note-hp", maHPBox).addEventListener("click", function (event) {
+                changeNoteHP(this);
+            });
+        }
+    }
+    window.changeNoteHP = function (element) {
+        console.log("changeNoteHP: ", element);
+        let noteHP = GM_getValue("noteHP", {});
+        const maHP = element.textContent.match(/([A-Z]{2})\d{4}/)[0];
+
+        let notePrompt = prompt(`Nhập ghi chú cho học phần ${maHP}:`, noteHP[maHP]);
+
+        if (notePrompt != null && notePrompt != undefined && notePrompt != "") {
+            // Lưu lại note
+            noteHP[maHP] = notePrompt;
+            GM_setValue("noteHP", noteHP);
+        }
+        if (noteHP[maHP] != null && noteHP[maHP] != undefined && noteHP[maHP] != "") {
+            // Thêm bookmark
+            element.innerHTML = `<a class="note-hp" href="javascript:void(0);"
+				>${"🔖" + maHP}</a>`;
+        } else
+            element.innerHTML = `<a class="note-hp" href="javascript:void(0);"
+				>${maHP}</a>`;
+    };
     // ======================================================================================
     const changeHeaderInterval = controlInterval(changeHeader, 5000);
     const showInfoAfterEditScoreInterval = controlInterval(showInfoAfterEditScore, 1000);
@@ -1026,5 +1079,7 @@
         toggleChiTietHocPhan();
         // Kiểm tra hệ số điểm trong chi tiết học phần CDIO
         checkHeSoDiemCDIO();
+        // Ghi chú chi tiết học phần
+        noteChiTietHocPhan();
     }, 500);
 })();
