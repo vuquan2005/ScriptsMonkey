@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      18.1
+// @version      18.2
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -780,10 +780,17 @@
     // Chuyển đổi giữa kết quả thi và kết quả học tập
     function toggleExamresultAndStudyresults() {
         if (
+            // Bản thân
             currentURL != "https://sv.haui.edu.vn/student/result/examresult" &&
             currentURL != "https://sv.haui.edu.vn/student/result/studyresults" &&
+            // Lớp
             !currentURL.includes("https://sv.haui.edu.vn/student/result/viewexamresultclass?id=") &&
-            !currentURL.includes("https://sv.haui.edu.vn/student/result/viewstudyresultclass?id=")
+            !currentURL.includes(
+                "https://sv.haui.edu.vn/student/result/viewstudyresultclass?id="
+            ) &&
+            // Bạn
+            !currentURL.includes("https://sv.haui.edu.vn/student/result/viewexamresult?code=") &&
+            !currentURL.includes("https://sv.haui.edu.vn/student/result/viewstudyresult?code=")
         ) {
             return;
         }
@@ -797,15 +804,16 @@
         toggleLink.style.fontSize = "12px";
         toggleLinkContainer.appendChild(toggleLink);
 
+		// Bản thân
         if (currentURL.includes("https://sv.haui.edu.vn/student/result/examresult")) {
             toggleLink.textContent = "---Điểm Thi---> Điểm TX";
             toggleLink.href = "https://sv.haui.edu.vn/student/result/studyresults";
         } else if (currentURL.includes("https://sv.haui.edu.vn/student/result/studyresults")) {
             toggleLink.textContent = "---Điểm TX---> Điểm Thi";
             toggleLink.href = "https://sv.haui.edu.vn/student/result/examresult";
-        } else if (
-            currentURL.includes("https://sv.haui.edu.vn/student/result/viewexamresultclass?id=")
-        ) {
+        }
+		// Lớp
+        if (currentURL.includes("https://sv.haui.edu.vn/student/result/viewexamresultclass?id=")) {
             toggleLink.textContent = "---Điểm thi lớp---> Điểm TX lớp";
             toggleLink.href =
                 "https://sv.haui.edu.vn/student/result/viewstudyresultclass" + queryString;
@@ -816,6 +824,14 @@
             toggleLink.href =
                 "https://sv.haui.edu.vn/student/result/viewexamresultclass" + queryString;
         }
+		// Bạn
+		if (currentURL.includes("https://sv.haui.edu.vn/student/result/viewexamresult?code=")) {
+			toggleLink.textContent = "---Điểm thi---> Điểm TX";
+			toggleLink.href = "https://sv.haui.edu.vn/student/result/viewstudyresult?code=" + queryString;
+		} else if (currentURL.includes("https://sv.haui.edu.vn/student/result/viewstudyresult")) {
+			toggleLink.textContent = "---Điểm TX---> Điểm thi";
+			toggleLink.href = "https://sv.haui.edu.vn/student/result/viewexamresult" + queryString;
+		}
 
         title.appendChild(toggleLinkContainer);
     }
