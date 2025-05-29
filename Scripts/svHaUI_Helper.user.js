@@ -855,36 +855,37 @@
         // Show info after edit score
         showInfoAfterEditScoreInterval.start(1000, false);
 
-        // Customize Home page
+        // Trang chủ tuỳ biến
         customizeHomePage();
-        // Create exam schedule panel in home page
+        // Tạo panel lịch thi trong trang chủ
         createExamSchedulePanelInHomePage();
-        // Create exam plan panel in home page
+        // Tạo panel kế hoạch thi trong trang chủ
         createExamPlanPanelInHomePage();
 
-        // Highlight grade scores
+        // Tô điểm học phần
         highlightGradeScores();
-        // Show the total credits
+        // Thêm thông tin vào kết quả thi
         addSomeInfoInExamresult();
+        // 
 
-        // Highlight studyresults scores
+        // Tô điểm thi
         highlightStudyresultsScores();
 
-        // Toggle examresult and studyresults
+        // Chuyển đổi giữa kết quả thi và kết quả học tập
         toggleExamresultAndStudyresults();
 
-        // Sort exam schedule
+        // Sắp xếp lịch thi
         sortExamSchedule();
-        // Highlight exam schedule
+        // Tô lịch thi
         highlightExamSchedule();
 
-        // Show exam plan
+        // Hiển thị kế hoạch thi
         showExamPlan();
 
-        // Check total credits
+        // Kiểm tra tổng số tín chỉ
         checkTotalCredits();
 
-        // Toggle Chi tiết học phần
+        // Chuyển đổi giữa chi tiết học phần và chi tiết học phần CDIO
         toggleChiTietHocPhan();
     }, 500);
 })();
