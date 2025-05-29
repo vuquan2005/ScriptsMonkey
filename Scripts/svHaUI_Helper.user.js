@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      18.5
+// @version      18.6
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -907,9 +907,9 @@
                 const maHP = row.children[1].textContent.trim();
                 const maIN = row.children[2].textContent.match(/\d+/)[0];
                 maHPtoMaIn[maHP] = maIN;
-                row.children[1].innerHTML = `<a style="color:rgb(49, 49, 150);" 
-				href="https://sv.haui.edu.vn/training/viewmodulescdiosv/xem-chi-tiet-hoc-phan.htm?id=${maIN}&ver=2">
-				${maHP}
+                row.children[1].innerHTML = `<a class="di-den-chi-tiet-hp" 
+					href="https://sv.haui.edu.vn/training/viewmodulescdiosv/xem-chi-tiet-hoc-phan.htm?id=${maIN}&ver=2">
+						${maHP}
 				</a>`;
             }
             // console.log("maHPtoMaIn: ", maHPtoMaIn);
@@ -921,15 +921,19 @@
             const hocPhan = $$("tr.kTableAltRow, tr.kTableRow", $("div.kGrid"));
             for (const row of hocPhan) {
                 const maHP = row.children[2].textContent.match(/([A-Z]{2})\d{4}/)[0];
-                row.children[2].innerHTML = `<a style="color:rgb(49, 49, 150);" 
-				href="https://sv.haui.edu.vn/training/viewmodulescdiosv/xem-chi-tiet-hoc-phan.htm?id=${
-                    maHPtoMaIn[maHP]
-                }&ver=2">
-				${row.children[2].textContent.trim()}
+                row.children[2].innerHTML = `<a class="di-den-chi-tiet-hp" 
+					href="https://sv.haui.edu.vn/training/viewmodulescdiosv/xem-chi-tiet-hoc-phan.htm?id=${
+                        maHPtoMaIn[maHP]
+                    }&ver=2">
+					${row.children[2].textContent.trim()}
 				</a>`;
                 // console.log("maHP: ", maHP), "maIn: ", maHPtoMaIn[maHP];
             }
         }
+        GM_addStyle(`
+			.di-den-chi-tiet-hp {
+				color: color:rgb(49, 49, 120);
+		}`);
     }
     // Check hệ số điểm trong xem chi tiết học phần CDIO
     function checkHeSoDiemCDIO() {
