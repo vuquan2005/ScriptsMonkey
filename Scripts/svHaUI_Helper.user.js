@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      16.0
+// @version      17.0
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -202,7 +202,7 @@
         // console.log("hocPhan: ", hocPhan);
         for (const row of hocPhan) {
             if (hpToNext.some((hp) => row.children[2].textContent.includes(hp))) continue;
-			// Tô những học phần chưa có điểm
+            // Tô những học phần chưa có điểm
             if (row.children[4].textContent.trim() == "")
                 row.children[4].style.backgroundColor = "rgb(248,226,135)";
         }
@@ -899,8 +899,10 @@
             for (const row of hocPhan) {
                 const maHP = row.children[2].textContent.match(/([A-Z]{2})\d{4}/)[0];
                 row.children[2].innerHTML = `<a style="color:rgb(49, 49, 150);" 
-				href="https://sv.haui.edu.vn/training/viewmodulescdiosv/xem-chi-tiet-hoc-phan.htm?id=${maHPtoMaIn[maHP]}&ver=2">
-				${maHP}
+				href="https://sv.haui.edu.vn/training/viewmodulescdiosv/xem-chi-tiet-hoc-phan.htm?id=${
+                    maHPtoMaIn[maHP]
+                }&ver=2">
+				${row.children[2].textContent.trim()}
 				</a>`;
                 // console.log("maHP: ", maHP), "maIn: ", maHPtoMaIn[maHP];
             }
@@ -943,21 +945,39 @@
         // Lưu lại hệ số điểm
         GM_setValue("heSoDiemCDIO", saveHeSo);
     }
-	// Show hệ số điểm trong xem điểm TX
-	function showHeSoDiemTX() {
-		if (currentURL != "https://sv.haui.edu.vn/student/result/studyresults"){
-			return;
-		}
-		let maHPIndex = 2;
-		const heSoDiem = GM_getValue("heSoDiemCDIO", {});
-		const hocPhan = $$("tr.kTableAltRow, tr.kTableRow", $("div.kGrid"));
-		for (const row of hocPhan) {
-			const maHP = row.children[maHPIndex].textContent.match(/([A-Z]{2})\d{4}/)[0];
-			if (heSoDiem[maHP] != null) {
-				$("td:last-child", row).textContent = heSoDiem[maHP];
-			}
-		}
-	}
+    // Show hệ số điểm trong xem điểm TX
+    function showHeSoDiemTX() {
+        if (currentURL != "https://sv.haui.edu.vn/student/result/studyresults") {
+            return;
+        }
+        let tx1Index = 4;
+        let gk1Index = 14;
+        const heSoDiem = GM_getValue("heSoDiemCDIO", {});
+        const hocPhan = $$("tr.kTableAltRow, tr.kTableRow", $("div.kGrid"));
+        for (const row of hocPhan) {
+            const maHP = row.children[2].textContent.match(/([A-Z]{2})\d{4}/)[0];
+            if (heSoDiem[maHP] != "" && heSoDiem[maHP] != undefined) {
+				// Hiển thị hệ số điểm vào cột cuối cùng
+                $("td:last-child", row).textContent = heSoDiem[maHP];
+                // Nếu có điểm giữ kỳ thì bỏ qua
+                if (row.children[gk1Index].textContent.trim() != "") continue;
+                // Nếu có điểm tx thì tính
+                if (row.children[tx1Index].textContent.trim() != "") {
+                    let heSoDiemRow = heSoDiem[maHP].split(" | ");
+                    let tongDiem = 0;
+                    for (let i = 0; i < heSoDiemRow.length; i++) {
+                        tongDiem +=
+                            (Number(row.children[tx1Index + i].textContent.trim()) *
+                                Number(heSoDiemRow[i])) /
+                            100;
+                        console.log(row.children[tx1Index + i].textContent.trim());
+                    }
+                    row.children[tx1Index + 5].innerHTML = `Tx*Hs:<br>${tongDiem.toFixed(2)}`;
+					row.children[tx1Index + 5].style.backgroundColor = "rgb(255, 249, 227)";
+                }
+            }
+        }
+    }
     // ======================================================================================
     const changeHeaderInterval = controlInterval(changeHeader, 5000);
     const showInfoAfterEditScoreInterval = controlInterval(showInfoAfterEditScore, 1000);
@@ -985,8 +1005,8 @@
 
         // Tô điểm TX
         highlightStudyresultsScores();
-		// Hiển thị hệ số điểm trong xem điểm TX
-		showHeSoDiemTX();
+        // Hiển thị hệ số điểm trong xem điểm TX
+        showHeSoDiemTX();
 
         // Chuyển đổi giữa kết quả thi và kết quả học tập
         toggleExamresultAndStudyresults();
