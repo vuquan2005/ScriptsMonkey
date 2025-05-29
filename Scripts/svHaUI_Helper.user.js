@@ -835,7 +835,7 @@
         if (currentURL.includes("https://sv.haui.edu.vn/student/result/viewexamresult?code=")) {
             toggleLink.textContent = "---Điểm thi---> Điểm TX";
             toggleLink.href =
-                "https://sv.haui.edu.vn/student/result/viewstudyresult?code=" + queryString;
+                "https://sv.haui.edu.vn/student/result/viewstudyresult" + queryString;
         } else if (currentURL.includes("https://sv.haui.edu.vn/student/result/viewstudyresult")) {
             toggleLink.textContent = "---Điểm TX---> Điểm thi";
             toggleLink.href = "https://sv.haui.edu.vn/student/result/viewexamresult" + queryString;
