@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      13.5
+// @version      14.0
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -844,6 +844,49 @@
 
         title.appendChild(toggleLinkContainer);
     }
+    // Di chuyển sang chi tiết học phần
+    function moveToChiTietHocPhan() {
+        if (
+            currentURL != "https://sv.haui.edu.vn/student/result/examresult" &&
+            currentURL != "https://sv.haui.edu.vn/student/result/studyresults" &&
+            !currentURL.includes("https://sv.haui.edu.vn/student/result/viewexamresultclass?id=") &&
+            !currentURL.includes("https://sv.haui.edu.vn/student/result/viewstudyresultclass?id=")
+        ) {
+            return;
+        }
+        if (
+            currentURL == "https://sv.haui.edu.vn/student/result/examresult" ||
+            currentURL.includes("https://sv.haui.edu.vn/student/result/viewexamresult?code=")
+        ) {
+            // Xem điểm học phần
+            let maHPtoMaIn = {};
+            const hocPhan = $$("tr.kTableAltRow, tr.kTableRow", $("div.kGrid"));
+            for (const row of hocPhan) {
+                const maHP = row.children[1].textContent.trim();
+                const maIN = row.children[2].textContent.match(/\d+/)[0];
+                maHPtoMaIn[maHP] = maIN;
+                row.children[1].innerHTML = `<a style="color:rgb(49, 49, 150);" 
+				href="https://sv.haui.edu.vn/training/viewmodulescdiosv/xem-chi-tiet-hoc-phan.htm?id=${maIN}&ver=2">
+				${maHP}
+				</a>`;
+            }
+            // console.log("maHPtoMaIn: ", maHPtoMaIn);
+            GM_setValue("maHPtoMaIn", maHPtoMaIn);
+        } else {
+            // Xem điểm TX
+            const maHPtoMaIn = GM_getValue("maHPtoMaIn");
+			console.log("maHPtoMaIn: ", maHPtoMaIn);
+            const hocPhan = $$("tr.kTableAltRow, tr.kTableRow", $("div.kGrid"));
+            for (const row of hocPhan) {
+				const maHP = row.children[2].textContent.match(/([A-Z]{2})\w+/)[0];
+                row.children[2].innerHTML = `<a style="color:rgb(49, 49, 150);" 
+				href="https://sv.haui.edu.vn/training/viewmodulescdiosv/xem-chi-tiet-hoc-phan.htm?id=${maHPtoMaIn[maHP]}&ver=2">
+				${maHP}
+				</a>`;
+				console.log("maHP: ", maHP), "maIn: ", maHPtoMaIn[maHP];
+            }
+        }
+    }
     // ======================================================================================
     const changeHeaderInterval = controlInterval(changeHeader, 5000);
     const showInfoAfterEditScoreInterval = controlInterval(showInfoAfterEditScore, 1000);
@@ -866,7 +909,8 @@
         highlightGradeScores();
         // Thêm thông tin vào kết quả thi
         addSomeInfoInExamresult();
-        // 
+        // Di chuyển sang chi tiết học phần
+        moveToChiTietHocPhan();
 
         // Tô điểm thi
         highlightStudyresultsScores();
