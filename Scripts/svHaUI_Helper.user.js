@@ -1058,7 +1058,7 @@
         element.innerHTML = `<a class="note-hp" href="javascript:void(0);">${label}</a>`;
     };
     // Hiển thị ghi chú trong trang xem điểm
-    function showNoteHPStudyExxamResult() {
+    function showNoteHPStudyExamResult() {
         if (
             currentURL != "https://sv.haui.edu.vn/student/result/examresult" &&
             currentURL != "https://sv.haui.edu.vn/student/result/studyresults"
@@ -1083,7 +1083,7 @@
 				>${label}</a>`;
 
             $("a.note-hp", row).addEventListener("click", function (event) {
-                const rowIndex = dem;
+                const rowIndex = dem + 0;
                 changeNoteHPSEResult(row, maHPIndex, rowIndex);
             });
         }
@@ -1147,7 +1147,7 @@
         // Di chuyển sang trang chi tiết học phần
         moveToChiTietHocPhan();
         // Hiển thị ghi chú trong kết quả thi và kết quả học tập
-        showNoteHPStudyExxamResult();
+        showNoteHPStudyExamResult();
 
         // Sắp xếp lịch thi
         sortExamSchedule();
