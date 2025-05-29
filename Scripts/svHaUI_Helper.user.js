@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      18.6
+// @version      18.7
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -730,7 +730,9 @@
                 row.children[12].textContent.trim()
             )
                 continue;
-
+			// Đánh dấu điểm đã sửa
+			row.children[12].style.color = "red";
+			row.children[12].style.fontWeight = "bold";
             const diemSo = Number(row.children[12].textContent.trim());
             const tinChi = Number(row.children[5].textContent.trim());
             diemTong += diemSo * tinChi;
@@ -1129,9 +1131,9 @@
     setTimeout(() => {
         // Run
         console.log("sv.HaUI loaded: " + currentURL);
-        // Change header
+        // Thay đổi tiêu đề trang
         changeHeaderInterval.start(5000, true);
-        // Show info after edit score
+        // Sửa điểm
         showInfoAfterEditScoreInterval.start(1000, false);
 
         // Trang chủ tuỳ biến
