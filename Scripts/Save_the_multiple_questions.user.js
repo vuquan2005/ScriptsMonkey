@@ -196,7 +196,7 @@
 				saveJSON(totalQuiz, lesson);
 			}
 
-            GM_setValue("quizData", {});
+            GM_setValue("quizData", null);
         }
     }, 100);
 
