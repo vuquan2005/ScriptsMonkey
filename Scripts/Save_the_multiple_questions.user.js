@@ -3,7 +3,7 @@
 // @description		Lưu lại câu hỏi trắc nghiệm trên hệ thống quản lý học tập qldt.haui.edu.vn
 // @author         	QuanVu
 // @namespace      	https://github.com/vuquan2005/ScriptsMonkey
-// @version        	0.1.5
+// @version        	0.2.0
 // @match          	https://qlht.haui.edu.vn/mod/quiz/attempt.php*
 // @match          	https://qlht.haui.edu.vn/mod/quiz/summary.php*
 // @grant          	GM_setValue
@@ -20,9 +20,9 @@
     const $$ = (selector, scope = document) => scope.querySelectorAll(selector);
     // ===========================================================================
 
-    let quizData = GM_getValue("quizData", {});
-
     function run() {
+        let quizData = GM_getValue("quizData", {});
+
         const container = $("form#responseform > div > div.multichoice");
         const info = $("div.info", container);
         const questionNumber = $("span.qno", info).textContent.trim();
@@ -83,6 +83,20 @@
         const lesson = $("title").textContent.match(/bài\s\d+/)[0];
         console.log(lesson);
 
+        // Kiểm tra index của object có correct là null
+		let isNullCorrect = false;
+		let nullCorrectItemsList = "Các câu hỏi chưa được lưu câu trả lời: ";
+        Object.keys(totalQuiz).forEach((key) => {
+            if (totalQuiz[key].correct === null) {
+				isNullCorrect = true;
+                nullCorrectItemsList += totalQuiz[key].index + ", ";
+            }
+        });
+		if (isNullCorrect) {
+			alert(nullCorrectItemsList);
+			return;
+		}
+
         let optionFileType = prompt(
             "Bạn muốn lưu dữ liệu dưới dạng nào (có thể chọn nhiều)? \n0: html | 1: txt | 2: json",
             "0"
@@ -108,7 +122,7 @@
         const checkData = GM_getValue("quizData", null);
         setTimeout(() => {
             console.log("Đã xóa dữ liệu quizData:", checkData);
-        }, 1000);
+        }, 500);
     }
 
     // ===========================================================================
