@@ -3,7 +3,7 @@
 // @description		Lưu lại câu hỏi trắc nghiệm trên hệ thống quản lý học tập qldt.haui.edu.vn
 // @author         	QuanVu
 // @namespace      	https://github.com/vuquan2005/ScriptsMonkey
-// @version        	0.4.1
+// @version        	0.4.2
 // @match          	https://qlht.haui.edu.vn/mod/quiz/attempt.php*
 // @match          	https://qlht.haui.edu.vn/mod/quiz/summary.php*
 // @grant          	GM_setValue
@@ -78,7 +78,7 @@
         ).innerHTML += `<span id="copy-quiz-btn" style="cursor: pointer;">©️</span>`;
         $("#copy-quiz-btn", content).addEventListener("click", function () {
             const textToCopy = `Câu ${questionNumber}: ${question}\nChọn một:${answersData}`;
-            navigator.clipboard.writeText(question);
+            navigator.clipboard.writeText(textToCopy);
         });
         // Thêm nút sao chép câu hỏi
         $(
