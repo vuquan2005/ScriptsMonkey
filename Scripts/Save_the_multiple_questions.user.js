@@ -3,7 +3,7 @@
 // @description		Lưu lại câu hỏi trắc nghiệm trên hệ thống quản lý học tập qldt.haui.edu.vn
 // @author         	QuanVu
 // @namespace      	https://github.com/vuquan2005/ScriptsMonkey
-// @version        	0.3.0
+// @version        	0.4.0
 // @match          	https://qlht.haui.edu.vn/mod/quiz/attempt.php*
 // @match          	https://qlht.haui.edu.vn/mod/quiz/summary.php*
 // @grant          	GM_setValue
@@ -24,10 +24,18 @@
         let quizData = GM_getValue("quizData", {});
 
         const container = $("form#responseform > div > div.multichoice");
+
         const info = $("div.info", container);
         const questionNumber = $("span.qno", info).textContent.trim();
+
         const content = $("div.content", container);
         const question = $("div.qtext", content).textContent.trim();
+        $("div.qtext", content).innerHTML += `<span id="copy-btn" style="cursor: pointer;">©️</span>`;
+		
+		$("#copy-btn", content).addEventListener("click", function () {
+			navigator.clipboard.writeText(question);
+        });
+
         const answersContainer = $("div.answer", content);
         const answers = $$("div", answersContainer);
 
