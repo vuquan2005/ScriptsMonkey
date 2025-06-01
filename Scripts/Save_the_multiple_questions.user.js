@@ -3,7 +3,7 @@
 // @description		Lưu lại câu hỏi trắc nghiệm trên hệ thống quản lý học tập qldt.haui.edu.vn
 // @author         	QuanVu
 // @namespace      	https://github.com/vuquan2005/ScriptsMonkey
-// @version        	0.1.3
+// @version        	0.1.4
 // @match          	https://qlht.haui.edu.vn/mod/quiz/attempt.php*
 // @match          	https://qlht.haui.edu.vn/mod/quiz/summary.php*
 // @grant          	GM_setValue
@@ -44,7 +44,7 @@
 
             radio.addEventListener("change", function () {
                 if (radio.checked) {
-					correctAnswer = radio.value;
+                    correctAnswer = radio.value;
                     quizData[questionNumber] = {
                         index: questionNumber,
                         question: question,
@@ -83,15 +83,15 @@
     }
 
     function saveTxt(jsonData, filename) {
-		// Câu 1.1;${question};${answer1} ||${answer2} ||${answer3} ||${answer4} ;${correctAnswer}
-		const lesson = filename.match(/\d+/)[0];
+        // Câu 1.1;${question};${answer1} ||${answer2} ||${answer3} ||${answer4} ;${correctAnswer}
+        const lesson = filename.match(/\d+/)[0];
         let txtContent = "";
         for (const key in jsonData) {
             const item = jsonData[key];
             const question = item.question.replace(/;/g, ","); // Remove semicolons to avoid breaking the format
-			const answers = item.answers.map((answer) => answer.replace(/;/g, ",")).join(" ||");
-			const correctAnswer = item.correct ? item.correct : "";
-			txtContent += `Câu ${lesson}.${item.index};${question};${answers} ;${correctAnswer}\n`;
+            const answers = item.answers.map((answer) => answer.replace(/;/g, ",")).join(" ||");
+            const correctAnswer = item.correct ? item.correct : "";
+            txtContent += `Câu ${lesson}.${item.index};${question};${answers} ;${correctAnswer}\n`;
 
             txtContent += "\n";
         }
@@ -180,24 +180,32 @@
             const lesson = $("title").textContent.match(/bài\s\d+/)[0];
             console.log(lesson);
 
-			let optionFileType = prompt("Bạn muốn lưu dữ liệu dưới dạng nào? \n0: html | 1: txt | 2: json", "0");
-			optionFileType = optionFileType ? parseInt(optionFileType) : 0;
-			if (isNaN(optionFileType) || optionFileType < 0 || optionFileType > 2) {
-				alert("Lựa chọn không hợp lệ, mặc định lưu dưới dạng HTML.");
-				optionFileType = 0;
-			}
-			if (optionFileType === 0) {
-				// Save as HTML
-				saveJsonToHtml(totalQuiz, lesson);
-			} else if (optionFileType === 1) {
-				// Save as TXT
-				saveTxt(totalQuiz, lesson);
-			} else if (optionFileType === 2) {
-				// Save as JSON
-				saveJSON(totalQuiz, lesson);
-			}
+            let optionFileType = prompt(
+                "Bạn muốn lưu dữ liệu dưới dạng nào (có thể chọn nhiều)? \n0: html | 1: txt | 2: json",
+                "0"
+            );
+
+			if (optionFileType == null) 
+				optionFileType = "Don't save";
+			console.log("File type: ", optionFileType);
+
+            if (optionFileType.includes(0)) {
+                // Save as HTML
+                saveJsonToHtml(totalQuiz, lesson);
+            }
+            if (optionFileType.includes(1)) {
+                // Save as TXT
+                saveTxt(totalQuiz, lesson);
+            }
+            if (optionFileType.includes(2)) {
+                // Save as JSON
+                saveJSON(totalQuiz, lesson);
+            }
 
             GM_setValue("quizData", null);
+            setTimeout(() => {
+                console.log(GM_getValue("quizData", {}));
+            }, 1000);
         }
     }, 100);
 
