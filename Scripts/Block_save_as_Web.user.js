@@ -5,10 +5,9 @@
 // @description:vi 	Chặn lưu trang bằng phím tắt ctrl + s
 // @author         	QuanVu
 // @namespace      	https://github.com/vuquan2005/ScriptsMonkey
-// @version        	0.0.1
+// @version        	0.0.2
 // @match          	*://*/*
 // @grant          	none
-// @require        	none
 // @updateURL	   	https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/Block_save_as_Web.user.js
 // @downloadURL    	https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/Block_save_as_Web.user.js
 // ==/UserScript==
