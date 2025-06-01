@@ -3,11 +3,12 @@
 // @description		Lưu lại câu hỏi trắc nghiệm trên hệ thống quản lý học tập qldt.haui.edu.vn
 // @author         	QuanVu
 // @namespace      	https://github.com/vuquan2005/ScriptsMonkey
-// @version        	0.1.4
+// @version        	0.1.5
 // @match          	https://qlht.haui.edu.vn/mod/quiz/attempt.php*
 // @match          	https://qlht.haui.edu.vn/mod/quiz/summary.php*
 // @grant          	GM_setValue
 // @grant          	GM_getValue
+// @grant          	GM_deleteValue
 // @updateURL		https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/Save_the_multiple_questions.user.js
 // @downloadURL		https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/Save_the_multiple_questions.user.js
 // ==/UserScript==
@@ -18,6 +19,7 @@
     const $ = (selector, scope = document) => scope.querySelector(selector);
     const $$ = (selector, scope = document) => scope.querySelectorAll(selector);
     // ===========================================================================
+
     let quizData = GM_getValue("quizData", {});
 
     function run() {
@@ -31,6 +33,7 @@
 
         let answersData = [];
         let correctAnswer = null;
+        quizData[questionNumber] = {};
 
         answers.forEach((answer) => {
             const radio = $("input[type='radio']", answer);
@@ -65,6 +68,10 @@
         };
 
         console.log(quizData);
+
+        window.addEventListener("beforeunload", function () {
+            GM_setValue("quizData", quizData);
+        });
     }
 
     // ===========================================================================
@@ -97,17 +104,12 @@
             saveJSON(totalQuiz, lesson);
         }
 
-        GM_setValue("quizData", null);
+        GM_deleteValue("quizData");
+        const checkData = GM_getValue("quizData", null);
         setTimeout(() => {
-            console.log(GM_getValue("quizData", {}));
+            console.log("Đã xóa dữ liệu quizData:", checkData);
         }, 1000);
     }
-
-    // ===========================================================================
-
-    window.addEventListener("beforeunload", function () {
-        GM_setValue("quizData", quizData);
-    });
 
     // ===========================================================================
 
@@ -122,7 +124,7 @@
         downloadAnchorNode.remove();
     }
 
-	// ===========================================================================
+    // ===========================================================================
 
     function saveTxt(jsonData, filename) {
         // Câu 1.1;${question};${answer1} ||${answer2} ||${answer3} ||${answer4} ;${correctAnswer}
@@ -147,7 +149,7 @@
         URL.revokeObjectURL(link.href);
     }
 
-	// ===========================================================================
+    // ===========================================================================
 
     function jsonToHtml(jsonData) {
         let html = '<div class="quiz-container">\n';
@@ -208,7 +210,7 @@
         URL.revokeObjectURL(link.href);
     }
 
-	// ===========================================================================
+    // ===========================================================================
 
     const waitToWebsiteLoaded = setInterval(() => {
         if (
@@ -224,5 +226,4 @@
             finishQuiz();
         }
     }, 100);
-
 })();
