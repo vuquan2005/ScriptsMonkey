@@ -3,7 +3,7 @@
 // @description		Lưu lại câu hỏi trắc nghiệm trên hệ thống quản lý học tập qldt.haui.edu.vn
 // @author         	QuanVu
 // @namespace      	https://github.com/vuquan2005/ScriptsMonkey
-// @version        	0.4.0
+// @version        	0.4.1
 // @match          	https://qlht.haui.edu.vn/mod/quiz/attempt.php*
 // @match          	https://qlht.haui.edu.vn/mod/quiz/summary.php*
 // @grant          	GM_setValue
@@ -30,11 +30,6 @@
 
         const content = $("div.content", container);
         const question = $("div.qtext", content).textContent.trim();
-        $("div.qtext", content).innerHTML += `<span id="copy-btn" style="cursor: pointer;">©️</span>`;
-		
-		$("#copy-btn", content).addEventListener("click", function () {
-			navigator.clipboard.writeText(question);
-        });
 
         const answersContainer = $("div.answer", content);
         const answers = $$("div", answersContainer);
@@ -76,6 +71,23 @@
         };
 
         console.log(quizData);
+
+        $(
+            "div.prompt",
+            content
+        ).innerHTML += `<span id="copy-quiz-btn" style="cursor: pointer;">©️</span>`;
+        $("#copy-quiz-btn", content).addEventListener("click", function () {
+            const textToCopy = `Câu ${questionNumber}: ${question}\nChọn một:${answersData}`;
+            navigator.clipboard.writeText(question);
+        });
+        // Thêm nút sao chép câu hỏi
+        $(
+            "div.qtext",
+            content
+        ).innerHTML += `<span id="copy-question-btn" style="cursor: pointer;">©️</span>`;
+        $("#copy-question-btn", content).addEventListener("click", function () {
+            navigator.clipboard.writeText(question);
+        });
 
         window.addEventListener("beforeunload", function () {
             GM_setValue("quizData", quizData);
@@ -208,7 +220,7 @@
 
             item.answers.forEach((answer, index) => {
                 const optionLabel = String.fromCharCode(65 + index); // A, B, C, D
-                const isCorrect = item.correct && parseInt(item.correct) === index + 1;
+                const isCorrect = item.correct && parseInt(item.correct) === index;
                 const correctClass = isCorrect ? ' class="correct-answer"' : "";
                 html += `      <li${correctClass}>${optionLabel}. ${answer}</li>\n`;
             });
