@@ -3,7 +3,7 @@
 // @description		Lưu lại câu hỏi trắc nghiệm trên hệ thống quản lý học tập qldt.haui.edu.vn
 // @author         	QuanVu
 // @namespace      	https://github.com/vuquan2005/ScriptsMonkey
-// @version        	0.1.2
+// @version        	0.1.3
 // @match          	https://qlht.haui.edu.vn/mod/quiz/attempt.php*
 // @match          	https://qlht.haui.edu.vn/mod/quiz/summary.php*
 // @grant          	GM_setValue
@@ -44,6 +44,7 @@
 
             radio.addEventListener("change", function () {
                 if (radio.checked) {
+					correctAnswer = radio.value;
                     quizData[questionNumber] = {
                         index: questionNumber,
                         question: question,
@@ -63,7 +64,7 @@
             correct: correctAnswer,
         };
 
-        console.log(quizData[questionNumber]);
+        console.log(quizData);
     }
 
     window.addEventListener("beforeunload", function () {
