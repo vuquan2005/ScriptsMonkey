@@ -3,7 +3,7 @@
 // @description		Lưu lại câu hỏi trắc nghiệm trên hệ thống quản lý học tập qldt.haui.edu.vn
 // @author         	QuanVu
 // @namespace      	https://github.com/vuquan2005/ScriptsMonkey
-// @version        	0.2.0
+// @version        	0.3.0
 // @match          	https://qlht.haui.edu.vn/mod/quiz/attempt.php*
 // @match          	https://qlht.haui.edu.vn/mod/quiz/summary.php*
 // @grant          	GM_setValue
@@ -77,25 +77,28 @@
     // ===========================================================================
 
     function finishQuiz() {
-        const totalQuiz = GM_getValue("quizData", {});
+        let totalQuiz = GM_getValue("quizData", {});
         console.log(totalQuiz);
 
         const lesson = $("title").textContent.match(/bài\s\d+/)[0];
         console.log(lesson);
 
         // Kiểm tra index của object có correct là null
-		let isNullCorrect = false;
-		let nullCorrectItemsList = "Các câu hỏi chưa được lưu câu trả lời: ";
+        let isNullCorrect = false;
+        let nullCorrectItemsList = "Các câu hỏi chưa được lưu câu trả lời: ";
         Object.keys(totalQuiz).forEach((key) => {
             if (totalQuiz[key].correct === null) {
-				isNullCorrect = true;
+                isNullCorrect = true;
                 nullCorrectItemsList += totalQuiz[key].index + ", ";
             }
         });
-		if (isNullCorrect) {
-			alert(nullCorrectItemsList);
-			return;
-		}
+        if (isNullCorrect) {
+            alert(nullCorrectItemsList);
+            return;
+        }
+
+        // Sắp xếp dữ liệu theo thứ tự câu hỏi
+        totalQuiz = sortJSON(totalQuiz);
 
         let optionFileType = prompt(
             "Bạn muốn lưu dữ liệu dưới dạng nào (có thể chọn nhiều)? \n0: html | 1: txt | 2: json",
@@ -123,6 +126,27 @@
         setTimeout(() => {
             console.log("Đã xóa dữ liệu quizData:", checkData);
         }, 500);
+    }
+
+    // ===========================================================================
+
+    function sortJSON(jsonData) {
+        // Chuyển object thành mảng các cặp [key, value]
+        const quizArray = Object.entries(jsonData);
+
+        // Sắp xếp mảng theo thuộc tính question
+        quizArray.sort((a, b) => a[1].question.localeCompare(b[1].question));
+
+        // Tạo object mới với key và index được cập nhật
+        const sortedQuiz = {};
+        quizArray.forEach(([key, value], i) => {
+            // Cập nhật index để phản ánh thứ tự mới (bắt đầu từ 1)
+            value.index = (i + 1).toString();
+            // Gán vào object mới với key mới (bắt đầu từ 1)
+            sortedQuiz[(i + 1).toString()] = value;
+        });
+        console.log(sortedQuiz);
+        return sortedQuiz;
     }
 
     // ===========================================================================
