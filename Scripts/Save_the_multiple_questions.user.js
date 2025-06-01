@@ -67,9 +67,49 @@
         console.log(quizData);
     }
 
+    // ===========================================================================
+
+    function finishQuiz() {
+        const totalQuiz = GM_getValue("quizData", {});
+        console.log(totalQuiz);
+
+        const lesson = $("title").textContent.match(/bài\s\d+/)[0];
+        console.log(lesson);
+
+        let optionFileType = prompt(
+            "Bạn muốn lưu dữ liệu dưới dạng nào (có thể chọn nhiều)? \n0: html | 1: txt | 2: json",
+            "0"
+        );
+
+        if (optionFileType == null) optionFileType = "Don't save";
+        console.log("File type: ", optionFileType);
+
+        if (optionFileType.includes(0)) {
+            // Save as HTML
+            saveJsonToHtml(totalQuiz, lesson);
+        }
+        if (optionFileType.includes(1)) {
+            // Save as TXT
+            saveTxt(totalQuiz, lesson);
+        }
+        if (optionFileType.includes(2)) {
+            // Save as JSON
+            saveJSON(totalQuiz, lesson);
+        }
+
+        GM_setValue("quizData", null);
+        setTimeout(() => {
+            console.log(GM_getValue("quizData", {}));
+        }, 1000);
+    }
+
+    // ===========================================================================
+
     window.addEventListener("beforeunload", function () {
         GM_setValue("quizData", quizData);
     });
+
+    // ===========================================================================
 
     function saveJSON(jsonData, filename) {
         const dataStr =
@@ -81,6 +121,8 @@
         downloadAnchorNode.click();
         downloadAnchorNode.remove();
     }
+
+	// ===========================================================================
 
     function saveTxt(jsonData, filename) {
         // Câu 1.1;${question};${answer1} ||${answer2} ||${answer3} ||${answer4} ;${correctAnswer}
@@ -104,6 +146,8 @@
         document.body.removeChild(link);
         URL.revokeObjectURL(link.href);
     }
+
+	// ===========================================================================
 
     function jsonToHtml(jsonData) {
         let html = '<div class="quiz-container">\n';
@@ -164,6 +208,8 @@
         URL.revokeObjectURL(link.href);
     }
 
+	// ===========================================================================
+
     const waitToWebsiteLoaded = setInterval(() => {
         if (
             ($("span.answernumber") ? $("span.answernumber").textContent === "a. " : false) &&
@@ -174,40 +220,9 @@
         }
         if (currentURL.includes("summary.php")) {
             clearInterval(waitToWebsiteLoaded);
-            const totalQuiz = GM_getValue("quizData", {});
-            console.log(totalQuiz);
 
-            const lesson = $("title").textContent.match(/bài\s\d+/)[0];
-            console.log(lesson);
-
-            let optionFileType = prompt(
-                "Bạn muốn lưu dữ liệu dưới dạng nào (có thể chọn nhiều)? \n0: html | 1: txt | 2: json",
-                "0"
-            );
-
-			if (optionFileType == null) 
-				optionFileType = "Don't save";
-			console.log("File type: ", optionFileType);
-
-            if (optionFileType.includes(0)) {
-                // Save as HTML
-                saveJsonToHtml(totalQuiz, lesson);
-            }
-            if (optionFileType.includes(1)) {
-                // Save as TXT
-                saveTxt(totalQuiz, lesson);
-            }
-            if (optionFileType.includes(2)) {
-                // Save as JSON
-                saveJSON(totalQuiz, lesson);
-            }
-
-            GM_setValue("quizData", null);
-            setTimeout(() => {
-                console.log(GM_getValue("quizData", {}));
-            }, 1000);
+            finishQuiz();
         }
     }, 100);
 
-    // quizData.push({ question: `${question.textContent.trim()}`, answers: [...], correct: 1 });
 })();
