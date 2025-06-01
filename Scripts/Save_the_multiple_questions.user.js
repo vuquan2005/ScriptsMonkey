@@ -3,7 +3,7 @@
 // @description		Lưu lại câu hỏi trắc nghiệm trên hệ thống quản lý học tập qldt.haui.edu.vn
 // @author         	QuanVu
 // @namespace      	https://github.com/vuquan2005/ScriptsMonkey
-// @version        	0.1.0
+// @version        	0.1.1
 // @match          	https://qlht.haui.edu.vn/mod/quiz/attempt.php*
 // @match          	https://qlht.haui.edu.vn/mod/quiz/summary.php*
 // @grant          	GM_setValue
@@ -179,9 +179,22 @@
             const lesson = $("title").textContent.match(/bài\s\d+/)[0];
             console.log(lesson);
 
-            // saveJSON(totalQuiz, lesson);
-            saveJsonToHtml(totalQuiz, lesson);
-			saveTxt(totalQuiz, lesson);
+			let optionFileType = prompt("Bạn muốn lưu dữ liệu dưới dạng nào? \n0: html | 1: txt | 2: json", "0");
+			optionFileType = optionFileType ? parseInt(optionFileType) : 0;
+			if (isNaN(optionFileType) || optionFileType < 0 || optionFileType > 2) {
+				alert("Lựa chọn không hợp lệ, mặc định lưu dưới dạng HTML.");
+				optionFileType = 0;
+			}
+			if (optionFileType === 0) {
+				// Save as HTML
+				saveJsonToHtml(totalQuiz, lesson);
+			} else if (optionFileType === 1) {
+				// Save as TXT
+				saveTxt(totalQuiz, lesson);
+			} else if (optionFileType === 2) {
+				// Save as JSON
+				saveJSON(totalQuiz, lesson);
+			}
 
             GM_setValue("quizData", {});
         }
