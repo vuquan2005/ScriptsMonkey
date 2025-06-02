@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      18.8
+// @version      18.9
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -981,15 +981,24 @@
     }
     // Show hệ số điểm trong xem điểm TX
     function showHeSoDiemTX() {
-        if (currentURL != "https://sv.haui.edu.vn/student/result/studyresults") {
+        if (
+            currentURL != "https://sv.haui.edu.vn/student/result/studyresults" &&
+            !currentURL.includes("https://sv.haui.edu.vn/student/result/viewstudyresult?code=")
+        ) {
             return;
         }
         let tx1Index = 4;
         let gk1Index = 14;
+        if (currentURL.includes("https://sv.haui.edu.vn/student/result/viewstudyresult?code=")) {
+			tx1Index = 3;
+			gk1Index = 9;
+        }
+
         const heSoDiem = GM_getValue("heSoDiemCDIO", {});
         const hocPhan = $$("tr.kTableAltRow, tr.kTableRow", $("div.kGrid"));
         for (const row of hocPhan) {
             const maHP = row.children[2].textContent.match(/([A-Z]{2})\d{4}/)[0];
+			// console.log("maHP: ", maHP);
             if (heSoDiem[maHP] != "" && heSoDiem[maHP] != undefined) {
                 // Hiển thị hệ số điểm vào cột cuối cùng
                 $("td:last-child", row).textContent = heSoDiem[maHP];
