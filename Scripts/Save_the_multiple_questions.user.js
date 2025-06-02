@@ -3,7 +3,7 @@
 // @description		Lưu lại câu hỏi trắc nghiệm trên hệ thống quản lý học tập qldt.haui.edu.vn
 // @author         	QuanVu
 // @namespace      	https://github.com/vuquan2005/ScriptsMonkey
-// @version        	0.4.3
+// @version        	0.4.4
 // @match          	https://qlht.haui.edu.vn/mod/quiz/attempt.php*
 // @match          	https://qlht.haui.edu.vn/mod/quiz/summary.php*
 // @grant          	GM_setValue
@@ -114,7 +114,7 @@
         });
         if (isNullCorrect) {
             alert(nullCorrectItemsList);
-            return;
+            // return;
         }
 
         // Sắp xếp dữ liệu theo thứ tự câu hỏi
