@@ -3,7 +3,7 @@
 // @description		Lưu lại câu hỏi trắc nghiệm trên hệ thống quản lý học tập qldt.haui.edu.vn
 // @author         	QuanVu
 // @namespace      	https://github.com/vuquan2005/ScriptsMonkey
-// @version        	0.4.6
+// @version        	0.4.7
 // @match          	https://qlht.haui.edu.vn/mod/quiz/attempt.php*
 // @match          	https://qlht.haui.edu.vn/mod/quiz/summary.php*
 // @grant          	GM_setValue
@@ -193,7 +193,9 @@
             const question = item.question.replace(/;/g, ","); // Remove semicolons to avoid breaking the format
             const answers = item.answers.map((answer) => answer.replace(/;/g, ",")).join(" ||");
             const correctAnswer = item.correct ? item.correct : "";
-            txtContent += `Câu ${lesson}.${item.index};${question};${answers + 1} ;${correctAnswer}\n`;
+            txtContent += `Câu ${lesson}.${item.index};${question};${answers} ;${
+                correctAnswer + 1
+            }\n`;
 
             txtContent += "\n";
         }
@@ -222,7 +224,7 @@
                 const optionLabel = String.fromCharCode(65 + index); // A, B, C, D
                 const isCorrect = item.correct && parseInt(item.correct) === index;
                 const correctClass = isCorrect ? ' class="correct-answer"' : "";
-				const correctTick = isCorrect ? "✅" : "";
+                const correctTick = isCorrect ? "✅" : "";
                 html += `      <li${correctClass}>${optionLabel}. ${correctTick} ${answer}</li>\n`;
             });
 
