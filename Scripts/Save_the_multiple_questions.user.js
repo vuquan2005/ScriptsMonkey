@@ -3,7 +3,7 @@
 // @description		Lưu lại câu hỏi trắc nghiệm trên hệ thống quản lý học tập qldt.haui.edu.vn
 // @author         	QuanVu
 // @namespace      	https://github.com/vuquan2005/ScriptsMonkey
-// @version        	0.4.8
+// @version        	0.4.9
 // @match          	https://qlht.haui.edu.vn/mod/quiz/attempt.php*
 // @match          	https://qlht.haui.edu.vn/mod/quiz/summary.php*
 // @grant          	GM_setValue
@@ -193,8 +193,9 @@
             const question = item.question.replace(/;/g, ","); // Remove semicolons to avoid breaking the format
             const answers = item.answers.map((answer) => answer.replace(/;/g, ",")).join(" ||");
             const correctAnswer = item.correct ? item.correct : "";
-            txtContent += `Câu ${lesson}.${item.index};${question};${answers} ;
-			${Number(correctAnswer) + 1}\n`;
+            txtContent += `Câu ${lesson}.${item.index};${question};${answers} ;${
+                Number(correctAnswer) + 1
+            }\n`;
 
             txtContent += "\n";
         }
