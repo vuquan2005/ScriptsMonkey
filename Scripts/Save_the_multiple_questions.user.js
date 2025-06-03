@@ -193,7 +193,7 @@
             const question = item.question.replace(/;/g, ","); // Remove semicolons to avoid breaking the format
             const answers = item.answers.map((answer) => answer.replace(/;/g, ",")).join(" ||");
             const correctAnswer = item.correct ? item.correct : "";
-            txtContent += `Câu ${lesson}.${item.index};${question};${answers} ;${correctAnswer}\n`;
+            txtContent += `Câu ${lesson}.${item.index};${question};${answers + 1} ;${correctAnswer}\n`;
 
             txtContent += "\n";
         }
