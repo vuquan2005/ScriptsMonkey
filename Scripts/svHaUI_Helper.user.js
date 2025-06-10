@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      18.9
+// @version      18.10
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -179,14 +179,19 @@
         for (const row of hocPhan) {
             // Bỏ qua hpNotGPA
             if (hpNotGPA.some((hp) => row.children[1].textContent.includes(hp))) continue;
-            const oDiem = row.children[12];
-            const diemSo = 0.0 + Number(oDiem.textContent.trim());
             // Tô màu tín chỉ
             row.children[5].style.backgroundColor =
                 creditsBoxColor[row.children[5].textContent.trim()];
             row.children[5].style.color = "#FFFFFF";
+
+            const oDiem = row.children[12];
             // Bỏ qua những học phần không có điểm
-            if (oDiem.textContent.trim() == "") continue;
+            if (oDiem.textContent.trim() == "") {
+                row.children[13].style.backgroundColor = "rgba(0, 0, 0, 0)";
+                continue;
+            }
+            const diemSo = 0.0 + Number(oDiem.textContent.trim());
+			console.log(diemSo);
             // Tô màu điểm
             row.children[13].style.backgroundColor = scoresBoxColor[diemSo];
             row.children[13].style.color = "#FFFFFF";
@@ -644,13 +649,18 @@
 
         const letterScore = {
             4: "A",
+            4.0: "A",
             3.5: "B+",
             3: "B",
+            3.0: "B",
             2.5: "C+",
             2: "C",
+            2.0: "C",
             1.5: "D+",
             1: "D",
+            1.0: "D",
             0: "F",
+            0.0: "F",
         };
         // Lưu lại original-score
         for (const row of hocPhan) {
@@ -667,7 +677,7 @@
                 // Vô hiệu hóa edit score
                 row.children[12].setAttribute("contenteditable", "false");
                 // Bỏ qua học phần không sửa
-                if (row.children[12].textContent == row.children[12].getAttribute("original-score"))
+                if (row.children[12].textContent === row.children[12].getAttribute("original-score"))
                     continue;
                 // Return original score
                 row.children[12].textContent = row.children[12].getAttribute("original-score");
@@ -678,6 +688,8 @@
                 row.children[15].textContent = "";
             }
             highlightGradeScores();
+            if ($("span#can-replace.info-examresult"))
+                $("span#can-replace.info-examresult").remove();
             return false;
         } else {
             // Checked
@@ -686,9 +698,9 @@
                 row.children[12].setAttribute("contenteditable", "true");
                 if (row.children[12].textContent == row.children[12].getAttribute("original-score"))
                     continue;
-                // Return original score
-                row.children[13].textContent = letterScore[row.children[12].textContent.trim()];
-                // Return original letter score
+                // Show letter score
+                row.children[13].textContent = letterScore[0.0 + Number(row.children[12].textContent.trim())];
+                // Show original letter score
                 row.children[15].textContent =
                     letterScore[row.children[12].getAttribute("original-score")];
             }
@@ -726,7 +738,7 @@
             if (hpNotGPA.some((hp) => row.children[1].textContent.includes(hp))) continue;
             // Bỏ qua học phần không sửa
             if (
-                row.children[12].getAttribute("original-score") ==
+                row.children[12].getAttribute("original-score") ===
                 row.children[12].textContent.trim()
             )
                 continue;
@@ -990,15 +1002,15 @@
         let tx1Index = 4;
         let gk1Index = 14;
         if (currentURL.includes("https://sv.haui.edu.vn/student/result/viewstudyresult?code=")) {
-			tx1Index = 3;
-			gk1Index = 9;
+            tx1Index = 3;
+            gk1Index = 9;
         }
 
         const heSoDiem = GM_getValue("heSoDiemCDIO", {});
         const hocPhan = $$("tr.kTableAltRow, tr.kTableRow", $("div.kGrid"));
         for (const row of hocPhan) {
             const maHP = row.children[2].textContent.match(/([A-Z]{2})\d{4}/)[0];
-			// console.log("maHP: ", maHP);
+            // console.log("maHP: ", maHP);
             if (heSoDiem[maHP] != "" && heSoDiem[maHP] != undefined) {
                 // Hiển thị hệ số điểm vào cột cuối cùng
                 $("td:last-child", row).textContent = heSoDiem[maHP];
