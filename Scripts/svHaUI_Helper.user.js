@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      18.10
+// @version      19.0
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -191,7 +191,7 @@
                 continue;
             }
             const diemSo = 0.0 + Number(oDiem.textContent.trim());
-			console.log(diemSo);
+            console.log(diemSo);
             // Tô màu điểm
             row.children[13].style.backgroundColor = scoresBoxColor[diemSo];
             row.children[13].style.color = "#FFFFFF";
@@ -677,7 +677,9 @@
                 // Vô hiệu hóa edit score
                 row.children[12].setAttribute("contenteditable", "false");
                 // Bỏ qua học phần không sửa
-                if (row.children[12].textContent === row.children[12].getAttribute("original-score"))
+                if (
+                    row.children[12].textContent === row.children[12].getAttribute("original-score")
+                )
                     continue;
                 // Return original score
                 row.children[12].textContent = row.children[12].getAttribute("original-score");
@@ -699,7 +701,8 @@
                 if (row.children[12].textContent == row.children[12].getAttribute("original-score"))
                     continue;
                 // Show letter score
-                row.children[13].textContent = letterScore[0.0 + Number(row.children[12].textContent.trim())];
+                row.children[13].textContent =
+                    letterScore[0.0 + Number(row.children[12].textContent.trim())];
                 // Show original letter score
                 row.children[15].textContent =
                     letterScore[row.children[12].getAttribute("original-score")];
@@ -1152,6 +1155,31 @@
         noteElement.textContent = `${label}`;
     };
     // ======================================================================================
+    function autoSurvey() {
+        if (!currentURL.includes("https://sv.haui.edu.vn/survey/view?")) {
+            return;
+        }
+        setTimeout(() => {
+            const table = $("table.card-body.table-responsive.table.table-bordered.table-striped");
+            const scores = $$("thead > tr:nth-child(2) > td", table);
+            for (const score of scores) {
+                const scoreId = score.textContent.trim().match(/\d+/)[0];
+                const inputSelectScore = document.createElement("input");
+                inputSelectScore.type = "radio";
+                inputSelectScore.name = "select_score";
+                inputSelectScore.value = scoreId;
+                score.appendChild(inputSelectScore);
+
+                inputSelectScore.addEventListener("change", function () {
+                    const scoreElements = $$(`td[title="${scoreId} điểm"] > input`, table);
+                    for (const scoreElement of scoreElements) {
+                        scoreElement.checked = true;
+                    }
+                });
+            }
+        }, 1000);
+    }
+    // ======================================================================================
     const changeHeaderInterval = controlInterval(changeHeader, 5000);
     const showInfoAfterEditScoreInterval = controlInterval(showInfoAfterEditScore, 1000);
     setTimeout(() => {
@@ -1203,5 +1231,8 @@
         toggleChiTietHocPhan();
         // Kiểm tra hệ số điểm trong chi tiết học phần CDIO
         checkHeSoDiemCDIO();
+
+        // Khảo sát, đánh giá giảng viên
+        autoSurvey();
     }, 500);
 })();
