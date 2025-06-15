@@ -350,9 +350,9 @@
                 // Nếu chưa đến ngày thi thì tô màu vàng
                 examPlan.style.backgroundColor = "rgb(248,226,135)";
                 // Hiển thị khoảng cách ngày
-                examPlan.children[3].innerHTML += `<br>(${calculateDateDifference(
+                examPlan.children[3].innerHTML += `<br>(Còn ${calculateDateDifference(
                     examPlan.children[3].textContent
-                )} ngày sau)`;
+                )} ngày)`;
             }
             examScheduleResultTable.appendChild(examPlan);
             await delay(200);
@@ -417,9 +417,9 @@
                     // Nếu chưa đến ngày thi thì tô màu vàng
                     examPlan.style.backgroundColor = "rgb(248,226,135)";
                     // Hiển thị khoảng cách ngày
-                    examPlan.children[3].innerHTML += `<br>(${calculateDateDifference(
+                    examPlan.children[3].innerHTML += `<br>(Còn ${calculateDateDifference(
                         examPlan.children[3].textContent
-                    )} ngày sau)`;
+                    )} ngày)`;
                 }
                 if (checkExamTime(examPlan, 3, true)) {
                     // Hiển thị khoảng cách ngày
@@ -466,9 +466,9 @@
             if (checkExamTime(examElement, 2, false)) {
                 examElement.style.backgroundColor = "rgb(248,226,135)";
                 // Hiển thị khoảng cách ngày
-                examElement.children[2].innerHTML += `<br>(${calculateDateDifference(
+                examElement.children[2].innerHTML += `<br>(Còn ${calculateDateDifference(
                     examElement.children[2].textContent
-                )} ngày sau)`;
+                )} ngày)`;
             }
         }
     }
@@ -531,9 +531,9 @@
                     // Nếu chưa đến ngày thi thì tô màu vàng
                     examScheduleElement.style.backgroundColor = "rgb(248,226,135)";
                     // Hiển thị khoảng cách ngày
-                    examScheduleElement.children[2].innerHTML += `<br>(${calculateDateDifference(
+                    examScheduleElement.children[2].innerHTML += `<br>(Còn ${calculateDateDifference(
                         examScheduleElement.children[2].textContent
-                    )} ngày sau)`;
+                    )} ngày)`;
                 }
                 if (checkExamTime(examScheduleElement, 2, true)) {
                     // Hiển thị khoảng cách ngày
