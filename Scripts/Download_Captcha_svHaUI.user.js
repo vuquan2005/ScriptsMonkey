@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Download captcha svHaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.4
+// @version      3.0
 // @description  Tự động tải captcha của svHaUI
 // @match        https://sv.haui.edu.vn/*
 // @grant        none
@@ -19,6 +19,28 @@
         const captchaInput = $("input#ctl00_txtimgcode");
         setTimeout(() => {
             const captchaImg = $("img#ctl00_Image1");
+            let captchaImgBase64 = "";
+            captchaImgBase64 = convertImageToBase64(captchaImg);
+            GM_setValue("captchaImg", captchaImgBase64);
+            // console.log(captchaImgBase64);
+        }, 2000);
+
+        captchaInput.addEventListener("change", function () {
+            captchaLabel = this.value;
+        });
+        window.addEventListener("beforeunload", function () {
+            GM_setValue("lastURL", currentURL);
+            GM_setValue("isLoginPassed", true);
+            if (captchaLabel.length === 5) {
+                GM_setValue("captchaLabel", captchaLabel);
+            }
+        });
+    }
+    function dkHPweb() {
+        let captchaLabel = "";
+        const captchaInput = $("input#ctl02_txtimgcode");
+        setTimeout(() => {
+            const captchaImg = $("img#ctl02_Image1");
             let captchaImgBase64 = "";
             captchaImgBase64 = convertImageToBase64(captchaImg);
             GM_setValue("captchaImg", captchaImgBase64);
@@ -102,6 +124,16 @@
             //     lastURL
             // );
         }
+        if (
+            $("div#tab0_data") &&
+            currentURL == "https://sv.haui.edu.vn/register/" &&
+            lastURL == "https://sv.haui.edu.vn/register/" &&
+            isLoginPassed
+        ) {
+            captchaIsPassed();
+        } else if (currentURL == "https://sv.haui.edu.vn/register/") {
+            dkHPweb();
+        }
     }
-    setTimeout(run, 200);
+    setTimeout(run, 500);
 })();
