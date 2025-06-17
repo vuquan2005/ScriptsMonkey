@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      19.0
+// @version      19.1
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -723,6 +723,8 @@
             const oDiem = row.children[12];
             // Bỏ qua những học phần không có điểm
             if (oDiem.textContent.trim() == "") continue;
+			// Bỏ qua những học phần F
+            if (oDiem.textContent.trim() == "0") continue;
             const diemSo = Number(oDiem.textContent.trim());
             const tinChi = Number(row.children[5].textContent.trim());
             diemTong += diemSo * tinChi;
