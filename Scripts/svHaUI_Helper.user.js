@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      19.1
+// @version      19.2
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -423,9 +423,9 @@
                 }
                 if (checkExamTime(examPlan, 3, true)) {
                     // Hiển thị khoảng cách ngày
-                    examPlan.children[3].innerHTML += `<br>(${Math.abs(
-                        calculateDateDifference(examPlan.children[3].textContent)
-                    )} ngày trước)`;
+                    examPlan.children[3].innerHTML += `<br>(${
+                        Math.abs(calculateDateDifference(examPlan.children[3].textContent)) - 1
+                    } ngày trước)`;
                 }
                 listExamPlan.push(examPlan);
                 addExamPlanToPanel(examPlan);
@@ -537,9 +537,11 @@
                 }
                 if (checkExamTime(examScheduleElement, 2, true)) {
                     // Hiển thị khoảng cách ngày
-                    examScheduleElement.children[2].innerHTML += `<br>(${Math.abs(
-                        calculateDateDifference(examScheduleElement.children[2].textContent)
-                    )} ngày trước)`;
+                    examScheduleElement.children[2].innerHTML += `<br>(${
+                        Math.abs(
+                            calculateDateDifference(examScheduleElement.children[2].textContent)
+                        ) - 1
+                    } ngày trước)`;
                 }
                 listExamSchedule.push(examScheduleElement);
                 addExamScheduleToPanel(examScheduleElement);
@@ -723,7 +725,7 @@
             const oDiem = row.children[12];
             // Bỏ qua những học phần không có điểm
             if (oDiem.textContent.trim() == "") continue;
-			// Bỏ qua những học phần F
+            // Bỏ qua những học phần F
             if (oDiem.textContent.trim() == "0") continue;
             const diemSo = Number(oDiem.textContent.trim());
             const tinChi = Number(row.children[5].textContent.trim());
