@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      19.2
+// @version      19.3
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -191,7 +191,7 @@
                 continue;
             }
             const diemSo = 0.0 + Number(oDiem.textContent.trim());
-            console.log(diemSo);
+            // console.log(diemSo);
             // Tô màu điểm
             row.children[13].style.backgroundColor = scoresBoxColor[diemSo];
             row.children[13].style.color = "#FFFFFF";
@@ -241,7 +241,7 @@
         const d1 = new Date(date1Array[2], date1Array[1] - 1, date1Array[0]);
         const d2 = new Date(date2Array[2], date2Array[1] - 1, date2Array[0]);
         const difference = d1.getTime() - d2.getTime();
-        const days = difference / (1000 * 60 * 60 * 24) - 1;
+        const days = difference / (1000 * 60 * 60 * 24);
         return days;
     }
     // Check exam time
@@ -423,9 +423,9 @@
                 }
                 if (checkExamTime(examPlan, 3, true)) {
                     // Hiển thị khoảng cách ngày
-                    examPlan.children[3].innerHTML += `<br>(${
-                        Math.abs(calculateDateDifference(examPlan.children[3].textContent)) - 1
-                    } ngày trước)`;
+                    examPlan.children[3].innerHTML += `<br>(${Math.abs(
+                        calculateDateDifference(examPlan.children[3].textContent)
+                    )} ngày trước)`;
                 }
                 listExamPlan.push(examPlan);
                 addExamPlanToPanel(examPlan);
@@ -537,11 +537,9 @@
                 }
                 if (checkExamTime(examScheduleElement, 2, true)) {
                     // Hiển thị khoảng cách ngày
-                    examScheduleElement.children[2].innerHTML += `<br>(${
-                        Math.abs(
-                            calculateDateDifference(examScheduleElement.children[2].textContent)
-                        ) - 1
-                    } ngày trước)`;
+                    examScheduleElement.children[2].innerHTML += `<br>(${Math.abs(
+                        calculateDateDifference(examScheduleElement.children[2].textContent)
+                    )} ngày trước)`;
                 }
                 listExamSchedule.push(examScheduleElement);
                 addExamScheduleToPanel(examScheduleElement);
