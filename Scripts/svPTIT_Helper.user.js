@@ -12,6 +12,9 @@
 
 (function () {
     "use strict";
+
+    console.log("PTIT");
+
     GM_addStyle(`
 		body > app-root > div > div > div > div.contentshow.ng-star-inserted > div > div > div.px-md-0.frame_left {
 			flex: 3;
@@ -21,17 +24,11 @@
 		}
 	`);
 
-    if (location.pathname === "/#/diem") {
-        const maintable = document.querySelector("#excel-table > tbody");
-        if (maintable) {
-        }
-    }
-
-    function suaDiem() {
+    function getInfo() {
         const maintable = document.querySelector("#excel-table > tbody");
 
         const rows = maintable.querySelectorAll("tr");
-        const semesters = [];
+        var semesters = [];
         let currentSemester = null;
         let isParsingSubjects = false;
 
@@ -49,9 +46,7 @@
                     summary: {},
                 };
                 isParsingSubjects = true;
-            }
-
-            else if (
+            } else if (
                 isParsingSubjects &&
                 row.classList.contains("text-center") &&
                 row.classList.contains("ng-star-inserted")
@@ -66,12 +61,10 @@
                         group: cells[2],
                         name: cells[3],
                         credits: cells[4],
+						score: cells[7],
                     });
                 }
-            }
-
-            else if (
-                rowText.includes("- tbHK:") &&
+            } else if (
                 row.classList.contains("m-0") &&
                 row.classList.contains("ng-star-inserted")
             ) {
@@ -81,8 +74,6 @@
                 const soTin = tables[0].querySelector("tr:nth-child(3) > td:nth-child(2)");
                 const tbttl = tables[1].querySelector("tr:nth-child(1) > td:nth-child(2)");
                 const tinTichLuy = tables[1].querySelector("tr:nth-child(3) > td:nth-child(2)");
-
-				console.log(tbHK)
 
                 if (currentSemester) {
                     currentSemester.summary = {
@@ -101,5 +92,30 @@
         }
 
         console.log(semesters);
+    }
+
+    function suaDiem() {
+        const editbtn = document.createElement("button");
+        editbtn.className = "btn btn-outline-primary text-nowrap";
+        editbtn.textContent = "Sửa điểm";
+
+        const buttonContainer = document.querySelector(".col-12.text-right.ng-star-inserted");
+        if (buttonContainer) {
+            buttonContainer.appendChild(editbtn);
+        }
+
+		document.addEventListener("click",  function (event) {
+
+		});
+    }
+
+    if (location.href === "https://qldt.ptit.edu.vn/#/diem") {
+        setTimeout(() => {
+            const maintable = document.querySelector("#excel-table > tbody");
+            if (maintable) {
+                getInfo();
+                suaDiem();
+            }
+        }, 5000);
     }
 })();
