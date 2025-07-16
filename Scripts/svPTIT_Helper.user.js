@@ -22,79 +22,54 @@
 		body > app-root > div > div > div > div.contentshow.ng-star-inserted > div > div > div.frame_right.pr-0.ng-star-inserted {
 			flex: 1;
 		}
+		.infoElement {
+			position: absolute;
+			top: 0;
+			left: 0;
+		}
 	`);
 
-    function getInfo() {
-        const maintable = document.querySelector("#excel-table > tbody");
+    function showGPA() {
+        console.log("Hiển thị GPA");
+        const container = document.querySelector("app-right");
 
-        const rows = maintable.querySelectorAll("tr");
-        var semesters = [];
-        let currentSemester = null;
-        let isParsingSubjects = false;
+		const gpaDivContainer = document.createElement("div");
+		gpaDivContainer.className = "card shadow-lg ng-star-inserted";
+        const gpaDiv = document.createElement("div");
+        gpaDiv.className = "card shadow-lg ng-star-inserted infoElement";
 
-        rows.forEach((row) => {
-            const rowText = row.textContent.trim();
+        gpaDiv.innerHTML = `
+			<table>
+				<tr>
+					<td class="text-nowrap" >Điểm trung bình tích lũy: </td>
+					<td class="text-nowrap" id="gpa" >0.00 </td>
+				</tr>
+				<tr>
+					<td class="text-nowrap" >Tín tích lũy: </td>
+					<td class="text-nowrap" id="tin" >0.00 </td>
+				</tr>
+				<tr>
+					<td class="text-nowrap" >Tín còn lại: </td>
+					<td class="text-nowrap" id="tinConLai" >0.00 </td>
+				</tr>
+				<tr>
+					<td class="text-nowrap" >Các môn còn lại cần để đạt GPA 3.2: </td>
+					<td class="text-nowrap" id="gpa3.2" >0.00 </td>
+				</tr>
+				<tr>
+					<td class="text-nowrap" >Các môn còn lại cần để đạt GPA 3.6: </td>
+					<td class="text-nowrap" id="gpa3.6" >0.00 </td>
+				</tr>
+			</table>
+		`;
 
-            if (
-                row.classList.contains("table-primary") &&
-                row.classList.contains("ng-star-inserted")
-            ) {
-                if (currentSemester) semesters.push(currentSemester);
-                currentSemester = {
-                    title: rowText,
-                    subjects: [],
-                    summary: {},
-                };
-                isParsingSubjects = true;
-            } else if (
-                isParsingSubjects &&
-                row.classList.contains("text-center") &&
-                row.classList.contains("ng-star-inserted")
-            ) {
-                const cells = Array.from(row.querySelectorAll("td")).map((td) =>
-                    td.textContent.trim()
-                );
-                if (cells.length >= 5) {
-                    currentSemester.subjects.push({
-                        stt: cells[0],
-                        code: cells[1],
-                        group: cells[2],
-                        name: cells[3],
-                        credits: cells[4],
-						score: cells[7],
-                    });
-                }
-            } else if (
-                row.classList.contains("m-0") &&
-                row.classList.contains("ng-star-inserted")
-            ) {
-                const tables = row.querySelectorAll("table");
-
-                const tbHK = tables[0].querySelector("tr:nth-child(1) > td:nth-child(2)");
-                const soTin = tables[0].querySelector("tr:nth-child(3) > td:nth-child(2)");
-                const tbttl = tables[1].querySelector("tr:nth-child(1) > td:nth-child(2)");
-                const tinTichLuy = tables[1].querySelector("tr:nth-child(3) > td:nth-child(2)");
-
-                if (currentSemester) {
-                    currentSemester.summary = {
-                        tbHK: parseFloat(tbHK.textContent),
-                        soTin: parseInt(soTin.textContent),
-                        tbTichLuy: parseFloat(tbttl.textContent),
-                        tinTichLuy: parseInt(tinTichLuy.textContent),
-                    };
-                    isParsingSubjects = false;
-                }
-            }
-        });
-
-        if (currentSemester) {
-            semesters.push(currentSemester);
-        }
-
-        console.log(semesters);
+        gpaDivContainer.insertAdjacentElement("beforeend", gpaDiv);
+		container.insertAdjacentElement("beforeend", gpaDivContainer);
     }
 
     function suaDiem() {
+        console.log("Sửa điểm");
+
         const editbtn = document.createElement("button");
         editbtn.className = "btn btn-outline-primary text-nowrap";
         editbtn.textContent = "Sửa điểm";
@@ -104,18 +79,24 @@
             buttonContainer.appendChild(editbtn);
         }
 
-		document.addEventListener("click",  function (event) {
+        document.addEventListener("click", function (event) {
+            const maintable = document.querySelector("#excel-table > tbody");
+            const rows = maintable.querySelectorAll("tr");
 
-		});
+            rows.forEach((row) => {
+                if (row.classList.contains("text-center")) {
+                    row.children[7].setAttribute("contenteditable", "true");
+                }
+            });
+        });
     }
-
-    if (location.href === "https://qldt.ptit.edu.vn/#/diem") {
-        setTimeout(() => {
+    setTimeout(() => {
+        if (location.href === "https://qldt.ptit.edu.vn/#/diem") {
             const maintable = document.querySelector("#excel-table > tbody");
             if (maintable) {
-                getInfo();
                 suaDiem();
+                showGPA();
             }
-        }, 5000);
-    }
+        }
+    }, 5000);
 })();
