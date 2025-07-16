@@ -76,17 +76,20 @@
                 row.classList.contains("ng-star-inserted")
             ) {
                 const tables = row.querySelectorAll("table");
+
                 const tbHK = tables[0].querySelector("tr:nth-child(1) > td:nth-child(2)");
                 const soTin = tables[0].querySelector("tr:nth-child(3) > td:nth-child(2)");
                 const tbttl = tables[1].querySelector("tr:nth-child(1) > td:nth-child(2)");
                 const tinTichLuy = tables[1].querySelector("tr:nth-child(3) > td:nth-child(2)");
 
+				console.log(tbHK)
+
                 if (currentSemester) {
                     currentSemester.summary = {
-                        tbHK: parseFloat(),
-                        soTin: parseInt(matches[3]),
-                        tbTichLuy: parseFloat(matches[4]),
-                        tinTichLuy: parseInt(matches[6]),
+                        tbHK: parseFloat(tbHK.textContent),
+                        soTin: parseInt(soTin.textContent),
+                        tbTichLuy: parseFloat(tbttl.textContent),
+                        tinTichLuy: parseInt(tinTichLuy.textContent),
                     };
                     isParsingSubjects = false;
                 }
