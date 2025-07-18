@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PTIT Helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      0.2.0
+// @version      0.2.1
 // @description  Công cụ hỗ trợ cho sinh viên PTIT
 // @author       QuanVu
 // @match        https://qldt.ptit.edu.vn/*
@@ -93,8 +93,6 @@
         D: 1.0,
         F: 0.0,
     };
-
-    let originListHP = [];
 
     function showInfo() {
         const container = document.querySelector("app-right");
@@ -280,11 +278,17 @@
         const rows = maintable.querySelectorAll("tr.text-center");
 
         for (const row of rows) {
-            let match = row.children[8].textContent.match(/([a-zA-Z]\+?)/);
+            let match = row.children[8].textContent.match(/^([ABCDF]\+?)$/);
             if (match) {
-                row.children[8].textContent = match[0].toUpperCase();
+                row.children[7].textContent = letterScoreTo4[row.children[8].textContent.trim()];
+            } else {
+                let match1 = row.children[8].textContent.match(/([abcdf]\+?)/);
+                if (match1) {
+                    row.children[8].textContent = match1[0].toUpperCase();
+                    row.children[7].textContent =
+                        letterScoreTo4[row.children[8].textContent.trim()];
+                } else row.children[8].textContent = "";
             }
-            row.children[7].textContent = letterScoreTo4[row.children[8].textContent.trim()];
         }
     }
 
@@ -295,6 +299,7 @@
                 suaDiem();
                 showInfo();
                 calculateGPA();
+                highlight();
 
                 setInterval(() => {
                     convertLetterScoreTo4();
