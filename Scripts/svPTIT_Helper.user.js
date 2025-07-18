@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PTIT Helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      0.1.0
+// @version      0.2.0
 // @description  Công cụ hỗ trợ cho sinh viên PTIT
 // @author       QuanVu
 // @match        https://qldt.ptit.edu.vn/*
@@ -16,18 +16,71 @@
     console.log("PTIT");
 
     GM_addStyle(`
-		body > app-root > div > div > div > div.contentshow.ng-star-inserted > div > div > div.px-md-0.frame_left {
-			flex: 3;
+			@media (min-width: 769px) {
+			body > app-root > div > div > div > div.contentshow.ng-star-inserted > div > div > div.px-md-0.frame_left {
+				width:75% !important;
+			}
+			body > app-root > div > div > div > div.contentshow.ng-star-inserted > div > div > div.frame_right.pr-0.ng-star-inserted {
+				width:25% !important;
+			}
+		}
+
+		@media (max-width: 768px) {
+			body > app-root > div > div > div > div.contentshow.ng-star-inserted > div > div > div.px-md-0.frame_left {
+			width:100% !important;
 		}
 		body > app-root > div > div > div > div.contentshow.ng-star-inserted > div > div > div.frame_right.pr-0.ng-star-inserted {
-			flex: 1;
+			width:0% !important;
 		}
+		}
+
 		.infoElement {
-			position: absolute;
+			position: sticky;
 			top: 0;
-			left: 0;
+			margin: 5px;
+			font-size: auto;			
+		}
+		#gpa-table {
+			width: 100%;
+			max-width: 600px;
+			margin: 5px auto;
+		}
+
+		#gpa-table tr {
+			border-bottom: 1px solid #ddd;
+		}
+
+		#gpa-table td {
+			padding: 5px 6px;
+			vertical-align: top;
+		}
+
+		#gpa-table td:first-child {
+			font-weight: bold;
+			width: 70%;
+		}
+
+		#gpa-table td:last-child {
+			width: 30%;
+			color: #2a7ae2;
 		}
 	`);
+
+    function waitForElement(selector, callback, delayAfterFound = 0) {
+        const observer = new MutationObserver(() => {
+            const el = document.querySelector(selector);
+            if (el) {
+                observer.disconnect();
+                if (delayAfterFound > 0) {
+                    setTimeout(() => callback(el), delayAfterFound);
+                } else {
+                    callback(el);
+                }
+            }
+        });
+
+        observer.observe(document.body, { childList: true, subtree: true });
+    }
 
     const letterScoreTo4 = {
         "A+": 4.0,
@@ -43,8 +96,7 @@
 
     let originListHP = [];
 
-    function showGPA() {
-        console.log("Hiển thị GPA");
+    function showInfo() {
         const container = document.querySelector("app-right");
 
         const gpaDivContainer = document.createElement("div");
@@ -53,28 +105,50 @@
         gpaDiv.className = "card shadow-lg ng-star-inserted infoElement";
 
         gpaDiv.innerHTML = `
-			<table>
+			<table id="gpa-table">
 				<tr>
-					<td class="text-nowrap" >Điểm trung bình tích lũy: </td>
+					<td class="text-nowrap" >Tổng số tín chương trình: </td>
+					<td class="text-nowrap" id="tongSoTin" contenteditable="true" >130 </td>
+				</tr>
+				<tr>
+					<td class="text-nowrap" >GPA: </td>
 					<td class="text-nowrap" id="gpa" >0.00 </td>
 				</tr>
 				<tr>
 					<td class="text-nowrap" >Tín tích lũy: </td>
-					<td class="text-nowrap" id="tin" >0.00 </td>
+					<td class="text-nowrap" id="tin" >0 </td>
 				</tr>
 				<tr>
 					<td class="text-nowrap" >Tín còn lại: </td>
-					<td class="text-nowrap" id="tinConLai" >0.00 </td>
+					<td class="text-nowrap" id="tinConLai" >0 </td>
 				</tr>
 				<tr>
-					<td class="text-nowrap" >Các môn còn lại cần để đạt GPA 3.2: </td>
+					<td>Điểm sau khi sửa✏️: </td>
+				</tr>
+				<tr>
+					<td class="text-nowrap" >GPA ✏️: </td>
+					<td class="text-nowrap" id="edit_gpa" >0.00 </td>
+				</tr>
+				<tr>
+					<td class="text-nowrap" >Tín tích lũy ✏️: </td>
+					<td class="text-nowrap" id="edit_tin" >0 </td>
+				</tr>
+				<tr>
+					<td class="text-nowrap" >Tín còn lại ✏️: </td>
+					<td class="text-nowrap" id="edit_tinConLai" >0 </td>
+				</tr>
+				<tr>
+					<td class="text-nowrap" >Các môn còn lại cần để đạt: </td>
+				<tr>
+					<td class="text-nowrap" >GPA 3.2: </td>
 					<td class="text-nowrap" id="gpa3.2" >0.00 </td>
 				</tr>
 				<tr>
-					<td class="text-nowrap" >Các môn còn lại cần để đạt GPA 3.6: </td>
+					<td class="text-nowrap" >GPA 3.6: </td>
 					<td class="text-nowrap" id="gpa3.6" >0.00 </td>
 				</tr>
 			</table>
+			<p style="color: red;" >* Có thể sửa 'tổng số tín' và 'điểm chữ các môn'.</p>
 		`;
 
         gpaDivContainer.insertAdjacentElement("beforeend", gpaDiv);
@@ -107,8 +181,8 @@
         for (const row of rows) {
             if (row.children[8].textContent.trim() === "P") continue;
 
-            // row.children[4].style.backgroundColor =
-                // creditsBoxColor[row.children[4].textContent.trim()] || "transparent";
+            row.children[4].style.backgroundColor =
+                creditsBoxColor[row.children[4].textContent.trim()] || "transparent";
 
             row.children[8].style.backgroundColor =
                 scoresBoxColor[letterScoreTo4[row.children[8].textContent.trim()]] || "transparent";
@@ -143,20 +217,15 @@
             listHP.push(hp);
         }
 
-        console.log("Get done");
         return listHP;
     }
 
     function calculateGPA() {
         const listHP = getListHP();
 
-        console.log("Calculate GPA");
-
         let totalCredits = 0;
         let totalPoints = 0;
-        // let totalCreditsLeft = 0;
-        // let totalPointsNeeded3_2 = 0;
-        // let totalPointsNeeded3_6 = 0;
+        let totalCreditsAll = parseInt(document.querySelector("#tongSoTin").textContent.trim());
 
         for (const hp of listHP) {
             const score = hp.score;
@@ -166,13 +235,35 @@
             }
         }
         const gpa = totalPoints / totalCredits;
-        // const gpa3_2 = (totalPointsNeeded3_2 - totalPoints) / (totalCredits + totalCreditsLeft);
-        // const gpa3_6 = (totalPointsNeeded3_6 - totalPoints) / (totalCredits + totalCreditsLeft);
         document.getElementById("gpa").textContent = gpa.toFixed(2);
-        document.getElementById("tin").textContent = totalCredits.toFixed(2);
-        // document.getElementById("tinConLai").textContent = totalCreditsLeft.toFixed(2);
-        // document.getElementById("gpa3.2").textContent = gpa3_2.toFixed(2);
-        // document.getElementById("gpa3.6").textContent = gpa3_6.toFixed(2);
+        document.getElementById("tin").textContent = totalCredits.toFixed(0);
+        document.getElementById("tinConLai").textContent = totalCreditsAll - totalCredits;
+    }
+
+    function calculateEditGPA() {
+        const listHP = getListHP();
+
+        let totalCredits = 0;
+        let totalPoints = 0;
+        let totalCreditsAll = parseInt(document.querySelector("#tongSoTin").textContent.trim());
+
+        for (const hp of listHP) {
+            const score = hp.score;
+            if (score !== undefined) {
+                totalCredits += hp.credits;
+                totalPoints += score * hp.credits;
+            }
+        }
+        const gpa = totalPoints / totalCredits;
+        const gpa3_2 =
+            (3.2 * totalCreditsAll - gpa * totalCredits) / (totalCreditsAll - totalCredits);
+        const gpa3_6 =
+            (3.6 * totalCreditsAll - gpa * totalCredits) / (totalCreditsAll - totalCredits);
+        document.getElementById("edit_gpa").textContent = gpa.toFixed(2);
+        document.getElementById("edit_tin").textContent = totalCredits.toFixed(0);
+        document.getElementById("edit_tinConLai").textContent = totalCreditsAll - totalCredits;
+        document.getElementById("gpa3.2").textContent = gpa3_2.toFixed(2);
+        document.getElementById("gpa3.6").textContent = gpa3_6.toFixed(2);
     }
 
     function suaDiem() {
@@ -197,21 +288,21 @@
         }
     }
 
-    setTimeout(() => {
-        if (location.href === "https://qldt.ptit.edu.vn/#/diem") {
-            const maintable = document.querySelector("#excel-table > tbody");
-            if (maintable) {
+    if (location.href === "https://qldt.ptit.edu.vn/#/diem") {
+        waitForElement(
+            "#excel-table > tbody",
+            () => {
                 suaDiem();
-                showGPA();
-
-                originListHP = getListHP();
+                showInfo();
+                calculateGPA();
 
                 setInterval(() => {
                     convertLetterScoreTo4();
                     highlight();
-                    calculateGPA();
+                    calculateEditGPA();
                 }, 1000);
-            }
-        }
-    }, 5000);
+            },
+            700
+        );
+    }
 })();
