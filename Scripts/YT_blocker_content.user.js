@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YouTube Content Filter
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      0.0.1
+// @version      0.1.0
 // @description  Ẩn video, short, playlist dựa trên từ khóa tiêu đề hoặc tên kênh
 // @author       QuanVu
 // @match        https://www.youtube.com/*
@@ -130,7 +130,7 @@
 
     //===================================================
     /* Check video */
-    function checkVideo(title, channel, hashtags) {
+    function checkVideo(title = "", channel = "", hashtags = []) {
         // allowedChannels
         if (allowedChannels.includes(channel)) return false;
         // blockedChannels
@@ -275,15 +275,88 @@
         );
 
         items.forEach((item) => {
-            // item.style.display = "none";
+            let titleText = "";
+            let channelText = "";
+
+            // Video
+            const titleElement = item.querySelector("#video-title");
+            if (titleElement) titleText = titleElement.textContent.trim();
+            const channelElement = item.querySelector(".ytd-channel-name > a");
+            if (channelElement) channelText = channelElement.textContent.trim();
+
+            // Short
+            const shortTitleElement = item.querySelector(
+                ".shortsLockupViewModelHostMetadataTitle > a > span"
+            );
+            if (shortTitleElement) titleText = shortTitleElement.textContent.trim();
+
+            //
+            const titleSuggestVideoElement = item.querySelector("h3[title]");
+            // if (titleSuggestVideoElement) titleText = titleSuggestVideoElement.getAttribute('title');
+
+            if (checkVideo(titleText, channelText)) item.style.display = "none";
         });
     }
 
-    const observer = new MutationObserver(() => {
-        cleanYouTube();
+    const targetTags = [
+        "ytd-rich-item-renderer",
+        "ytd-video-renderer",
+        "yt-lockup-view-model",
+        "ytm-shorts-lockup-view-model",
+        "ytd-grid-video-renderer",
+        "ytd-playlist-panel-video-renderer",
+        "ytd-playlist-video-renderer",
+    ];
+
+    let scheduledNum = 0;
+
+    const scheduleClean = () => {
+        if (scheduledNum >= 2) return;
+
+        scheduledNum++;
+
+        if (scheduledNum > 1) {
+            setTimeout(() => {
+                cleanYouTube();
+                scheduledNum--;
+            }, 5000);
+            return;
+        }
+
+        requestIdleCallback(
+            async () => {
+                cleanYouTube();
+
+                scheduledNum--;
+            },
+            { timeout: 1000 }
+        );
+    };
+
+    const observer = new MutationObserver((mutations) => {
+        for (const mutation of mutations) {
+            for (const node of mutation.addedNodes) {
+                if (node.nodeType === 1) {
+                    if (
+                        targetTags.includes(node.tagName.toLowerCase()) ||
+                        node.querySelector?.(targetTags.join(","))
+                    ) {
+                        scheduleClean();
+                        return;
+                    }
+                }
+            }
+        }
     });
 
-    observer.observe(document.body, { childList: true, subtree: true });
-
-    cleanYouTube();
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+    });
 })();
+
+/* Google sheet code
+
+
+
+*/
