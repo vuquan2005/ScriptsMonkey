@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YouTube Content Filter
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      0.1.0
+// @version      1.0.0
 // @description  Ẩn video, short, playlist dựa trên từ khóa tiêu đề hoặc tên kênh
 // @author       QuanVu
 // @match        https://www.youtube.com/*
@@ -48,25 +48,27 @@
     //===================================================
     /* Set data */
     // Chanel
-    var blockedChannels = GM_getValue("blockedChannels", [""]);
-    var allowedChannels = GM_getValue("allowedChannels", [""]);
+    var blockedChannels = GM_getValue("blockedChannels", []);
+    var allowedChannels = GM_getValue("allowedChannels", []);
     // Keywords
-    var blockedKeywords = GM_getValue("blockedKeywords", [""]);
-    var whitelistedKeywords = GM_getValue("whitelistedKeywords", [""]);
+    var blockedKeywords = GM_getValue("blockedKeywords", []);
+    var whitelistedKeywords = GM_getValue("whitelistedKeywords", []);
     // Hashtags
-    var blockedHashtags = GM_getValue("blockedHashtags", [""]);
-    var whitelistedHashtags = GM_getValue("whitelistedHashtags", [""]);
+    var blockedHashtags = GM_getValue("blockedHashtags", []);
+    var whitelistedHashtags = GM_getValue("whitelistedHashtags", []);
 
     /* Update data */
     async function fetchOnlineData() {
         try {
             const response = await fetch(
-                "https://raw.githubusercontent.com/vuquan2005/ScriptsMonkey/main/Scripts/YT_blocker_data.json"
+                "https://script.google.com/macros/s/.........../exec"
             );
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const data = await response.json();
+			console.log("Fetched online data:");
+			console.log(data);
             return {
                 blockedChannels: data.blockedChannels || [],
                 allowedChannels: data.allowedChannels || [],
@@ -103,6 +105,15 @@
             onlineData.whitelistedHashtags || []
         );
 
+		// Log data
+		console.log("Merge local data from online source:");
+		console.log("Blocked Channels:", blockedChannels);
+		console.log("Allowed Channels:", allowedChannels);
+		console.log("Blocked Keywords:", blockedKeywords);
+		console.log("Whitelisted Keywords:", whitelistedKeywords);
+		console.log("Blocked Hashtags:", blockedHashtags);
+		console.log("Whitelisted Hashtags:", whitelistedHashtags);
+
         GM_setValue("blockedChannels", blockedChannels);
         GM_setValue("allowedChannels", allowedChannels);
 
@@ -117,12 +128,15 @@
 
     /* Check update */
     const ONE_DAY = 24 * 60 * 60 * 1000;
+	const _12_HOURS = 12 * 60 * 60 * 1000;
+	const _10_MINUTE = 10 * 60 * 1000;
+	const _30_SEC = 30 * 1000;
     const lastUpdateTime = GM_getValue("lastUpdateTime", 0);
     const now = Date.now();
 
-    if (now - lastUpdateTime > ONE_DAY) {
+    if (now - lastUpdateTime > _30_SEC) {
         console.log("Updating local data from online source...");
-        // updateLocalData();
+        updateLocalData();
         GM_setValue("lastUpdateTime", now);
     } else {
         console.log("Local data is up-to-date, no update needed.");
@@ -271,10 +285,11 @@
     /* Check list video */
     function cleanYouTube() {
         const items = document.querySelectorAll(
-            "ytd-rich-item-renderer, ytd-video-renderer, yt-lockup-view-model, ytm-shorts-lockup-view-model, ytd-grid-video-renderer, ytd-playlist-panel-video-renderer, ytd-playlist-video-renderer"
+            "ytd-rich-item-renderer, ytd-video-renderer, yt-lockup-view-model, ytm-shorts-lockup-view-model, ytd-grid-video-renderer, ytd-playlist-panel-video-renderer, ytd-playlist-video-renderer, .ytd-channel-renderer"
         );
 
         items.forEach((item) => {
+			if (item.style.display === "none") return;
             let titleText = "";
             let channelText = "";
 
@@ -290,11 +305,25 @@
             );
             if (shortTitleElement) titleText = shortTitleElement.textContent.trim();
 
-            //
+            // Suggest video when watching
             const titleSuggestVideoElement = item.querySelector("h3[title]");
-            // if (titleSuggestVideoElement) titleText = titleSuggestVideoElement.getAttribute('title');
+            if (titleSuggestVideoElement)
+                titleText = titleSuggestVideoElement.getAttribute("title").trim();
 
-            if (checkVideo(titleText, channelText)) item.style.display = "none";
+			// Channel when searching
+			const channelSuggestVideoElement = item.querySelector(
+				".ytd-channel-name"
+			);
+			if (channelSuggestVideoElement)
+				channelText = channelSuggestVideoElement.textContent.trim();
+
+
+			// Check
+            if (checkVideo(titleText, channelText)) {
+                item.style.display = "none";
+            } else {
+				// console.log("Video not blocked:", titleText, "\nBy channel:", channelText);
+			}
         });
     }
 
@@ -357,6 +386,99 @@
 
 /* Google sheet code
 
+function initializeSheet() {
+    const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+    const sheet = spreadsheet.getSheets()[0];
+    const headers = [
+        "❌Channels",
+        "✅Channels",
+        "❌Keywords",
+        "✅Keywords",
+        "❌Hashtags",
+        "✅Hashtags",
+    ];
+    const range = sheet.getRange(1, 1, 1, headers.length);
+
+    // Ghi nội dung tiêu đề
+    range.setValues([headers]);
+
+    // Định dạng tiêu đề
+    range
+        .setFontWeight("bold")
+        .setFontSize(14)
+        .setBackground("#4a90e2")
+        .setFontColor("#ffffff")
+        .setHorizontalAlignment("center")
+        .setVerticalAlignment("middle")
+        .setWrap(true);
+
+    // Điều chỉnh chiều cao hàng 1
+    sheet.setRowHeight(1, 40);
+
+    // Điều chỉnh chiều rộng từng cột
+    const columnWidths = [180, 180, 180, 180, 180, 180];
+    columnWidths.forEach((width, index) => {
+        sheet.setColumnWidth(index + 1, width);
+    });
+    applyGridLines(sheet);
+}
+
+function applyGridLines(sheet) {
+    const dataRange = sheet.getDataRange();
+    dataRange.setBorder(
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        "#cccccc",
+        SpreadsheetApp.BorderStyle.SOLID
+    );
+}
+function getDataAsJson() {
+    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
+    initializeSheet();
+    applyGridLines(sheet);
+    const headers = [
+        "blockedChannels",
+        "allowedChannels",
+        "blockedKeywords",
+        "whitelistedKeywords",
+        "blockedHashtags",
+        "whitelistedHashtags",
+    ];
+
+    const numColumns = headers.length;
+    const lastRow = sheet.getLastRow();
+
+    if (lastRow < 2) return JSON.stringify({}); // Không có dữ liệu
+
+    const values = sheet.getRange(2, 1, lastRow - 1, numColumns).getValues();
+
+    // Khởi tạo object kết quả dựa trên headers
+    const result = {};
+    headers.forEach((header) => {
+        result[header] = [];
+    });
+
+    // Duyệt từng hàng và thêm vào object tương ứng
+    for (let row of values) {
+        row.forEach((cellValue, colIndex) => {
+            if (cellValue && cellValue.toString().trim() !== "") {
+                const key = headers[colIndex];
+                result[key].push(cellValue.toString().trim());
+            }
+        });
+    }
+    console.log(result);
+    return JSON.stringify(result, null, 2);
+}
+
+function doGet(e) {
+    const json = getDataAsJson();
+    return ContentService.createTextOutput(json).setMimeType(ContentService.MimeType.JSON);
+}
 
 
 */
