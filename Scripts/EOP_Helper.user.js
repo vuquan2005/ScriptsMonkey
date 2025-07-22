@@ -14,6 +14,9 @@
 
 (function () {
     "use strict";
+
+	console.log("EOP Helper: Script loaded successfully!");
+
     const $ = (selector, scope = document) => scope.querySelector(selector);
     const $$ = (selector, scope = document) => scope.querySelectorAll(selector);
     const currentURL = window.location.href;
