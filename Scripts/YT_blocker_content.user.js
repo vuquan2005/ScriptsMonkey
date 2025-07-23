@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YouTube Content Filter
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      1.0.1
+// @version      1.0.2
 // @description  Ẩn video, short, playlist dựa trên từ khóa tiêu đề hoặc tên kênh
 // @author       QuanVu
 // @updateURL    https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/YT_blocker_content.user.js
@@ -390,44 +390,42 @@
 /* Google sheet code
 
 function initializeSheet() {
-    const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-    const sheet = spreadsheet.getSheets()[0];
-    const headers = [
-        "❌Channels",
-        "✅Channels",
-        "❌Keywords",
-        "✅Keywords",
-        "❌Hashtags",
-        "✅Hashtags",
-    ];
-    const range = sheet.getRange(1, 1, 1, headers.length);
+  const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = spreadsheet.getSheets()[0];
+  const headers = ["❌Channels", "✅Channels", "❌Keywords", "✅Keywords", "❌Hashtags", "✅Hashtags"];
+  const range = sheet.getRange(3, 1, 1, headers.length); 
 
-    // Ghi nội dung tiêu đề
-    range.setValues([headers]);
+  // Ghi nội dung tiêu đề
+  range.setValues([headers]);
 
-    // Định dạng tiêu đề
-    range
-        .setFontWeight("bold")
-        .setFontSize(14)
-        .setBackground("#4a90e2")
-        .setFontColor("#ffffff")
-        .setHorizontalAlignment("center")
-        .setVerticalAlignment("middle")
-        .setWrap(true);
+  // Định dạng tiêu đề
+  range
+    .setFontWeight("bold")
+    .setFontSize(14)
+    .setBackground("#4a90e2")
+    .setFontColor("#ffffff")
+    .setHorizontalAlignment("center")
+    .setVerticalAlignment("middle")
+    .setWrap(true);
 
-    // Điều chỉnh chiều cao hàng 1
-    sheet.setRowHeight(1, 40);
+  // Điều chỉnh chiều cao hàng 1
+  sheet.setRowHeight(3, 40);
 
-    // Điều chỉnh chiều rộng từng cột
-    const columnWidths = [180, 180, 180, 180, 180, 180];
-    columnWidths.forEach((width, index) => {
-        sheet.setColumnWidth(index + 1, width);
-    });
-    applyGridLines(sheet);
+  // Điều chỉnh chiều rộng từng cột
+  const columnWidths = [180, 180, 180, 180, 180, 180];
+  columnWidths.forEach((width, index) => {
+    sheet.setColumnWidth(index + 1, width);
+  });
+  applyGridLines(sheet);
 }
 
 function applyGridLines(sheet) {
-    const dataRange = sheet.getDataRange();
+    const lastRow = sheet.getLastRow();
+    const lastCol = sheet.getLastColumn();
+
+    if (lastRow < 3) return; // Nếu không có đủ hàng thì bỏ qua
+
+    const dataRange = sheet.getRange(3, 1, lastRow - 2, lastCol); // Bắt đầu từ hàng 3
     dataRange.setBorder(
         true,
         true,
@@ -439,49 +437,51 @@ function applyGridLines(sheet) {
         SpreadsheetApp.BorderStyle.SOLID
     );
 }
+
 function getDataAsJson() {
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
-    initializeSheet();
-    applyGridLines(sheet);
-    const headers = [
-        "blockedChannels",
-        "allowedChannels",
-        "blockedKeywords",
-        "whitelistedKeywords",
-        "blockedHashtags",
-        "whitelistedHashtags",
-    ];
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
+  initializeSheet();
+  applyGridLines(sheet);
+  const headers = [
+    "blockedChannels",
+    "allowedChannels",
+    "blockedKeywords",
+    "whitelistedKeywords",
+    "blockedHashtags",
+    "whitelistedHashtags"
+  ];
 
-    const numColumns = headers.length;
-    const lastRow = sheet.getLastRow();
+  const numColumns = headers.length;
+  const lastRow = sheet.getLastRow();
 
-    if (lastRow < 2) return JSON.stringify({}); // Không có dữ liệu
+  if (lastRow < 4) return JSON.stringify({}); // Không có dữ liệu
 
-    const values = sheet.getRange(2, 1, lastRow - 1, numColumns).getValues();
+  const values = sheet.getRange(4, 1, lastRow - 1, numColumns).getValues();
 
-    // Khởi tạo object kết quả dựa trên headers
-    const result = {};
-    headers.forEach((header) => {
-        result[header] = [];
+  // Khởi tạo object kết quả dựa trên headers
+  const result = {};
+  headers.forEach(header => {
+    result[header] = [];
+  });
+
+  // Duyệt từng hàng và thêm vào object tương ứng
+  for (let row of values) {
+    row.forEach((cellValue, colIndex) => {
+      if (cellValue && cellValue.toString().trim() !== "") {
+        const key = headers[colIndex];
+        result[key].push(cellValue.toString().trim());
+      }
     });
-
-    // Duyệt từng hàng và thêm vào object tương ứng
-    for (let row of values) {
-        row.forEach((cellValue, colIndex) => {
-            if (cellValue && cellValue.toString().trim() !== "") {
-                const key = headers[colIndex];
-                result[key].push(cellValue.toString().trim());
-            }
-        });
-    }
-    console.log(result);
-    return JSON.stringify(result, null, 2);
+  }
+  console.log(result);
+  return JSON.stringify(result, null, 2);
 }
 
 function doGet(e) {
-    const json = getDataAsJson();
-    return ContentService.createTextOutput(json).setMimeType(ContentService.MimeType.JSON);
+  const json = getDataAsJson();
+  return ContentService
+    .createTextOutput(json)
+    .setMimeType(ContentService.MimeType.JSON);
 }
-
 
 */
