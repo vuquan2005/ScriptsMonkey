@@ -1,9 +1,10 @@
 // ==UserScript==
 // @name         YouTube Content Filter
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      1.0.0
+// @version      1.0.1
 // @description  Ẩn video, short, playlist dựa trên từ khóa tiêu đề hoặc tên kênh
 // @author       QuanVu
+// @updateURL    https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/YT_blocker_content.user.js
 // @match        https://www.youtube.com/*
 // @grant        GM_getValue
 // @grant        GM_setValue
@@ -46,6 +47,13 @@
     }
 
     //===================================================
+    let updateUrl = GM_getValue("updateUrl", "");
+    if (!updateUrl) {
+        updateUrl = prompt("Please enter the update URL:", "https://");
+        if (updateUrl) {
+            GM_setValue("updateUrl", updateUrl);
+        }
+    }
     /* Set data */
     // Chanel
     var blockedChannels = GM_getValue("blockedChannels", []);
@@ -60,15 +68,13 @@
     /* Update data */
     async function fetchOnlineData() {
         try {
-            const response = await fetch(
-                "https://script.google.com/macros/s/.........../exec"
-            );
+            const response = await fetch(updateUrl);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             const data = await response.json();
-			console.log("Fetched online data:");
-			console.log(data);
+            console.log("Fetched online data:");
+            console.log(data);
             return {
                 blockedChannels: data.blockedChannels || [],
                 allowedChannels: data.allowedChannels || [],
@@ -105,14 +111,14 @@
             onlineData.whitelistedHashtags || []
         );
 
-		// Log data
-		console.log("Merge local data from online source:");
-		console.log("Blocked Channels:", blockedChannels);
-		console.log("Allowed Channels:", allowedChannels);
-		console.log("Blocked Keywords:", blockedKeywords);
-		console.log("Whitelisted Keywords:", whitelistedKeywords);
-		console.log("Blocked Hashtags:", blockedHashtags);
-		console.log("Whitelisted Hashtags:", whitelistedHashtags);
+        // Log data
+        console.log("Merge local data from online source:");
+        console.log("Blocked Channels:", blockedChannels);
+        console.log("Allowed Channels:", allowedChannels);
+        console.log("Blocked Keywords:", blockedKeywords);
+        console.log("Whitelisted Keywords:", whitelistedKeywords);
+        console.log("Blocked Hashtags:", blockedHashtags);
+        console.log("Whitelisted Hashtags:", whitelistedHashtags);
 
         GM_setValue("blockedChannels", blockedChannels);
         GM_setValue("allowedChannels", allowedChannels);
@@ -128,9 +134,9 @@
 
     /* Check update */
     const ONE_DAY = 24 * 60 * 60 * 1000;
-	const _12_HOURS = 12 * 60 * 60 * 1000;
-	const _10_MINUTE = 10 * 60 * 1000;
-	const _30_SEC = 30 * 1000;
+    const _12_HOURS = 12 * 60 * 60 * 1000;
+    const _10_MINUTE = 10 * 60 * 1000;
+    const _30_SEC = 30 * 1000;
     const lastUpdateTime = GM_getValue("lastUpdateTime", 0);
     const now = Date.now();
 
@@ -289,7 +295,7 @@
         );
 
         items.forEach((item) => {
-			if (item.style.display === "none") return;
+            if (item.style.display === "none") return;
             let titleText = "";
             let channelText = "";
 
@@ -310,20 +316,17 @@
             if (titleSuggestVideoElement)
                 titleText = titleSuggestVideoElement.getAttribute("title").trim();
 
-			// Channel when searching
-			const channelSuggestVideoElement = item.querySelector(
-				".ytd-channel-name"
-			);
-			if (channelSuggestVideoElement)
-				channelText = channelSuggestVideoElement.textContent.trim();
+            // Channel when searching
+            const channelSuggestVideoElement = item.querySelector(".ytd-channel-name");
+            if (channelSuggestVideoElement)
+                channelText = channelSuggestVideoElement.textContent.trim();
 
-
-			// Check
+            // Check
             if (checkVideo(titleText, channelText)) {
                 item.style.display = "none";
             } else {
-				// console.log("Video not blocked:", titleText, "\nBy channel:", channelText);
-			}
+                // console.log("Video not blocked:", titleText, "\nBy channel:", channelText);
+            }
         });
     }
 
