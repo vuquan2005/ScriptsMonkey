@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YouTube Content Filter
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      1.0.2
+// @version      1.0.3
 // @description  Ẩn video, short, playlist dựa trên từ khóa tiêu đề hoặc tên kênh
 // @author       QuanVu
 // @updateURL    https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/YT_blocker_content.user.js
@@ -39,11 +39,6 @@
                 subtree: true,
             });
         });
-    }
-
-    function mergeArrays(Array1, Array2) {
-        const merged = new Set([...Array1, ...Array2]);
-        return Array.from(merged).filter((x) => x && x.trim() !== "");
     }
 
     //===================================================
@@ -97,22 +92,17 @@
     }
     async function updateLocalData() {
         const onlineData = await fetchOnlineData();
-        // Merge
-        blockedChannels = mergeArrays(blockedChannels, onlineData.blockedChannels || []);
-        allowedChannels = mergeArrays(allowedChannels, onlineData.allowedChannels || []);
-        blockedKeywords = mergeArrays(blockedKeywords, onlineData.blockedKeywords || []);
-        whitelistedKeywords = mergeArrays(
-            whitelistedKeywords,
-            onlineData.whitelistedKeywords || []
-        );
-        blockedHashtags = mergeArrays(blockedHashtags, onlineData.blockedHashtags || []);
-        whitelistedHashtags = mergeArrays(
-            whitelistedHashtags,
-            onlineData.whitelistedHashtags || []
-        );
+
+        // Directly use online data
+        blockedChannels = onlineData.blockedChannels || [];
+        allowedChannels = onlineData.allowedChannels || [];
+        blockedKeywords = onlineData.blockedKeywords || [];
+        whitelistedKeywords = onlineData.whitelistedKeywords || [];
+        blockedHashtags = onlineData.blockedHashtags || [];
+        whitelistedHashtags = onlineData.whitelistedHashtags || [];
 
         // Log data
-        console.log("Merge local data from online source:");
+        console.log("Updated local data from online source:");
         console.log("Blocked Channels:", blockedChannels);
         console.log("Allowed Channels:", allowedChannels);
         console.log("Blocked Keywords:", blockedKeywords);
@@ -474,6 +464,17 @@ function getDataAsJson() {
     });
   }
   console.log(result);
+  return JSON.stringify(result, null, 2);
+}
+
+function doGet(e) {
+  const json = getDataAsJson();
+  return ContentService
+    .createTextOutput(json)
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+*/
   return JSON.stringify(result, null, 2);
 }
 
