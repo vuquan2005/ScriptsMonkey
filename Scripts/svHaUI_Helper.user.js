@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      1.0.0
+// @version      1.0.1
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -52,18 +52,18 @@
 
         for (const link of validLinks) {
             if (typeof link === "string") {
-                if (href.includes(link) || pathname === link) {
+                if (link === pathname || link === href || link === "") {
                     console.log(`${callback.name || "'Callback'"} :`, link);
                     return callback();
                 }
             } else if (link instanceof RegExp) {
-                if (link.test(href) || link.test(pathname)) {
+                if (link.test(href)) {
                     console.log(`${callback.name || "'Callback'"} :`, link);
                     return callback();
                 }
             }
         }
-        console.log(`${callback.name || "'Callback'"} !!`, href);
+        console.log(`! ${callback.name || "'Callback'"} :`, validLinks);
     }
 
     async function fetchDOM(url) {
@@ -149,11 +149,11 @@
         }
     }
 
-	function changeHomePagePath() {
-		const sideBar = document.querySelector("div.left-sidebar-content")
-		const homeElement = sideBar.querySelector("a[href='/']");
-		homeElement.href = "/home";
-	}
+    function changeHomePagePath() {
+        const sideBar = document.querySelector("div.left-sidebar-content");
+        const homeElement = sideBar.querySelector("a[href='/']");
+        homeElement.href = "/home";
+    }
 
     function autoSurvey() {
         waitForSelector("table.card-body.table-responsive.table.table-bordered.table-striped").then(
@@ -498,6 +498,7 @@
                 examScheduleContainer.appendChild(examScheduleElement);
             }
         }
+		if (i === 0) console.warn("Không có lịch thi nào.");
     }
 
     function sortExamSchedule() {
@@ -514,7 +515,6 @@
     function highlightExamSchedule() {
         const examSchedule = document.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
         for (const examElement of examSchedule) {
-
             const examDate = examElement.children[2].textContent.trim();
             const examHour = examElement.children[3].textContent.trim();
             const examTime = `${examHour} ${examDate}`;
@@ -533,9 +533,10 @@
 
     function run() {
         console.log("sv.HaUI loaded: " + window.location.href);
-        runOnUrl(changeTitle, "sv.haui.edu.vn");
-		runOnUrl(changeHomePagePath, "sv.haui.edu.vn");
-		
+
+        runOnUrl(changeTitle, "");
+        runOnUrl(changeHomePagePath, "");
+
         runOnUrl(autoSurvey, /\/survey\//);
 
         runOnUrl(customizeHomePage, "/home");
@@ -551,4 +552,5 @@
         .catch((err) => {
             console.error("Lỗi:", err);
         });
+    // ================================================================
 })();
