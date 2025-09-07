@@ -2,6 +2,7 @@
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
 // @version      1.0.1
+// @version      1.0.3
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -581,7 +582,85 @@
         }
     }
 
+    function highlightExamResult() {
+        const scoresBoxColor = {
+            4.0: "rgb(64,212,81)", // A
+            3.5: "rgb(49, 163, 255)", // B+
+            3.0: "rgb(20, 120, 230)", // B
+            2.5: "rgb(255,186,0)", // C+
+            2.0: "rgb(255,144,0)", // C
+            1.5: "rgb(255, 50, 0)", // D+
+            1.0: "rgb(200, 0, 0)", // D
+            0.0: "rgb(157, 0, 255)", // F
+        };
+        const creditsBoxColor = {
+            "5.0": "rgb(200, 0, 100)",
+            "4.0": "rgb(255, 0, 0)",
+            "3.0": "rgb(255, 165, 0)",
+            "2.0": "rgb(0, 191, 255)",
+            "1.0": "rgb(46, 204, 64)",
+        };
+        const kgrid = document.querySelector("div.kGrid");
+        const hocPhan = kgrid.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
+
+        const courseCodeIndex = 1,
+            creditIndex = 5,
+            score4Index = 12,
+            scoreLetterIndex = 13;
+
+        for (const row of hocPhan) {
+            // Bỏ qua nonCreditCourse
+            if (
+                nonCreditCourse.some((hp) => row.children[courseCodeIndex].textContent.includes(hp))
+            )
+                continue;
+            // Tô màu tín chỉ
+            row.children[creditIndex].style.backgroundColor =
+                creditsBoxColor[row.children[creditIndex].textContent.trim()];
+            row.children[creditIndex].style.color = "#FFFFFF";
+
+            // Bỏ qua những học phần không có điểm
+            if (row.children[score4Index].textContent.trim() == "") {
+                row.children[scoreLetterIndex].style.backgroundColor = "rgba(0, 0, 0, 0)";
+                continue;
+            }
+            const diemSo = 0.0 + Number(row.children[score4Index].textContent.trim());
+            // console.log(diemSo);
+            // Tô màu điểm
+            row.children[scoreLetterIndex].style.backgroundColor = scoresBoxColor[diemSo];
+            row.children[scoreLetterIndex].style.color = "#FFFFFF";
+        }
+    }
+
+    function highlightStudyResults() {
+        let tx1Index = 4;
+        if (window.location.pathname.includes("student/result/viewstudyresult")) {
+            tx1Index = 3;
+        }
+        const kgrid = document.querySelector("div.kGrid");
+        const hocPhan = kgrid.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
+
+        const codeCourseIndex = 2;
+        const regex = /FL\d{4}OT\.\d/;
+
+        for (const row of hocPhan) {
+            if (regex.test(row.children[2].textContent.trim())) continue;
+            // Tô những học phần chưa có điểm
+            if (row.children[tx1Index].textContent.trim() == "")
+                row.children[tx1Index].style.backgroundColor = "rgb(248,226,135)";
+        }
+    }
+
+    function getCourseCode(scope = document) {
     //===============================================================
+
+    const nonCreditCourse = [
+        "FL609", // Tiếng Anh cơ bản FL609x
+        "PE60", // Giáo dục thể chất PE60xx
+        "DC600", // Giáo dục quốc phòng DC600x
+        "IC6005", // Công nghệ thông tin cơ bản
+        "IC6007", // Công nghệ thông tin nâng cao
+    ];
 
     function run() {
         console.log("sv.HaUI loaded: " + window.location.href);
@@ -595,6 +674,18 @@
 
         runOnUrl(sortExamSchedule, "/student/schedulefees/transactionmodules");
         runOnUrl(highlightExamSchedule, "/student/schedulefees/transactionmodules");
+
+        runOnUrl(
+            highlightExamResult,
+            "/student/result/examresult",
+            "/student/result/viewexamresult"
+        );
+        runOnUrl(
+            highlightStudyResults,
+            "/student/result/studyresults",
+            "/student/result/viewstudyresult"
+        );
+
     }
 
     waitForSelector("#frmMain", 5000, 100)
