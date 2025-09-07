@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      1.0.5
+// @version      1.0.6
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -17,9 +17,9 @@
 
     function waitForSelector(selector, timeout = 10000, delay = 10) {
         return new Promise((resolve, reject) => {
-            const existing = document.querySelector(selector);
-            if (existing) {
-                return setTimeout(() => resolve(existing), delay);
+            const element = document.querySelector(selector);
+            if (element) {
+                return setTimeout(() => resolve(element), delay);
             }
 
             let timeoutId;
@@ -31,11 +31,11 @@
             }
 
             const observer = new MutationObserver(() => {
-                const el = document.querySelector(selector);
-                if (el) {
+                const element = document.querySelector(selector);
+                if (element) {
                     clearTimeout(timeoutId);
                     observer.disconnect();
-                    setTimeout(() => resolve(el), delay);
+                    setTimeout(() => resolve(element), delay);
                 }
             });
 
@@ -157,8 +157,8 @@
 
     function autoSurvey() {
         waitForSelector("table.card-body.table-responsive.table.table-bordered.table-striped").then(
-            (el) => {
-                const scores = el.querySelectorAll("thead > tr:nth-child(2) > td");
+            (element) => {
+                const scores = element.querySelectorAll("thead > tr:nth-child(2) > td");
                 for (const score of scores) {
                     const scoreId = score.textContent.trim().match(/\d+/)[0];
                     const inputSelectScore = document.createElement("input");
@@ -168,7 +168,7 @@
                     score.appendChild(inputSelectScore);
 
                     inputSelectScore.addEventListener("change", function () {
-                        const scoreElements = el.querySelectsorAll(
+                        const scoreElements = element.querySelectorAll(
                             `td[title="${scoreId} điểm"] > input`
                         );
                         for (const scoreElement of scoreElements) {
