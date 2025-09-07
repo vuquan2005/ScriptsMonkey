@@ -690,7 +690,7 @@
         }
     }
 
-    function highlightExamResult() {
+    function highlightExamScores() {
         const scoresBoxColor = {
             4.0: "rgb(64,212,81)", // A
             3.5: "rgb(49, 163, 255)", // B+
@@ -740,7 +740,7 @@
         }
     }
 
-    function highlightStudyResults() {
+    function highlightStudyScores() {
         let tx1Index = 4;
         if (window.location.pathname.includes("student/result/viewstudyresult")) {
             tx1Index = 3;
@@ -782,15 +782,15 @@
         runOnUrl(sortExamSchedule, "/student/schedulefees/transactionmodules");
         runOnUrl(highlightExamSchedule, "/student/schedulefees/transactionmodules");
 
-		runOnUrl(showExamPlan, "/student/schedulefees/examplant");
+        runOnUrl(showExamPlan, "/student/schedulefees/examplant");
 
         runOnUrl(
-            highlightExamResult,
+            highlightExamScores,
             "/student/result/examresult",
             "/student/result/viewexamresult"
         );
         runOnUrl(
-            highlightStudyResults,
+            highlightStudyScores,
             "/student/result/studyresults",
             "/student/result/viewstudyresult"
         );
