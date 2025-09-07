@@ -18,7 +18,7 @@
 1. Truy cập [Tampermonkey](https://www.tampermonkey.net/).
 2. Chọn trình duyệt bạn đang sử dụng và làm theo hướng dẫn cài đặt.
 
-    (⚠️Lưu ý quang trọng: Do google cập nhật Manifest V3 nên cần bật [`Chế độ nhà phát triển`](https://www.tampermonkey.net/faq.php?ext=iikm&version=5.3.3#Q209) theo hướng dẫn)
+    (⚠️Lưu ý quang trọng: Do google cập nhật Manifest V3 nên cần bật [`Chế độ nhà phát triển`](https://www.tampermonkey.net/faq.php?ext=iikm&version=5.3.3#Q209) và cho phép Tampermonkey chèn scripts theo hướng dẫn)
 
 ### Bước 2: Thêm Userscript từ ScriptsMonkey
 

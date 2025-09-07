@@ -766,7 +766,7 @@
         toggleLinkContainer.id = "toggle-link-container";
         const toggleLink = document.createElement("a");
         toggleLink.style.color = "gray";
-        toggleLink.style.fontSize = "12px";
+        toggleLink.style.fontSize = "14px";
         toggleLinkContainer.appendChild(toggleLink);
 
         if (window.location.pathname === "/student/result/studyresults") {
@@ -795,7 +795,7 @@
         toggleLinkContainer.id = "toggle-link-container";
         const toggleLink = document.createElement("a");
         toggleLink.style.color = "gray";
-        toggleLink.style.fontSize = "12px";
+        toggleLink.style.fontSize = "14px";
         toggleLinkContainer.appendChild(toggleLink);
 
         if (window.location.pathname === "/training/viewmodulescdiosv/xem-chi-tiet-hoc-phan.htm") {

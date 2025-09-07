@@ -58,7 +58,6 @@ Xem hướng dẫn cài đặt [tại đây](/README.md#-cài-đặt-userscript)
 
 ### Kết quả thi
 
-[Bấm vào đây nếu video không thể load](/assets/images/svHaUI_Helper.user.js/customizeExamResults.mp4)
 ![](/assets/images/svHaUI_Helper.user.js/customizeExamResults.gif "Customize trang kết quả thi")
 ![⚠️](/assets/images/svHaUI_Helper.user.js/navigateToStudyResults.png "Chuyển đến trang kết quả học tập")
 
