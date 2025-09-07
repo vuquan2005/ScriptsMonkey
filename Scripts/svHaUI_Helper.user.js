@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      19.3
+// @version      1.0.9
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -14,267 +14,58 @@
 
 (function () {
     "use strict";
-    // =====================================================================================
-    const currentURL = window.location.href;
-    const $ = (selector, scope = document) => scope.querySelector(selector);
-    const $$ = (selector, scope = document) => scope.querySelectorAll(selector);
-    function controlInterval(func, delayDefault = 1000) {
-        let intervalId = null;
-        return {
-            start: (delay = delayDefault, startImmediate = false) => {
-                if (intervalId) {
-                    clearInterval(intervalId);
-                }
-                intervalId = setInterval(func, delay);
-                if (startImmediate) {
-                    func();
-                }
-            },
-            stop: () => {
-                clearInterval(intervalId);
-                intervalId = null;
-            },
-        };
-    }
-    const today = new Date();
-    const todayDate = today.getDate();
-    const todayMonth = today.getMonth() + 1;
-    const todayYear = today.getFullYear();
-    const todayDateString = `${todayDate}/${todayMonth}/${todayYear}`;
-    const hpNotGPA = [
-        "FL609", // Tiếng Anh cơ bản FL609x
-        "PE60", // Giáo dục thể chất PE60xx
-        "DC600", // Giáo dục quốc phòng DC600x
-        "IC6005", // Công nghệ thông tin cơ bản
-        "IC6007", // Công nghệ thông tin nâng cao
-    ];
-    // =====================================================================================
-    // Change header
-    function changeHeader() {
-        if (!$("span.k-panel-header-text:first-child")) {
-            document.title = "sv.HaUI";
-            return;
-        }
-        let newTitle = $("span.k-panel-header-text:first-child").textContent;
 
-        newTitle = newTitle.replace("TRƯỜNG ĐẠI HỌC CÔNG NGHIỆP HÀ NỘI", "🏫");
-        newTitle = newTitle.replace("Đại học công nghiệp Hà Nội", "🏫");
-        newTitle = newTitle.replace("CHI TIẾT HỌC PHẦN", "ℹ️");
-        newTitle = newTitle.replace("CHI TIẾT", "ℹ️");
-        newTitle = newTitle.replace("Kết quả thi các môn", "🎯 Điểm học phần");
-        newTitle = newTitle.replace("Kết quả học tập các học phần", "🎯 Điểm TX");
-        document.title = newTitle;
-    }
-    // Trang chủ tuỳ biến
-    function customizeHomePage() {
-        if (currentURL != "https://sv.haui.edu.vn/" || !$("span.user-name")) {
-            return;
-        }
-        const frmMain = $("form#frmMain");
-        if (frmMain) {
-            const studyTabNext = `
-            <div class="panel panel-default panel-border-color panel-border-color-primary">
-                <div id="short-cut-panel">
-                    <div class="panel-heading">
-                        <h3 class="panel-title">Một số chức năng chính</h3>
-                    </div>
-                    <p>
-                        <a href="/sso/blearning">
-                            <i class="fa flaticon-science1 icon"></i>
-                            <span>Học kết hợp</span>
-                        </a>
-                    </p>
-                    <p>
-                        <a href="/training/viewcourseindustry">
-                            <i class="icon mdi mdi-book"></i>
-                            <span>Khung chương trình</span>
-                        </a>
-                        <br />
-                        <a href="/training/programmodulessemester">
-                            <i class="icon mdi mdi-book"></i>
-                            <span>Khung theo kỳ</span>
-                        </a>
-                    </p>
-                    <p>
-                        <a href="/register/dangkyhocphan">
-                            <i class="icon mdi mdi-calendar-note"></i>
-                            <span>ĐK HP dự kiến</span>
-                        </a>
-                        <br />
-                        <a href="/register/">
-                            <i class="fa flaticon-key105 icon"></i>
-                            <span>Đăng ký học phần</span>
-                        </a>
-                    </p>
-                    <p>
-                        <a href="/student/result/studyresults">
-                            <i class="fa flaticon-a10 icon"></i>
-                            <span>Kết quả học tập</span>
-                        </a>
-                        <br />
-                        <a href="/student/result/examresult">
-                            <i class="fa flaticon-a10 icon"></i>
-                            <span>Kết quả thi</span>
-                        </a>
-                    </p>
-                </div>
-            </div>
-            `;
-            frmMain.insertAdjacentHTML("beforeend", studyTabNext);
-            GM_addStyle(`
-                #short-cut-panel {
-                    display: block;
-                }
-                #short-cut-panel > p {
-                    font-size: 20px;
-                    margin: 10px;
-                    padding: 10px;
-                    color: #3d3d3d;
-                    border-radius: 10px;
-                    border: 1px solid #3d3d3d;
-                    line-height: 2;
-                }
-                #short-cut-panel > p > a {
-                    color: #3d3d3d;
-                }
-                #short-cut-panel > p > a:hover {
-                    background-color: rgb(208, 240, 219);
-                    color: #000000;
-                }
-                #short-cut-panel > p > a > i {
-                    margin-right: 10px;
-                    scale: 1.5;
-                }
-            `);
-        }
-    }
-    // Tô điểm học phần
-    function highlightGradeScores() {
-        if (
-            currentURL != "https://sv.haui.edu.vn/student/result/examresult" &&
-            !currentURL.includes("https://sv.haui.edu.vn/student/result/viewexamresult?code=")
-        ) {
-            return;
-        }
-        const scoresBoxColor = {
-            4.0: "rgb(64,212,81)", // A
-            3.5: "rgb(49, 163, 255)", // B+
-            3.0: "rgb(20, 120, 230)", // B
-            2.5: "rgb(255,186,0)", // C+
-            2.0: "rgb(255,144,0)", // C
-            1.5: "rgb(255, 50, 0)", // D+
-            1.0: "rgb(200, 0, 0)", // D
-            0.0: "rgb(157, 0, 255)", // F
-        };
-        const creditsBoxColor = {
-            "5.0": "rgb(200, 0, 100)",
-            "4.0": "rgb(255, 0, 0)",
-            "3.0": "rgb(255, 165, 0)",
-            "2.0": "rgb(0, 191, 255)",
-            "1.0": "rgb(46, 204, 64)",
-        };
-
-        const hocPhan = $$("tr.kTableAltRow, tr.kTableRow", $("div.kGrid"));
-
-        for (const row of hocPhan) {
-            // Bỏ qua hpNotGPA
-            if (hpNotGPA.some((hp) => row.children[1].textContent.includes(hp))) continue;
-            // Tô màu tín chỉ
-            row.children[5].style.backgroundColor =
-                creditsBoxColor[row.children[5].textContent.trim()];
-            row.children[5].style.color = "#FFFFFF";
-
-            const oDiem = row.children[12];
-            // Bỏ qua những học phần không có điểm
-            if (oDiem.textContent.trim() == "") {
-                row.children[13].style.backgroundColor = "rgba(0, 0, 0, 0)";
-                continue;
+    function waitForSelector(selector, timeout = 10000, delay = 10) {
+        return new Promise((resolve, reject) => {
+            const element = document.querySelector(selector);
+            if (element) {
+                return setTimeout(() => resolve(element), delay);
             }
-            const diemSo = 0.0 + Number(oDiem.textContent.trim());
-            // console.log(diemSo);
-            // Tô màu điểm
-            row.children[13].style.backgroundColor = scoresBoxColor[diemSo];
-            row.children[13].style.color = "#FFFFFF";
-        }
-    }
-    // Highlight studyresults scores
-    function highlightStudyresultsScores() {
-        if (
-            currentURL != "https://sv.haui.edu.vn/student/result/studyresults" &&
-            !currentURL.includes("https://sv.haui.edu.vn/student/result/viewstudyresult?code=")
-        ) {
-            return;
-        }
-        let tx1Index = 4;
-        if (currentURL.includes("https://sv.haui.edu.vn/student/result/viewstudyresult?code=")) {
-            tx1Index = 3;
-        }
-        const hpToNext = ["FL6091OT.1"];
-        const hocPhan = $$("tr.kTableAltRow, tr.kTableRow", $("div.kGrid"));
-        // console.log("hocPhan: ", hocPhan);
-        for (const row of hocPhan) {
-            if (hpToNext.some((hp) => row.children[2].textContent.includes(hp))) continue;
-            // Tô những học phần chưa có điểm
-            if (row.children[tx1Index].textContent.trim() == "")
-                row.children[tx1Index].style.backgroundColor = "rgb(248,226,135)";
-        }
-    }
-    // ======================================================================================
-    // Convert date
-    function convertDate(ddmmyyyy) {
-        // Convert dd/mm/yy to d/m/yyyy
-        const dateArray = ddmmyyyy.split("/");
-        if (dateArray[0].startsWith("0")) {
-            dateArray[0] = dateArray[0].slice(1);
-        }
-        if (dateArray[1].startsWith("0")) {
-            dateArray[1] = dateArray[1].slice(1);
-        }
-        return dateArray;
-    }
-    // Tính khoảng cách ngày giữa 2 ngày
-    function calculateDateDifference(date1, date2 = todayDateString) {
-        console.log(`date1: ${date1}, date2: ${date2}`);
-        const date1Array = convertDate(date1);
-        const date2Array = convertDate(date2);
-        console.log(`date1Array: ${date1Array}, date2Array: ${date2Array}`);
-        const d1 = new Date(date1Array[2], date1Array[1] - 1, date1Array[0]);
-        const d2 = new Date(date2Array[2], date2Array[1] - 1, date2Array[0]);
-        const difference = d1.getTime() - d2.getTime();
-        const days = difference / (1000 * 60 * 60 * 24);
-        return days;
-    }
-    // Check exam time
-    function checkExamTime(examElement, cellIndex, isOneMonthLate = false) {
-        // console.log(`today: ${todayDate}/${todayMonth}/${todayYear}`);
 
-        const examTime = examElement.children[cellIndex].textContent.trim();
-        const examDateArray = convertDate(examTime);
-        const examDate = examDateArray[0];
-        const examMonth = examDateArray[1];
-        const examYear = examDateArray[2];
-        // console.log(`${examElement}: ${examYear}/${examMonth}/${examDate}\nToday: ${todayYear}/${todayMonth}/${todayDate}`);
-        // so sánh ngày thi
-        if (examYear > todayYear) {
-            return true;
-        } else if (examYear == todayYear && examMonth > todayMonth) {
-            return true;
-        } else if (examYear == todayYear && examMonth == todayMonth && examDate >= todayDate) {
-            return true;
-        } else if (examYear == todayYear && examMonth > todayMonth - 1 && isOneMonthLate) {
-            return true;
-        } else if (
-            examYear == todayYear &&
-            examMonth == todayMonth - 1 &&
-            isOneMonthLate &&
-            examDate >= todayDate
-        ) {
-            return true;
-        } else {
-            return false;
-        }
+            let timeoutId;
+            if (timeout > 0) {
+                timeoutId = setTimeout(() => {
+                    observer.disconnect();
+                    reject(new Error(`Timeout: Không tìm thấy "${selector}" trong ${timeout}ms.`));
+                }, timeout);
+            }
+
+            const observer = new MutationObserver(() => {
+                const element = document.querySelector(selector);
+                if (element) {
+                    clearTimeout(timeoutId);
+                    observer.disconnect();
+                    setTimeout(() => resolve(element), delay);
+                }
+            });
+
+            observer.observe(document.documentElement, {
+                childList: true,
+                subtree: true,
+            });
+        });
     }
-    // Fetch DOM
+
+    function runOnUrl(callback, ...validLinks) {
+        const href = window.location.href;
+        const pathname = window.location.pathname;
+
+        for (const link of validLinks) {
+            if (typeof link === "string") {
+                if (link === pathname || link === href || link === "") {
+                    console.log(`${callback.name || "'Callback'"} :`, link);
+                    return callback();
+                }
+            } else if (link instanceof RegExp) {
+                if (link.test(href)) {
+                    console.log(`${callback.name || "'Callback'"} :`, link);
+                    return callback();
+                }
+            }
+        }
+        // console.log(`! ${callback.name || "'Callback'"} :`, validLinks);
+    }
+
     async function fetchDOM(url) {
         try {
             const response = await fetch(url, {
@@ -295,16 +86,548 @@
             throw err;
         }
     }
-    // ======================================================================================
-    // Kế hoạch thi
-    // Get hpCode
-    function getHpCode(scope = document) {
-        const listHPCodeElement = $$(
-            "div:nth-child(3) > div > div > table > tbody > tr > td:nth-child(2) > a",
-            scope
+
+    function getTimeDifference(inputDateTime) {
+        // Chuyển đổi chuỗi thời gian đầu vào (định dạng: "15h00 01/03/2024")
+        const [time, date] = inputDateTime.split(" ");
+        const [hour, minute] = time.split("h").map(Number);
+        const [day, month, year] = date.split("/").map(Number);
+
+        // Tạo đối tượng Date từ đầu vào (tháng trong JavaScript bắt đầu từ 0)
+        const inputDate = new Date(year, month - 1, day, hour, minute);
+
+        const currentDate = new Date();
+
+        // Tính khoảng cách thời gian (miligiây)
+        const diffMs = Math.abs(currentDate - inputDate);
+
+        const days = Math.floor(diffMs / 86400000);
+        const hours = Math.floor((diffMs % 86400000) / 3600000);
+        const minutes = Math.floor((diffMs % 3600000) / 60000);
+        const seconds = Math.floor((diffMs % 60000) / 1000);
+
+        // Xác định thời gian đầu vào nằm trong quá khứ hay tương lai
+        const direction = inputDate < currentDate ? -1 : 1;
+
+        // Trả về kết quả
+        return {
+            days,
+            hours,
+            minutes,
+            seconds,
+            direction,
+            toString: ({
+                showDays = true,
+                showHours = true,
+                showMinutes = false,
+                showSeconds = false,
+            } = {}) => {
+                const parts = [];
+                if (showDays && days > 0) parts.push(`${days} ngày`);
+                if (showHours && hours > 0) parts.push(`${hours} giờ`);
+                if (showMinutes && minutes > 0) parts.push(`${minutes} phút`);
+                if (showSeconds && seconds > 0) parts.push(`${seconds} giây`);
+
+                const timeString = parts.length > 0 ? parts.join(", ") : "0 giây";
+                return inputDate < currentDate ? `${timeString} trước` : `Còn ${timeString}`;
+            },
+        };
+    }
+
+    //===============================================================
+    function changeTitle() {
+        let title = document.querySelector("span.k-panel-header-text:first-child")?.textContent;
+        if (title) {
+            title = title
+                .replace(/trường đại học công nghiệp hà nội/gi, "🏫")
+                .replace(/đại học công nghiệp hà nội/gi, "🏫")
+                .replace("CHI TIẾT HỌC PHẦN", "ℹ️")
+                .replace("CHI TIẾT", "ℹ️")
+                .replace("Kết quả thi các môn", "🎯 Điểm học phần")
+                .replace("Kết quả học tập các học phần", "🎯 Điểm TX");
+            document.title = title;
+        }
+    }
+
+    function changeHomePagePath() {
+        const sideBar = document.querySelector("div.left-sidebar-content");
+        const homeElement = sideBar.querySelector("a[href='/']");
+        homeElement.href = "/home";
+    }
+
+    function autoSurvey() {
+        waitForSelector("table.card-body.table-responsive.table.table-bordered.table-striped").then(
+            (element) => {
+                const scores = element.querySelectorAll("thead > tr:nth-child(2) > td");
+                for (const score of scores) {
+                    const scoreId = score.textContent.trim().match(/\d+/)[0];
+                    const inputSelectScore = document.createElement("input");
+                    inputSelectScore.type = "radio";
+                    inputSelectScore.name = "select_score";
+                    inputSelectScore.value = scoreId;
+                    score.appendChild(inputSelectScore);
+
+                    inputSelectScore.addEventListener("change", function () {
+                        const scoreElements = element.querySelectorAll(
+                            `td[title="${scoreId} điểm"] > input`
+                        );
+                        for (const scoreElement of scoreElements) {
+                            scoreElement.checked = true;
+                        }
+                    });
+                }
+            }
+        );
+    }
+
+    function customizeHomePage() {
+        const frmMain = document.querySelector("form#frmMain");
+        if (frmMain) {
+            const html = `
+            <div class="panel panel-default panel-border-color panel-border-color-primary">
+    			<div id="short-cut-panel">
+					<div class="panel-heading">
+						<h3 class="panel-title">Chức năng chính</h3>
+					</div>
+
+					<ul class="shortcut-list">
+						<li>
+							<a href="/sso/blearning">
+								<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="40px" version="1.1" viewBox="144 144 512 512">
+									<defs>
+										<clipPath id="a">
+											<path d="m148.09 148.09h503.81v503.81h-503.81z"/>
+										</clipPath>
+									</defs>
+									<g clip-path="url(#a)">
+										<path d="m183.92 148.09c-19.652 0-35.828 16.176-35.828 35.828v261.88h22.902v-261.88c0-7.3633 5.5625-12.926 12.926-12.926h432.16c7.3594 0 12.926 5.5625 12.926 12.926v284.78h-480.91v44.324c0 19.652 16.176 35.828 35.828 35.828h156.01l-17.824 80.152h-59.508v22.902h274.8v-22.902h-59.242l-17.824-80.152h155.74c19.648 0 35.824-16.176 35.824-35.828v-329.1c0-19.652-16.176-35.828-35.824-35.828zm-12.926 343.51h458.01v21.426c0 7.3555-5.5664 12.922-12.926 12.922h-432.16c-7.3633 0-12.926-5.5664-12.926-12.926zm192.39 57.25h73.488l17.824 80.152h-109.14z"/>
+									</g>
+									<path d="m400.11 205.23c-1.4336 0.035156-2.9062 0.35547-4.1367 0.84766l-137.4 51.527c-9.8711 3.7305-9.8711 17.695 0 21.426l49.402 18.516v79.547c0 4.1172 2.2109 7.918 5.7891 9.9531l80.578 45.801c3.5078 1.9922 7.8086 1.9922 11.316 0l80.578-45.801h-0.003906c3.582-2.0352 5.793-5.8359 5.793-9.9531v-79.547l33.926-12.727v69.375h22.902v-85.875c-0.078124-5.8086-3.6758-8.8359-7.4258-10.711l-137.4-51.527c-1.0898-0.64844-2.4805-0.88672-3.9141-0.84766zm-0.10938 23.77 104.82 39.316-104.82 39.293-104.82-39.293zm-69.125 77.133 65.102 24.422c2.5938 0.97266 5.457 0.97266 8.0508 0l65.102-24.422v64.297l-69.129 39.293-69.129-39.293z"/>
+								</svg>
+								<span>Học kết hợp</span>
+							</a>
+						</li>
+						<li>
+							<a href="/training/viewcourseindustry">
+								<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="40px" viewBox="0 0 24 24" fill="none">
+									<path d="M10 22C7.17157 22 5.75736 22 4.87868 21.1213C4 20.2426 4 18.8284 4 16V8C4 5.17157 4 3.75736 4.87868 2.87868C5.75736 2 7.17157 2 10 2H14C16.8284 2 18.2426 2 19.1213 2.87868C20 3.75736 20 5.17157 20 8M14 22C16.8284 22 18.2426 22 19.1213 21.1213C20 20.2426 20 18.8284 20 16V12" stroke="#1C274D" stroke-width="1.5" stroke-linecap="round"/>
+									<path d="M19.8978 16H7.89778C6.96781 16 6.50282 16 6.12132 16.1022C5.08604 16.3796 4.2774 17.1883 4 18.2235" stroke="#1C274D" stroke-width="1.5"/>
+									<path d="M7 16V9M7 2.5V5" stroke="#1C274D" stroke-width="1.5" stroke-linecap="round"/>
+									<path d="M13 16V19.5309C13 19.8065 13 19.9443 12.9051 20C12.8103 20.0557 12.6806 19.9941 12.4211 19.8708L11.1789 19.2808C11.0911 19.2391 11.0472 19.2182 11 19.2182C10.9528 19.2182 10.9089 19.2391 10.8211 19.2808L9.57889 19.8708C9.31943 19.9941 9.18971 20.0557 9.09485 20C9 19.9443 9 19.8065 9 19.5309V16.45" stroke="#1C274D" stroke-width="1.5" stroke-linecap="round"/>
+								</svg>
+								<span>Khung chương trình</span>
+							</a>
+						</li>
+						<li>
+							<a href="/training/programmodulessemester">
+								<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="40px" viewBox="0 0 24 24" fill="none">
+									<path d="M19.8978 16H7.89778C6.96781 16 6.50282 16 6.12132 16.1022C5.08604 16.3796 4.2774 17.1883 4 18.2235" stroke="#1C274D" stroke-width="1.5"/>
+									<path d="M8 7H16" stroke="#1C274D" stroke-width="1.5" stroke-linecap="round"/>
+									<path d="M8 10.5H13" stroke="#1C274D" stroke-width="1.5" stroke-linecap="round"/>
+									<path d="M13 16V19.5309C13 19.8065 13 19.9443 12.9051 20C12.8103 20.0557 12.6806 19.9941 12.4211 19.8708L11.1789 19.2808C11.0911 19.2391 11.0472 19.2182 11 19.2182C10.9528 19.2182 10.9089 19.2391 10.8211 19.2808L9.57889 19.8708C9.31943 19.9941 9.18971 20.0557 9.09485 20C9 19.9443 9 19.8065 9 19.5309V16.45" stroke="#1C274D" stroke-width="1.5" stroke-linecap="round"/>
+									<path d="M10 22C7.17157 22 5.75736 22 4.87868 21.1213C4 20.2426 4 18.8284 4 16V8C4 5.17157 4 3.75736 4.87868 2.87868C5.75736 2 7.17157 2 10 2H14C16.8284 2 18.2426 2 19.1213 2.87868C20 3.75736 20 5.17157 20 8M14 22C16.8284 22 18.2426 22 19.1213 21.1213C20 20.2426 20 18.8284 20 16V12" stroke="#1C274D" stroke-width="1.5" stroke-linecap="round"/>
+								</svg>
+								<span>Khung theo kỳ</span>
+							</a>
+						</li>
+						<li>
+							<a href="/register/dangkyhocphan">
+								<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="40px" viewBox="0 0 25 25">
+									<defs>
+										<style>.cls-1{fill:#ff7900;}</style>
+									</defs>
+									<g id="schedule">
+										<path class="cls-1" d="M22.5,3H21V2a1,1,0,0,0-1-1H19a1,1,0,0,0-1,1V3H14V2a1,1,0,0,0-1-1H12a1,1,0,0,0-1,1V3H7V2A1,1,0,0,0,6,1H5A1,1,0,0,0,4,2V3H2.5A1.5,1.5,0,0,0,1,4.5v18A1.5,1.5,0,0,0,2.5,24h16A5.51,5.51,0,0,0,24,18.5s0-.08,0-.13,0,0,0,0V4.5A1.5,1.5,0,0,0,22.5,3ZM19,2l1,0,0,3L19,5ZM12,2l1,0V3.44s0,0,0,.06,0,0,0,.07L13,5,12,5ZM5,2,6,2,6,5,5,5ZM2.5,4H4V5A1,1,0,0,0,5,6H6A1,1,0,0,0,7,5V4h4V5a1,1,0,0,0,1,1H13a1,1,0,0,0,1-1V4h4V5a1,1,0,0,0,1,1H20a1,1,0,0,0,1-1V4h1.5a.5.5,0,0,1,.5.5V8H2V4.5A.5.5,0,0,1,2.5,4Zm16,19A4.5,4.5,0,1,1,23,18.5,4.51,4.51,0,0,1,18.5,23Zm0-10a5.49,5.49,0,0,0-3.15,10H2.5a.5.5,0,0,1-.5-.5V9H23v6.35A5.49,5.49,0,0,0,18.5,13Z"/>
+										<path class="cls-1" d="M20.72,19.05,19,18.19V16.5a.5.5,0,0,0-1,0v2a.51.51,0,0,0,.28.45l2,1a.54.54,0,0,0,.22.05.5.5,0,0,0,.22-.95Z"/>
+									</g>
+								</svg>
+								<span>ĐK HP dự kiến</span>
+							</a>
+						</li>
+						<li>
+							<a href="/register/">
+								<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="40px" viewBox="0 0 25 25">
+									<defs>
+										<style>.cls-1{fill:#ff7900;}</style>
+									</defs>
+									<g data-name="calendar plus" id="calendar_plus">
+										<path class="cls-1" d="M22.5,3H21V2a1,1,0,0,0-1-1H19a1,1,0,0,0-1,1V3H14V2a1,1,0,0,0-1-1H12a1,1,0,0,0-1,1V3H7V2A1,1,0,0,0,6,1H5A1,1,0,0,0,4,2V3H2.5A1.5,1.5,0,0,0,1,4.5v18A1.5,1.5,0,0,0,2.5,24h16A5.51,5.51,0,0,0,24,18.5s0-.08,0-.13,0,0,0,0V4.5A1.5,1.5,0,0,0,22.5,3ZM19,2l1,0,0,3L19,5ZM12,2l1,0V3.44s0,0,0,.06,0,0,0,.07L13,5,12,5ZM5,2,6,2,6,5,5,5ZM2.5,4H4V5A1,1,0,0,0,5,6H6A1,1,0,0,0,7,5V4h4V5a1,1,0,0,0,1,1H13a1,1,0,0,0,1-1V4h4V5a1,1,0,0,0,1,1H20a1,1,0,0,0,1-1V4h1.5a.5.5,0,0,1,.5.5V8H2V4.5A.5.5,0,0,1,2.5,4Zm16,19A4.5,4.5,0,1,1,23,18.5,4.51,4.51,0,0,1,18.5,23Zm0-10a5.49,5.49,0,0,0-3.15,10H2.5a.5.5,0,0,1-.5-.5V9H23v6.35A5.49,5.49,0,0,0,18.5,13Z"/>
+										<path class="cls-1" d="M20.5,18H19V16.5a.5.5,0,0,0-1,0V18H16.5a.5.5,0,0,0,0,1H18v1.5a.5.5,0,0,0,1,0V19h1.5a.5.5,0,0,0,0-1Z"/>
+									</g>
+								</svg>
+								<span>Đăng ký học phần</span>
+							</a>
+						</li>
+						<li>
+							<a href="/student/result/studyresults">
+								<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="40px" viewBox="0 0 24 24" fill="none">
+									<path d="M19.7781 1.39348C20.1686 1.00295 20.8018 1.00295 21.1923 1.39348L22.6066 2.80769C22.9971 3.19822 22.9971 3.83138 22.6066 4.22191C22.216 4.61243 21.5829 4.61243 21.1923 4.22191L19.7781 2.80769C19.3876 2.41717 19.3876 1.784 19.7781 1.39348Z" fill="#0F0F0F"/>
+									<path d="M16.2425 2.10051C16.633 1.70999 17.2662 1.70999 17.6567 2.10051L21.8993 6.34315C22.2899 6.73368 22.2899 7.36684 21.8993 7.75736C21.5088 8.14789 20.8756 8.14789 20.4851 7.75736L16.2425 3.51472C15.852 3.1242 15.852 2.49103 16.2425 2.10051Z" fill="#0F0F0F"/>
+									<path d="M16.9497 8.46463L8.46451 16.9498L10.5858 19.0711C10.9763 19.4616 10.9763 20.0948 10.5858 20.4853C10.1952 20.8758 9.56207 20.8758 9.17155 20.4853L3.5147 14.8284C3.12417 14.4379 3.12417 13.8048 3.51469 13.4142C3.90522 13.0237 4.53838 13.0237 4.92891 13.4142L7.05029 15.5356L15.5355 7.05041L13.4141 4.92903C13.0236 4.53851 13.0236 3.90534 13.4141 3.51482C13.8046 3.12429 14.4378 3.12429 14.8283 3.51482L20.4852 9.17167C20.8757 9.56219 20.8757 10.1954 20.4852 10.5859C20.0947 10.9764 19.4615 10.9764 19.071 10.5859L16.9497 8.46463Z" fill="#0F0F0F"/>
+									<path d="M3.5146 16.2428C3.12408 15.8523 2.49091 15.8523 2.10039 16.2428C1.70986 16.6334 1.70986 17.2665 2.10039 17.6571L6.34303 21.8997C6.73355 22.2902 7.36672 22.2902 7.75724 21.8997C8.14777 21.5092 8.14777 20.876 7.75724 20.4855L3.5146 16.2428Z" fill="#0F0F0F"/>
+									<path d="M2.80757 19.7782C2.41705 19.3877 1.78388 19.3877 1.39336 19.7782C1.00283 20.1688 1.00283 20.8019 1.39336 21.1925L2.80757 22.6067C3.1981 22.9972 3.83126 22.9972 4.22178 22.6067C4.61231 22.2161 4.61231 21.583 4.22178 21.1925L2.80757 19.7782Z" fill="#0F0F0F"/>
+								</svg>
+								<span>Kết quả học tập</span>
+							</a>
+						</li>
+						<li>
+							<a href="/student/result/examresult">
+								<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="40px" viewBox="0 0 24 24" fill="none">
+									<path fill-rule="evenodd" clip-rule="evenodd" d="M5 4C5 2.34315 6.34315 1 8 1H15.9999C17.6568 1 19 2.34314 19 4H20C21.6569 4 23 5.34315 23 7V7.64593C23 8.87265 22.2531 9.97577 21.1142 10.4314L18.031 11.6646C17.5965 12.464 16.958 13.2715 16.0234 13.8946C15.211 14.4361 14.2124 14.8132 13 14.9467V17H15C16.6569 17 18 18.3431 18 20V21C18 22.1046 17.1046 23 16 23H8C6.89543 23 6 22.1046 6 21V20C6 18.3431 7.34315 17 9 17H11V14.9467C9.78757 14.8133 8.7889 14.4361 7.97651 13.8945C7.04188 13.2715 6.40335 12.464 5.9689 11.6646L2.88583 10.4314C1.74685 9.97577 1 8.87265 1 7.64593V7C1 5.34315 2.34315 4 4 4H5ZM5 6H4C3.44772 6 3 6.44772 3 7V7.64593C3 8.05484 3.24895 8.42255 3.62861 8.57441L5.11907 9.1706C5.05194 8.78628 5.00063 8.39214 5 8.00104L5 6ZM19 8V6H20C20.5523 6 21 6.44772 21 7V7.64593C21 8.05484 20.751 8.42255 20.3714 8.57441L18.8809 9.17062C18.9469 8.78361 19 8.39286 19 8ZM8 3C7.44772 3 7 3.44772 7 4V7.99707L7 7.99832C7 7.99996 7 8.00078 7 7.99832C7.00508 8.25761 7.03756 8.51764 7.08014 8.77311C7.16297 9.27012 7.32677 9.91751 7.6444 10.5528C7.96008 11.1842 8.4179 11.7851 9.08591 12.2305C9.74766 12.6716 10.6749 13 12 13C13.325 13 14.2522 12.6716 14.914 12.2304C15.582 11.7851 16.0398 11.1842 16.3555 10.5528C16.6732 9.9175 16.837 9.27011 16.9198 8.7731C16.9624 8.51735 16.993 8.25848 17 7.99909V4C17 3.44772 16.5522 3 15.9999 3H8ZM9 19C8.44772 19 8 19.4477 8 20V21H16V20C16 19.4477 15.5523 19 15 19H9Z" fill="#0F0F0F"/>
+								</svg>
+								<span>Kết quả thi</span>
+							</a>
+						</li>
+					</ul>
+				</div>
+				
+				
+				<div id="exam-plan-panel">
+					<div class="panel-heading">
+						<h3 class="panel-title">
+							<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="40px" viewBox="0 0 25 25">
+								<defs>
+									<style>.cls-1{fill:#000000;}</style>
+								</defs>
+								<g data-name="calendar date" id="calendar_date">
+									<path class="cls-1" d="M22.5,3H21V2a1,1,0,0,0-1-1H19a1,1,0,0,0-1,1V3H14V2a1,1,0,0,0-1-1H12a1,1,0,0,0-1,1V3H7V2A1,1,0,0,0,6,1H5A1,1,0,0,0,4,2V3H2.5A1.5,1.5,0,0,0,1,4.5v18A1.5,1.5,0,0,0,2.5,24h20A1.5,1.5,0,0,0,24,22.5V4.5A1.5,1.5,0,0,0,22.5,3ZM19,2l1,0,0,3L19,5ZM12,2l1,0V3.44s0,0,0,.06,0,0,0,.07L13,5,12,5ZM5,2,6,2,6,5,5,5ZM2.5,4H4V5A1,1,0,0,0,5,6H6A1,1,0,0,0,7,5V4h4V5a1,1,0,0,0,1,1H13a1,1,0,0,0,1-1V4h4V5a1,1,0,0,0,1,1H20a1,1,0,0,0,1-1V4h1.5a.5.5,0,0,1,.5.5V8H2V4.5A.5.5,0,0,1,2.5,4Zm20,19H2.5a.5.5,0,0,1-.5-.5V9H23V22.5A.5.5,0,0,1,22.5,23Z"/>
+									<path class="cls-1" d="M20.5,15h-6a.5.5,0,0,0-.5.5v5a.5.5,0,0,0,.5.5h6a.5.5,0,0,0,.5-.5v-5A.5.5,0,0,0,20.5,15ZM20,20H15V16h5Z"/>
+									<path class="cls-1" d="M6.5,11h-2a.5.5,0,0,0-.5.5v2a.5.5,0,0,0,.5.5h2a.5.5,0,0,0,.5-.5v-2A.5.5,0,0,0,6.5,11ZM6,13H5V12H6Z"/>
+									<path class="cls-1" d="M10.5,11h-2a.5.5,0,0,0-.5.5v2a.5.5,0,0,0,.5.5h2a.5.5,0,0,0,.5-.5v-2A.5.5,0,0,0,10.5,11ZM10,13H9V12h1Z"/>
+									<path class="cls-1" d="M6.5,16h-2a.5.5,0,0,0-.5.5v2a.5.5,0,0,0,.5.5h2a.5.5,0,0,0,.5-.5v-2A.5.5,0,0,0,6.5,16ZM6,18H5V17H6Z"/>
+									<path class="cls-1" d="M10.5,16h-2a.5.5,0,0,0-.5.5v2a.5.5,0,0,0,.5.5h2a.5.5,0,0,0,.5-.5v-2A.5.5,0,0,0,10.5,16ZM10,18H9V17h1Z"/>
+									<path class="cls-1" d="M14.5,14h2a.5.5,0,0,0,.5-.5v-2a.5.5,0,0,0-.5-.5h-2a.5.5,0,0,0-.5.5v2A.5.5,0,0,0,14.5,14Zm.5-2h1v1H15Z"/>
+									<path class="cls-1" d="M20.5,11h-2a.5.5,0,0,0-.5.5v2a.5.5,0,0,0,.5.5h2a.5.5,0,0,0,.5-.5v-2A.5.5,0,0,0,20.5,11ZM20,13H19V12h1Z"/>
+								</g>
+							</svg>
+							<a href="/student/schedulefees/examplant">Kế hoạch thi</a>
+						</h3>
+					</div>
+					<table class="table table-bordered table-striped">
+						<thead>
+							<tr class="kTableHeader">
+								<th>STT</th>
+								<th>Mã lớp độc lập</th>
+								<th>Tên học phần</th>
+								<th>Ngày thi</th>
+								<th>Ca thi</th>
+								<th>Lần thi</th>
+								<th>Lớp ưu tiên</th>
+								<th>Khoa</th>
+							</tr>
+						</thead>
+						<tbody id="exam-plan-body">
+						</tbody>
+					</table>
+				</div>
+
+				<div id="exam-schedule-panel">
+					<div class="panel-heading">
+						<h3 class="panel-title">
+							<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="40px" viewBox="0 0 25 25">
+								<defs>
+									<style>.cls-1{fill:#000000;}</style>
+								</defs>
+								<g data-name="calendar number" id="calendar_number">
+									<path class="cls-1" d="M22.5,3H21V2a1,1,0,0,0-1-1H19a1,1,0,0,0-1,1V3H14V2a1,1,0,0,0-1-1H12a1,1,0,0,0-1,1V3H7V2A1,1,0,0,0,6,1H5A1,1,0,0,0,4,2V3H2.5A1.5,1.5,0,0,0,1,4.5v18A1.5,1.5,0,0,0,2.5,24h20A1.5,1.5,0,0,0,24,22.5V4.5A1.5,1.5,0,0,0,22.5,3ZM19,2l1,0,0,3L19,5ZM12,2l1,0V3.44s0,0,0,.06,0,0,0,.07L13,5,12,5ZM5,2,6,2,6,5,5,5ZM2.5,4H4V5A1,1,0,0,0,5,6H6A1,1,0,0,0,7,5V4h4V5a1,1,0,0,0,1,1H13a1,1,0,0,0,1-1V4h4V5a1,1,0,0,0,1,1H20a1,1,0,0,0,1-1V4h1.5a.5.5,0,0,1,.5.5V8H2V4.5A.5.5,0,0,1,2.5,4Zm20,19H2.5a.5.5,0,0,1-.5-.5V9H23V22.5A.5.5,0,0,1,22.5,23Z"/>
+									<path class="cls-1" d="M10.62,15.89a3.55,3.55,0,0,0-1.28-.27H9.16l2.14-2.38.09-.12a.29.29,0,0,0,0-.14v-.39a.26.26,0,0,0-.07-.2.25.25,0,0,0-.19-.07H6.73a.24.24,0,0,0-.18.07.26.26,0,0,0-.07.2V13a.25.25,0,0,0,.07.19.28.28,0,0,0,.18.06H10L7.85,15.6l-.08.13a.33.33,0,0,0,0,.17v.3a.27.27,0,0,0,.07.19.29.29,0,0,0,.19.07H9a2,2,0,0,1,1.2.31,1.17,1.17,0,0,1,.43,1,1.26,1.26,0,0,1-.48,1.07A1.93,1.93,0,0,1,9,19.24a3.53,3.53,0,0,1-.72-.08,1.53,1.53,0,0,1-.64-.31,1.15,1.15,0,0,1-.38-.62A.31.31,0,0,0,7.08,18,.27.27,0,0,0,6.9,18H6.36a.24.24,0,0,0-.17.06.22.22,0,0,0-.07.16,1.65,1.65,0,0,0,.2.7,1.91,1.91,0,0,0,.54.64,2.56,2.56,0,0,0,.87.46A3.79,3.79,0,0,0,9,20.18a3.55,3.55,0,0,0,1.46-.28,2.42,2.42,0,0,0,1-.8,2.12,2.12,0,0,0,.37-1.27,2.15,2.15,0,0,0-.31-1.21A1.85,1.85,0,0,0,10.62,15.89Z"/>
+									<path class="cls-1" d="M18.47,14.05a2.73,2.73,0,0,0-.49-1,2.26,2.26,0,0,0-.86-.65,3.1,3.1,0,0,0-1.29-.24,3,3,0,0,0-1.28.24,2.26,2.26,0,0,0-.86.65,2.93,2.93,0,0,0-.5,1A4.76,4.76,0,0,0,13,15.2c0,.21,0,.43,0,.66s0,.45,0,.67,0,.44,0,.64a5.31,5.31,0,0,0,.17,1.15,2.69,2.69,0,0,0,.49,1,2.09,2.09,0,0,0,.86.65,3.1,3.1,0,0,0,1.29.24,3.11,3.11,0,0,0,1.3-.24,2.06,2.06,0,0,0,.85-.65,2.86,2.86,0,0,0,.49-1,4,4,0,0,0,.17-1.15c0-.2,0-.41,0-.64s0-.44,0-.67,0-.45,0-.66A4,4,0,0,0,18.47,14.05Zm-.91,2.43c0,.21,0,.42,0,.63a2.59,2.59,0,0,1-.43,1.55,1.49,1.49,0,0,1-1.28.57,1.48,1.48,0,0,1-1.27-.57,2.59,2.59,0,0,1-.44-1.55c0-.21,0-.42,0-.63v-.6c0-.21,0-.41,0-.61a2.68,2.68,0,0,1,.44-1.55,1.44,1.44,0,0,1,1.27-.58,1.47,1.47,0,0,1,1.28.58,2.68,2.68,0,0,1,.43,1.55c0,.2,0,.4,0,.61Z"/>
+								</g>
+							</svg>
+							<a href="/student/schedulefees/transactionmodules">Lịch thi</a>
+						</h3>
+					</div>
+					<table class="table table-bordered table-striped">
+						<thead>
+							<tr class="kTableHeader">
+								<th>STT</th>
+								<th>Môn thi</th>
+								<th>Ngày thi</th>
+								<th>Ca thi</th>
+								<th>SBD</th>
+								<th>Lần thi</th>
+								<th>Vị trí thi</th>
+								<th>Phòng thi</th>
+								<th>Tòa nhà</th>
+								<th>Cơ sở</th>
+								<th>Tiền VP PVT</th>
+								<th>Tham gia thi</th>
+								<th>Tình trạng</th>
+							</tr>
+						</thead>
+						<tbody id="exam-schedule-body">
+						</tbody>
+					</table>
+				</div>
+			</div>
+            `;
+            frmMain.innerHTML = html;
+            GM_addStyle(`
+				.panel {
+					border-radius: 8px;
+					box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+					overflow: hidden;
+					margin-bottom: 20px;
+					padding: 10px;
+				}
+
+				.panel-border-color-primary {
+					border: 2px solid #eaf3fdff;
+				}
+
+				.panel-heading {
+					color: black;
+					padding: 12px 16px;
+					border-bottom: 1px solid #0056b3;
+				}
+
+				.panel-title {
+					margin: 0;
+					font-size: 18px;
+					font-weight: 500;
+					display: flex;
+					align-items: center;
+					gap: 8px;
+				}
+
+				.panel-title a {
+					color: black;
+					text-decoration: none;
+					transition: color 0.3s;
+				}
+
+				.panel-title a:hover {
+					color: #3a68ffff;
+				}
+
+				.panel-icon {
+					stroke: white;
+				}
+
+				.shortcut-list {
+					list-style: none;
+					padding: 0;
+					margin: 0;
+					display: grid;
+					grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+					gap: 10px;
+					padding: 16px;
+				}
+
+				.shortcut-list li {
+					display: flex;
+				}
+
+				.shortcut-list a {
+					font-size: 1.5rem;
+					display: flex;
+					flex-direction: column;
+					align-items: center;
+					text-align: center;
+					text-decoration: none;
+					color: #333;
+					padding: 12px;
+					border-radius: 6px;
+					transition: background-color 0.3s, transform 0.2s;
+					width: 100%;
+				}
+
+				.shortcut-list a:hover {
+					color: #3a68ffff;
+					background-color: #f1f5f9;
+					transform: translateY(-2px);
+				}
+
+				.shortcut-list .icon {
+					width: 24px;
+					height: 24px;
+					margin-bottom: 8px;
+					stroke: #007bff;
+					transition: stroke 0.3s;
+				}
+
+				.shortcut-list a:hover .icon {
+					stroke: #0056b3;
+				}
+
+				.shortcut-list span {
+					font-weight: 400;
+					line-height: 1.4;
+				}
+
+				.table {
+					width: 100%;
+					border-collapse: collapse;
+					margin: 16px 20px 0;
+				}
+
+				.table-bordered th,
+				.table-bordered td {
+					border: 1px solid #dee2e6;
+					padding: 10px;
+					text-align: left;
+				}
+
+				.table-striped tbody tr:nth-of-type(odd) {
+					background-color: #f8f9fa;
+				}
+
+				.kTableHeader {
+					background-color: #e9ecef;
+					font-weight: 500;
+					color: #333;
+				}
+
+				.table tbody tr:hover {
+					background-color: #e0e7ff;
+				}
+
+				@media (max-width: 600px) {
+					.shortcut-list {
+						grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+					}
+
+					.shortcut-list a {
+						padding: 8px;
+					}
+
+					.shortcut-list span {
+						font-size: 0.85rem;
+					}
+
+					.table {
+						font-size: 0.85rem;
+					}
+
+					.table th,
+					.table td {
+						padding: 8px;
+					}
+				}
+            `);
+        }
+
+        showExamPlanInHomePage();
+        showExamScheduleInHomePage();
+    }
+
+    async function showExamPlanInHomePage() {
+        const examPlanDOM = await fetchDOM("https://sv.haui.edu.vn/student/schedulefees/examplant");
+        let listCourseCode = getCourseCode(examPlanDOM);
+        // Lấy 13 học phần gần nhất
+        listCourseCode = listCourseCode.slice(0, 12);
+        const examScheduleContainer = document.querySelector("#exam-plan-body");
+        let i = 0;
+        for (const courseCode of listCourseCode) {
+            let examPlan = await getExamPlan(courseCode);
+            // console.log(courseCode, " : " , examPlan);
+            // Nếu không có lịch
+            if (examPlan == null) continue;
+            // Hiển thị kế hoạch thi
+
+            const examDate = examPlan.children[3].textContent.trim();
+            const examHour = examPlan.children[4].textContent.trim();
+            const examTime = `${examHour} ${examDate}`;
+            // Kiểm tra thời gian thi
+            const diffTime = getTimeDifference(examTime);
+
+            if ((diffTime.direction === -1 && diffTime.days <= 20) || diffTime.direction === 1) {
+                i++;
+                const indexItem = examPlan.children[0];
+
+                indexItem.textContent = `${i}`;
+
+                if (diffTime.direction === 1) {
+                    // Nếu chưa đến ngày thi thì tô màu vàng
+                    examPlan.style.backgroundColor = "rgb(248,226,135)";
+                    // Hiển thị khoảng cách ngày
+                    examPlan.children[3].innerHTML += `<br>(${diffTime.toString()})`;
+                } else {
+                    // Hiển thị khoảng cách ngày
+                    examPlan.children[3].innerHTML += `<br>(${diffTime.toString()})`;
+                }
+
+                examScheduleContainer.appendChild(examPlan);
+            }
+            await delay(10);
+        }
+        if (i === 0) console.warn("Không có kế hoạch thi nào.");
+    }
+
+    async function showExamScheduleInHomePage() {
+        const examScheduleDOM = await fetchDOM(
+            "https://sv.haui.edu.vn/student/schedulefees/transactionmodules"
+        );
+        const examScheduleContainer = document.querySelector("#exam-schedule-body");
+
+        const examSchedule = examScheduleDOM.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
+        let i = 0;
+        for (const examScheduleElement of examSchedule) {
+            const examDate = examScheduleElement.children[2].textContent.trim();
+            const examHour = examScheduleElement.children[3].textContent.trim();
+            const examTime = `${examHour} ${examDate}`;
+            // Kiểm tra thời gian thi
+            const diffTime = getTimeDifference(examTime);
+
+            if ((diffTime.direction === -1 && diffTime.days <= 20) || diffTime.direction === 1) {
+                i++;
+                const checkItem = examScheduleElement.children[13];
+                const indexItem = examScheduleElement.children[0];
+
+                checkItem.remove();
+                indexItem.textContent = `${i}`;
+
+                if (diffTime.direction === 1) {
+                    // Nếu chưa đến ngày thi thì tô màu vàng
+                    examScheduleElement.style.backgroundColor = "rgb(248,226,135)";
+                    // Hiển thị khoảng cách ngày
+                    examScheduleElement.children[2].innerHTML += `<br>(${diffTime.toString()})`;
+                } else {
+                    // Hiển thị khoảng cách ngày
+                    examScheduleElement.children[2].innerHTML += `<br>(${diffTime.toString()})`;
+                }
+
+                examScheduleContainer.appendChild(examScheduleElement);
+            }
+        }
+        if (i === 0) console.warn("Không có lịch thi nào.");
+    }
+
+    function sortExamSchedule() {
+        // xắp xếp lịch thi
+        const examScheduleContainer = document.querySelector(
+            "div.kGrid > div > table:nth-child(3) > tbody"
+        );
+        const examSchedule = document.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
+        // console.log("examSchedule: ", examSchedule);
+        for (let i = examSchedule.length - 1; i >= 0; i--) {
+            examScheduleContainer.appendChild(examSchedule[i]);
+        }
+    }
+
+    function highlightExamSchedule() {
+        const examSchedule = document.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
+        for (const examElement of examSchedule) {
+            const examDate = examElement.children[2].textContent.trim();
+            const examHour = examElement.children[3].textContent.trim();
+            const examTime = `${examHour} ${examDate}`;
+            // Kiểm tra thời gian thi
+            const diffTime = getTimeDifference(examTime);
+
+            if (diffTime.direction === 1) {
+                examElement.style.backgroundColor = "rgb(248,226,135)";
+                // Hiển thị khoảng cách ngày
+                examElement.children[2].innerHTML += `<br>(${diffTime.toString()})`;
+            }
+        }
+    }
+
+    function getCourseCode(scope = document) {
+        const listCourseCodeElement = scope.querySelectorAll(
+            "div:nth-child(3) > div > div > table > tbody > tr > td:nth-child(2) > a"
         );
         let listHPCode = [];
-        for (const element of listHPCodeElement) {
+        for (const element of listCourseCodeElement) {
             const hpCode = element.textContent.trim();
             if (hpCode) {
                 listHPCode.push(hpCode);
@@ -313,516 +636,132 @@
         listHPCode.reverse();
         return listHPCode;
     }
-    // Get exam plan
-    async function getExamPlan(getHPCode) {
-        const url = `https://sv.haui.edu.vn/student/schedulefees/examplant?code=${getHPCode}`;
+
+    async function getExamPlan(courseCode) {
+        const url = `https://sv.haui.edu.vn/student/schedulefees/examplant?code=${courseCode}`;
         try {
             const dom = await fetchDOM(url);
-            return $("#ctl02_ctl00_viewResult > div > div > table > tbody > tr", dom);
+            return dom.querySelector("#ctl02_ctl00_viewResult > div > div > table > tbody > tr");
         } catch (err) {
             console.error(`Lỗi khi lấy lịch thi cho ${getHPCode}: `, err);
         }
     }
-    // Show list exam plan
+
     async function showExamPlan() {
-        if (currentURL != "https://sv.haui.edu.vn/student/schedulefees/examplant") {
-            return;
-        }
-        let listHPCode = getHpCode(document);
+        let listCourseCode = getCourseCode(document);
         // Lấy 13 học phần gần nhất
-        listHPCode = listHPCode.slice(0, 12);
-        const hpNotExam = ["PE60", "OT"];
-        const examScheduleResultTable = $("#ctl02_ctl00_viewResult > div > div > table > tbody");
+        listCourseCode = listCourseCode.slice(0, 12);
+        const examScheduleContainer = document.querySelector(
+            "#ctl02_ctl00_viewResult > div > div > table > tbody"
+        );
         let i = 0;
-        let listExamPlan = [];
-        for (const hpCode of listHPCode) {
-            if (hpNotExam.some((hp) => hpCode.includes(hp))) continue;
-            let examPlan = await getExamPlan(hpCode);
+        for (const courseCode of listCourseCode) {
+            let examPlan = await getExamPlan(courseCode);
+            // console.log(courseCode, " : " , examPlan);
             // Nếu không có lịch
             if (examPlan == null) continue;
-            listExamPlan.push(examPlan);
             // Hiển thị kế hoạch thi
-            if (checkExamTime(examPlan, 3, true)) {
-                i++;
-                examPlan.children[0].textContent = `${i}`;
-            }
-            if (checkExamTime(examPlan, 3, false)) {
-                // Nếu chưa đến ngày thi thì tô màu vàng
-                examPlan.style.backgroundColor = "rgb(248,226,135)";
-                // Hiển thị khoảng cách ngày
-                examPlan.children[3].innerHTML += `<br>(Còn ${calculateDateDifference(
-                    examPlan.children[3].textContent
-                )} ngày)`;
-            }
-            examScheduleResultTable.appendChild(examPlan);
-            await delay(200);
-        }
-        // console.log("listExamPlan: ", listExamPlan);
-    }
 
-    // Tạo panel kế hoạch thi trong trang chủ
-    function createExamPlanPanelInHomePage() {
-        if (currentURL != "https://sv.haui.edu.vn/" || !$("span.user-name")) {
-            return;
-        }
-        const examPlanPanelHtml = `
-            <div id="exam-plan-panel">
-                <div class="panel-heading">
-                    <h3 class="panel-title">
-                        <a href="/student/schedulefees/examplant">Kế hoạch thi</a>
-                    </h3>
-                </div>
-                <table class="table table-bordered table-striped">
-                    <thead>
-                        <tr class="kTableHeader">
-                        <td>STT</td>
-                        <td>Mã lớp độc lập</td>
-                        <td>Tên học phần</td>
-                        <td>Ngày thi</td>
-                        <td>Ca thi</td>
-                        <td>Lần thi</td>
-                        <td>Lớp ưu tiên</td>
-                        <td>Khoa</td>
-                    </tr>
-                </thead>
-                <tbody id="exam-plan-body">
-                    </tbody>
-                </table>
-            </div>
-        `;
-        const mainPanel = $(
-            "form#frmMain > div.panel.panel-default.panel-border-color.panel-border-color-primary"
-        );
-        mainPanel.insertAdjacentHTML("beforeend", examPlanPanelHtml);
-        getExamPlanInHomePage();
-    }
-    // Get exam plan in home page
-    async function getExamPlanInHomePage() {
-        const examPlanDOM = await fetchDOM("https://sv.haui.edu.vn/student/schedulefees/examplant");
-        let listHPCode = getHpCode(examPlanDOM);
-        listHPCode = listHPCode.slice(0, 12);
-        const hpNotExam = ["PE60", "OT"];
-        let i = 0;
-        let listExamPlan = [];
-        for (const hpCode of listHPCode) {
-            if (hpNotExam.some((hp) => hpCode.includes(hp))) continue;
-            let examPlan = await getExamPlan(hpCode);
-            // Nếu không có lịch thì bỏ qua
-            if (examPlan == null) continue;
-            if (checkExamTime(examPlan, 3, true)) {
-                i++;
-                examPlan.children[0].textContent = `${i}`;
+            const examDate = examPlan.children[3].textContent.trim();
+            const examHour = examPlan.children[4].textContent.trim();
+            const examTime = `${examHour} ${examDate}`;
+            // Kiểm tra thời gian thi
+            const diffTime = getTimeDifference(examTime);
 
-                if (checkExamTime(examPlan, 3, false)) {
+            if ((diffTime.direction === -1 && diffTime.days <= 20) || diffTime.direction === 1) {
+                i++;
+                const indexItem = examPlan.children[0];
+
+                indexItem.textContent = `${i}`;
+
+                if (diffTime.direction === 1) {
                     // Nếu chưa đến ngày thi thì tô màu vàng
                     examPlan.style.backgroundColor = "rgb(248,226,135)";
                     // Hiển thị khoảng cách ngày
-                    examPlan.children[3].innerHTML += `<br>(Còn ${calculateDateDifference(
-                        examPlan.children[3].textContent
-                    )} ngày)`;
-                }
-                if (checkExamTime(examPlan, 3, true)) {
+                    examPlan.children[3].innerHTML += `<br>(${diffTime.toString()})`;
+                } else {
                     // Hiển thị khoảng cách ngày
-                    examPlan.children[3].innerHTML += `<br>(${Math.abs(
-                        calculateDateDifference(examPlan.children[3].textContent)
-                    )} ngày trước)`;
+                    examPlan.children[3].innerHTML += `<br>(${diffTime.toString()})`;
                 }
-                listExamPlan.push(examPlan);
-                addExamPlanToPanel(examPlan);
+
+                examScheduleContainer.appendChild(examPlan);
             }
-            await delay(200);
-        }
-        // console.log("listExamPlan: ", listExamPlan);
-        return listExamPlan;
-    }
-    // Show exam plan in home page
-    function addExamPlanToPanel(examPlan) {
-        const examPlanContainer = $("#exam-plan-body");
-        examPlanContainer.appendChild(examPlan);
-    }
-
-    // ======================================================================================
-    // Lịch thi
-    // Sort exam schedule
-    function sortExamSchedule() {
-        if (currentURL != "https://sv.haui.edu.vn/student/schedulefees/transactionmodules") {
-            return;
-        }
-        // xắp xếp lịch thi
-        const examScheduleContainer = $("div.kGrid > div > table:nth-child(3) > tbody");
-        const examSchedule = $$("tr.kTableAltRow, tr.kTableRow");
-        // console.log("examSchedule: ", examSchedule);
-        for (let i = examSchedule.length - 1; i >= 0; i--) {
-            examScheduleContainer.appendChild(examSchedule[i]);
-        }
-    }
-    // Highlight exam schedule
-    function highlightExamSchedule() {
-        if (currentURL != "https://sv.haui.edu.vn/student/schedulefees/transactionmodules") {
-            return;
-        }
-        const examSchedule = $$("tr.kTableAltRow, tr.kTableRow");
-        for (const examElement of examSchedule) {
-            if (checkExamTime(examElement, 2, false)) {
-                examElement.style.backgroundColor = "rgb(248,226,135)";
-                // Hiển thị khoảng cách ngày
-                examElement.children[2].innerHTML += `<br>(Còn ${calculateDateDifference(
-                    examElement.children[2].textContent
-                )} ngày)`;
-            }
+            await delay(10);
         }
     }
 
-    // Tạo panel lịch thi trong trang chủ
-    function createExamSchedulePanelInHomePage() {
-        if (currentURL != "https://sv.haui.edu.vn/" || !$("span.user-name")) {
-            return;
-        }
-        const examSchedulePanelHtml = `
-            <div id="exam-schedule-panel">
-                <div class="panel-heading">
-                    <h3 class="panel-title">
-                        <a href="/student/schedulefees/transactionmodules">Lịch thi</a>
-                    </h3>
-                </div>
-                <table class="table table-bordered table-striped">
-                    <thead>
-                        <td>STT</td>
-                        <td>Môn thi</td>
-                        <td>Ngày thi</td>
-                        <td>Ca thi</td>
-                        <td>SBD</td>
-                        <td>Lần thi</td>
-                        <td>Vị trí thi</td>
-                        <td>Phòng thi</td>
-                        <td>Tòa nhà</td>
-                        <td>Cơ sở</td>
-                        <td>Tiền VP PVT</td>
-                        <td>Tham gia thi</td>
-                        <td>Tình trạng</td>
-                    </tr>
-                </thead>
-                <tbody id="exam-schedule-body">
-                    </tbody>
-                </table>
-            </div>
-        `;
-        const mainPanel = $(
-            "form#frmMain > div.panel.panel-default.panel-border-color.panel-border-color-primary"
-        );
-        mainPanel.insertAdjacentHTML("beforeend", examSchedulePanelHtml);
-        getExamSchedule();
-    }
-    // Get exam schedule
-    async function getExamSchedule() {
-        const examScheduleDOM = await fetchDOM(
-            "https://sv.haui.edu.vn/student/schedulefees/transactionmodules"
-        );
-        const examSchedule = $$("tr.kTableAltRow, tr.kTableRow", examScheduleDOM);
-        let i = 0;
-        let listExamSchedule = [];
-        for (const examScheduleElement of examSchedule) {
-            if (checkExamTime(examScheduleElement, 2, true)) {
-                i++;
-                examScheduleElement.children[13].remove();
-                examScheduleElement.children[0].textContent = `${i}`;
-
-                if (checkExamTime(examScheduleElement, 2, false)) {
-                    // Nếu chưa đến ngày thi thì tô màu vàng
-                    examScheduleElement.style.backgroundColor = "rgb(248,226,135)";
-                    // Hiển thị khoảng cách ngày
-                    examScheduleElement.children[2].innerHTML += `<br>(Còn ${calculateDateDifference(
-                        examScheduleElement.children[2].textContent
-                    )} ngày)`;
-                }
-                if (checkExamTime(examScheduleElement, 2, true)) {
-                    // Hiển thị khoảng cách ngày
-                    examScheduleElement.children[2].innerHTML += `<br>(${Math.abs(
-                        calculateDateDifference(examScheduleElement.children[2].textContent)
-                    )} ngày trước)`;
-                }
-                listExamSchedule.push(examScheduleElement);
-                addExamScheduleToPanel(examScheduleElement);
-            }
-        }
-        // console.log("listExamSchedule: ", listExamSchedule);
-        return listExamSchedule;
-    }
-    // Show exam schedule
-    function addExamScheduleToPanel(examSchedule) {
-        const examScheduleContainer = $("#exam-schedule-body");
-        examScheduleContainer.appendChild(examSchedule);
-    }
-    // ======================================================================================
-    // Check total credits
-    function checkTotalCredits() {
-        if (currentURL != "https://sv.haui.edu.vn/training/viewcourseindustry") {
-            return;
-        }
-        let totalCredits = $(
-            "#ctl02_dvList > tbody > tr:nth-child(7) > td.k-table-viewdetail"
-        ).textContent.trim();
-        totalCredits = totalCredits.replace("(tín chỉ)", "");
-        const totalCreditsNumber = Number(totalCredits);
-
-        GM_setValue("totalCredits", totalCreditsNumber);
-        console.log("totalCredits: ", totalCreditsNumber);
-    }
-    // Get date some info in examresult
-    function getSomeInfoInExamresult(tableContainer) {
-        const currentCredits = $("tbody > tr:last-child > td:first-child", tableContainer);
-        const currentCreditsNumber = Number(
-            currentCredits.textContent.trim().match(/(\d+)(?:\.\d+)?/g)[0]
-        );
-        GM_setValue("currentCredits", currentCreditsNumber);
-        console.log("currentCredits: ", currentCreditsNumber);
-
-        const currentGPA = $("tbody > tr:nth-last-child(2) > td:nth-child(2)", tableContainer);
-        const currentGPAValue = Number(currentGPA.textContent.trim().match(/(\d+)(?:\.\d+)?/g)[0]);
-        GM_setValue("currentGPA", currentGPAValue);
-        console.log("currentGPA: ", currentGPAValue);
-    }
-    // Thêm thông tin vào trang kết quả thi
-    function addSomeInfoInExamresult() {
-        if (
-            currentURL != "https://sv.haui.edu.vn/student/result/examresult" &&
-            !currentURL.includes("https://sv.haui.edu.vn/student/result/viewexamresult?code=")
-        ) {
-            return;
-        }
-        let tableContainer;
-        if (currentURL == "https://sv.haui.edu.vn/student/result/examresult") {
-            tableContainer = $("div.kGrid:last-child > table");
-        } else {
-            tableContainer = $("div.kGrid> div > table");
-        }
-        getSomeInfoInExamresult(tableContainer);
-        const newElement = document.createElement("span");
-        newElement.className = "info-examresult";
-        GM_addStyle(`
-            .info-examresult {
-                color: Red;
-                font-weight: bold;
-                font-size: 12px;
-                padding-left: 5px;
-            }
-        `);
-        newElement.style.paddingLeft = "5px";
-        tableContainer.insertAdjacentElement("afterend", newElement);
-
-        const totalCredits = GM_getValue("totalCredits");
-        if (totalCredits == null) {
-            console.log("Không tìm thấy tổng số tín chỉ");
-            return;
-        }
-        const currentCredits = GM_getValue("currentCredits");
-        const currentGPA = GM_getValue("currentGPA");
-        const remainingCredits = totalCredits - currentCredits;
-        const scoresToGPA25 = (2.5 * totalCredits - currentGPA * currentCredits) / remainingCredits;
-        const scoresToGPA32 = (3.2 * totalCredits - currentGPA * currentCredits) / remainingCredits;
-        const scoresToGPA36 = (3.6 * totalCredits - currentGPA * currentCredits) / remainingCredits;
-        newElement.innerHTML = `
-            <p>Số tín còn lại: ${remainingCredits}</p>
-            <p style="display: none;">Các môn còn lại cần đạt: ${scoresToGPA25.toFixed(
-                2
-            )} để GPA 2.5</p>
-            <p>Các môn còn lại cần đạt: ${scoresToGPA32.toFixed(2)} để GPA 3.2</p>
-            <p>Các môn còn lại cần đạt: ${scoresToGPA36.toFixed(2)} để GPA 3.6</p>
-            <input type="checkbox" id="edit-score"> Sửa điểm </input>
-        `;
-
-        const currentCreditsSpan = $(
-            "tbody > tr:last-child > td:first-child > span",
-            tableContainer
-        );
-        currentCreditsSpan.textContent = currentCreditsSpan.textContent.replace(
-            /(\d+)\.0\b/g,
-            "$1"
-        );
-        currentCreditsSpan.textContent += ` / ${totalCredits}`;
-    }
-
-    // Check edit score is enable
-    function checkEditScoreIsEnable() {
-        const editScoreButton = $("#edit-score");
-        const hocPhan = $$("tr.kTableAltRow, tr.kTableRow", $("div.kGrid"));
-
-        const letterScore = {
-            4: "A",
-            4.0: "A",
-            3.5: "B+",
-            3: "B",
-            3.0: "B",
-            2.5: "C+",
-            2: "C",
-            2.0: "C",
-            1.5: "D+",
-            1: "D",
-            1.0: "D",
-            0: "F",
-            0.0: "F",
+    function highlightExamScores() {
+        const scoresBoxColor = {
+            4.0: "rgb(64,212,81)", // A
+            3.5: "rgb(49, 163, 255)", // B+
+            3.0: "rgb(20, 120, 230)", // B
+            2.5: "rgb(255,186,0)", // C+
+            2.0: "rgb(255,144,0)", // C
+            1.5: "rgb(255, 50, 0)", // D+
+            1.0: "rgb(200, 0, 0)", // D
+            0.0: "rgb(157, 0, 255)", // F
         };
-        // Lưu lại original-score
-        for (const row of hocPhan) {
-            if (row.children[12].getAttribute("original-score") == null)
-                row.children[12].setAttribute(
-                    "original-score",
-                    row.children[12].textContent.trim()
-                );
-        }
+        const creditsBoxColor = {
+            "5.0": "rgb(200, 0, 100)",
+            "4.0": "rgb(255, 0, 0)",
+            "3.0": "rgb(255, 165, 0)",
+            "2.0": "rgb(0, 191, 255)",
+            "1.0": "rgb(46, 204, 64)",
+        };
+        const kgrid = document.querySelector("div.kGrid");
+        const hocPhan = kgrid.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
 
-        if (!editScoreButton.checked) {
-            // Not checked
-            for (const row of hocPhan) {
-                // Vô hiệu hóa edit score
-                row.children[12].setAttribute("contenteditable", "false");
-                // Bỏ qua học phần không sửa
-                if (
-                    row.children[12].textContent === row.children[12].getAttribute("original-score")
-                )
-                    continue;
-                // Return original score
-                row.children[12].textContent = row.children[12].getAttribute("original-score");
-                // Return original letter score
-                row.children[13].textContent =
-                    letterScore[row.children[12].getAttribute("original-score")];
-                // Remove text content
-                row.children[15].textContent = "";
-            }
-            highlightGradeScores();
-            if ($("span#can-replace.info-examresult"))
-                $("span#can-replace.info-examresult").remove();
-            return false;
-        } else {
-            // Checked
-            for (const row of hocPhan) {
-                // Bật edit score
-                row.children[12].setAttribute("contenteditable", "true");
-                if (row.children[12].textContent == row.children[12].getAttribute("original-score"))
-                    continue;
-                // Show letter score
-                row.children[13].textContent =
-                    letterScore[0.0 + Number(row.children[12].textContent.trim())];
-                // Show original letter score
-                row.children[15].textContent =
-                    letterScore[row.children[12].getAttribute("original-score")];
-            }
-            highlightGradeScores();
-            return true;
-        }
-    }
-    // Recalculate GPA
-    function recalculateGPA() {
-        const hocPhan = $$("tr.kTableAltRow, tr.kTableRow", $("div.kGrid"));
+        const courseCodeIndex = 1,
+            creditIndex = 5,
+            score4Index = 12,
+            scoreLetterIndex = 13;
 
-        let diemTong = 0;
-        let tongTinChi = 0;
         for (const row of hocPhan) {
-            // Bỏ qua hpNotGPA
-            if (hpNotGPA.some((hp) => row.children[1].textContent.includes(hp))) continue;
-            const oDiem = row.children[12];
-            // Bỏ qua những học phần không có điểm
-            if (oDiem.textContent.trim() == "") continue;
-            // Bỏ qua những học phần F
-            if (oDiem.textContent.trim() == "0") continue;
-            const diemSo = Number(oDiem.textContent.trim());
-            const tinChi = Number(row.children[5].textContent.trim());
-            diemTong += diemSo * tinChi;
-            tongTinChi += tinChi;
-        }
-        const GPA = diemTong / tongTinChi;
-        return GPA;
-    }
-    // Tính điểm trung bình các môn đã sửa điểm
-    function calculateScoreAfterEditScore() {
-        const hocPhan = $$("tr.kTableAltRow, tr.kTableRow", $("div.kGrid"));
-        let diemTong = 0;
-        let tongTinChi = 0;
-        for (const row of hocPhan) {
-            // Bỏ qua hpNotGPA
-            if (hpNotGPA.some((hp) => row.children[1].textContent.includes(hp))) continue;
-            // Bỏ qua học phần không sửa
+            // Bỏ qua nonCreditCourse
             if (
-                row.children[12].getAttribute("original-score") ===
-                row.children[12].textContent.trim()
+                nonCreditCourse.some((hp) => row.children[courseCodeIndex].textContent.includes(hp))
             )
                 continue;
-            // Đánh dấu điểm đã sửa
-            row.children[12].style.color = "red";
-            row.children[12].style.fontWeight = "bold";
-            const diemSo = Number(row.children[12].textContent.trim());
-            const tinChi = Number(row.children[5].textContent.trim());
-            diemTong += diemSo * tinChi;
-            tongTinChi += tinChi;
+            // Tô màu tín chỉ
+            row.children[creditIndex].style.backgroundColor =
+                creditsBoxColor[row.children[creditIndex].textContent.trim()];
+            row.children[creditIndex].style.color = "#FFFFFF";
+
+            // Bỏ qua những học phần không có điểm
+            if (row.children[score4Index].textContent.trim() == "") {
+                row.children[scoreLetterIndex].style.backgroundColor = "rgba(0, 0, 0, 0)";
+                continue;
+            }
+            const diemSo = 0.0 + Number(row.children[score4Index].textContent.trim());
+            // console.log(diemSo);
+            // Tô màu điểm
+            row.children[scoreLetterIndex].style.backgroundColor = scoresBoxColor[diemSo];
+            row.children[scoreLetterIndex].style.color = "#FFFFFF";
         }
-        const diemTB = diemTong / tongTinChi;
-        return diemTB;
     }
-    // Show info after edit score
-    function showInfoAfterEditScore() {
-        if (
-            currentURL != "https://sv.haui.edu.vn/student/result/examresult" &&
-            !currentURL.includes("https://sv.haui.edu.vn/student/result/viewexamresult?code=")
-        ) {
-            return;
-        }
-        if (!checkEditScoreIsEnable()) {
-            return;
-        }
 
-        const GPA = recalculateGPA();
-        const diemTB = calculateScoreAfterEditScore();
-
-        if ($("span#can-replace.info-examresult")) {
-            $("span#can-replace.info-examresult").remove();
+    function highlightStudyScores() {
+        let tx1Index = 4;
+        if (window.location.pathname.includes("student/result/viewstudyresult")) {
+            tx1Index = 3;
         }
-        const tableContainer = $("div.kGrid:last-child > div:last-child");
-        const newElement = document.createElement("span");
-        newElement.className = "info-examresult";
-        newElement.id = "can-replace";
+        const kgrid = document.querySelector("div.kGrid");
+        const hocPhan = kgrid.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
 
-        const totalCredits = GM_getValue("totalCredits");
-        if (totalCredits == null) {
-            console.log("Không tìm thấy tổng số tín chỉ");
-            return;
+        const codeCourseIndex = 2;
+        const regex = /FL\d{4}OT\.\d/;
+
+        for (const row of hocPhan) {
+            if (regex.test(row.children[2].textContent.trim())) continue;
+            // Tô những học phần chưa có điểm
+            if (row.children[tx1Index].textContent.trim() == "")
+                row.children[tx1Index].style.backgroundColor = "rgb(248,226,135)";
         }
-        const currentCredits = GM_getValue("currentCredits");
-        const remainingCredits = totalCredits - currentCredits;
-        const scoresToGPA25 = (2.5 * totalCredits - GPA * currentCredits) / remainingCredits;
-        const scoresToGPA32 = (3.2 * totalCredits - GPA * currentCredits) / remainingCredits;
-        const scoresToGPA36 = (3.6 * totalCredits - GPA * currentCredits) / remainingCredits;
-        newElement.innerHTML = `<hr>
-            <p>Tính lại:</p>
-            <p>Trung bình điểm sửa: ${diemTB.toFixed(2)} | GPA: ${GPA.toFixed(2)}</p>
-            <p style="display: none;">Các môn còn lại cần đạt: ${scoresToGPA25.toFixed(
-                2
-            )} để GPA 2.5</p>
-            <p>Các môn còn lại cần đạt: ${scoresToGPA32.toFixed(2)} để GPA 3.2</p>
-            <p>Các môn còn lại cần đạt: ${scoresToGPA36.toFixed(2)} để GPA 3.6</p>
-        `;
-        tableContainer.insertAdjacentElement("beforeend", newElement);
     }
-    // ======================================================================================
-    // Chuyển đổi giữa kết quả thi và kết quả học tập
-    function toggleExamresultAndStudyresults() {
-        if (
-            // Bản thân
-            currentURL != "https://sv.haui.edu.vn/student/result/examresult" &&
-            currentURL != "https://sv.haui.edu.vn/student/result/studyresults" &&
-            // Lớp
-            !currentURL.includes("https://sv.haui.edu.vn/student/result/viewexamresultclass?id=") &&
-            !currentURL.includes(
-                "https://sv.haui.edu.vn/student/result/viewstudyresultclass?id="
-            ) &&
-            // Bạn
-            !currentURL.includes("https://sv.haui.edu.vn/student/result/viewexamresult?code=") &&
-            !currentURL.includes("https://sv.haui.edu.vn/student/result/viewstudyresult?code=")
-        ) {
-            return;
-        }
-        const queryString = new URL(currentURL).search;
-        console.log("queryString: ", queryString);
-        const title = $("div.panel-heading");
+
+    function toggleStudyAndExam() {
+        const title = document.querySelector("div.panel-heading");
+
         const toggleLinkContainer = document.createElement("p");
         toggleLinkContainer.id = "toggle-link-container";
         const toggleLink = document.createElement("a");
@@ -830,52 +769,28 @@
         toggleLink.style.fontSize = "12px";
         toggleLinkContainer.appendChild(toggleLink);
 
-        // Bản thân
-        if (currentURL.includes("https://sv.haui.edu.vn/student/result/examresult")) {
-            toggleLink.textContent = "---Điểm Thi---> Điểm TX";
-            toggleLink.href = "https://sv.haui.edu.vn/student/result/studyresults";
-        } else if (currentURL.includes("https://sv.haui.edu.vn/student/result/studyresults")) {
-            toggleLink.textContent = "---Điểm TX---> Điểm Thi";
+        if (window.location.pathname === "/student/result/studyresults") {
             toggleLink.href = "https://sv.haui.edu.vn/student/result/examresult";
-        }
-        // Lớp
-        if (currentURL.includes("https://sv.haui.edu.vn/student/result/viewexamresultclass?id=")) {
-            toggleLink.textContent = "---Điểm thi lớp---> Điểm TX lớp";
-            toggleLink.href =
-                "https://sv.haui.edu.vn/student/result/viewstudyresultclass" + queryString;
-        } else if (
-            currentURL.includes("https://sv.haui.edu.vn/student/result/viewstudyresultclass?id=")
-        ) {
-            toggleLink.textContent = "---Điểm TX lớp---> Điểm thi lớp";
-            toggleLink.href =
-                "https://sv.haui.edu.vn/student/result/viewexamresultclass" + queryString;
-        }
-        // Bạn
-        if (currentURL.includes("https://sv.haui.edu.vn/student/result/viewexamresult?code=")) {
-            toggleLink.textContent = "---Điểm thi---> Điểm TX";
-            toggleLink.href = "https://sv.haui.edu.vn/student/result/viewstudyresult" + queryString;
-        } else if (currentURL.includes("https://sv.haui.edu.vn/student/result/viewstudyresult")) {
-            toggleLink.textContent = "---Điểm TX---> Điểm thi";
-            toggleLink.href = "https://sv.haui.edu.vn/student/result/viewexamresult" + queryString;
+            toggleLink.textContent = "➡️ Kết quả thi";
+        } else if (window.location.pathname === "/student/result/examresult") {
+            toggleLink.href = "https://sv.haui.edu.vn/student/result/studyresults";
+            toggleLink.textContent = "➡️ Kết quả học tập";
+        } else {
+            if (window.location.pathname.includes("exam")) {
+                toggleLink.href = window.location.href.replace("exam", "study");
+                toggleLink.textContent = "➡️ Kết quả học tập";
+            } else {
+                toggleLink.href = window.location.href.replace("study", "exam");
+                toggleLink.textContent = "➡️ Kết quả thi";
+            }
         }
 
         title.appendChild(toggleLinkContainer);
     }
-    // Toggle Chi tiết học phần
-    function toggleChiTietHocPhan() {
-        if (
-            !currentURL.includes(
-                "https://sv.haui.edu.vn/training/viewmodulescdiosv/xem-chi-tiet-hoc-phan.htm?id="
-            ) &&
-            !currentURL.includes(
-                "https://sv.haui.edu.vn/training/viewcourseindustry2/xem-chi-tiet-hoc-phan.htm?id="
-            )
-        ) {
-            return;
-        }
-        const queryString = new URL(currentURL).search;
-        // console.log("queryString: ", queryString);
-        const title = $("div.panel-heading");
+
+    function toggleCourseInfo() {
+        const title = document.querySelector("div.panel-heading");
+
         const toggleLinkContainer = document.createElement("p");
         toggleLinkContainer.id = "toggle-link-container";
         const toggleLink = document.createElement("a");
@@ -883,45 +798,31 @@
         toggleLink.style.fontSize = "12px";
         toggleLinkContainer.appendChild(toggleLink);
 
-        if (
-            currentURL.includes(
-                "https://sv.haui.edu.vn/training/viewmodulescdiosv/xem-chi-tiet-hoc-phan.htm?id="
-            )
-        ) {
-            toggleLink.textContent = "---Chi tiết học phần---";
-            toggleLink.href =
-                "https://sv.haui.edu.vn/training/viewcourseindustry2/xem-chi-tiet-hoc-phan.htm" +
-                queryString;
+        if (window.location.pathname === "/training/viewmodulescdiosv/xem-chi-tiet-hoc-phan.htm") {
+            toggleLink.href = window.location.href.replace(
+                "viewmodulescdiosv",
+                "viewcourseindustry2"
+            );
+            toggleLink.textContent = "➡️ Chi tiết học phần theo ngành";
         } else if (
-            currentURL.includes(
-                "https://sv.haui.edu.vn/training/viewcourseindustry2/xem-chi-tiet-hoc-phan.htm?id="
-            )
+            window.location.pathname === "/training/viewcourseindustry2/xem-chi-tiet-hoc-phan.htm"
         ) {
-            toggleLink.textContent = "---Chi tiết học phần CDIO---";
-            toggleLink.href =
-                "https://sv.haui.edu.vn/training/viewmodulescdiosv/xem-chi-tiet-hoc-phan.htm" +
-                queryString;
+            toggleLink.href = window.location.href.replace(
+                "viewcourseindustry2",
+                "viewmodulescdiosv"
+            );
+            toggleLink.textContent = "➡️ Chi tiết học phần theo CDIO";
         }
 
         title.appendChild(toggleLinkContainer);
     }
-    // Di chuyển sang trang chi tiết học phần
-    function moveToChiTietHocPhan() {
-        if (
-            currentURL != "https://sv.haui.edu.vn/student/result/examresult" &&
-            currentURL != "https://sv.haui.edu.vn/student/result/studyresults" &&
-            !currentURL.includes("https://sv.haui.edu.vn/student/result/viewexamresult?code=") &&
-            !currentURL.includes("https://sv.haui.edu.vn/student/result/viewstudyresult?code=")
-        ) {
-            return;
-        }
-        if (
-            currentURL == "https://sv.haui.edu.vn/student/result/examresult" ||
-            currentURL.includes("https://sv.haui.edu.vn/student/result/viewexamresult?code=")
-        ) {
+
+    function gotoCourseInfo() {
+        const kgrid = document.querySelector("div.kGrid");
+        if (window.location.pathname.includes("exam")) {
             // Trang xem điểm học phần
             let maHPtoMaIn = {};
-            const hocPhan = $$("tr.kTableAltRow, tr.kTableRow", $("div.kGrid"));
+            const hocPhan = kgrid.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
             for (const row of hocPhan) {
                 const maHP = row.children[1].textContent.trim();
                 const maIN = row.children[2].textContent.match(/\d+/)[0];
@@ -931,13 +832,12 @@
 						${maHP}
 				</a>`;
             }
-            // console.log("maHPtoMaIn: ", maHPtoMaIn);
             GM_setValue("maHPtoMaIn", maHPtoMaIn);
         } else {
             // Trang xem điểm TX
             const maHPtoMaIn = GM_getValue("maHPtoMaIn");
             console.log("maHPtoMaIn: ", maHPtoMaIn);
-            const hocPhan = $$("tr.kTableAltRow, tr.kTableRow", $("div.kGrid"));
+            const hocPhan = kgrid.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
             for (const row of hocPhan) {
                 const maHP = row.children[2].textContent.match(/([A-Z]{2})\d{4}/)[0];
                 row.children[2].innerHTML = `<a class="di-den-chi-tiet-hp" 
@@ -946,7 +846,6 @@
                     }&ver=2">
 					${row.children[2].textContent.trim()}
 				</a>`;
-                // console.log("maHP: ", maHP), "maIn: ", maHPtoMaIn[maHP];
             }
         }
         GM_addStyle(`
@@ -954,287 +853,157 @@
 				color: color:rgb(49, 49, 120);
 		}`);
     }
-    // Check hệ số điểm trong xem chi tiết học phần CDIO
-    function checkHeSoDiemCDIO() {
-        if (
-            !currentURL.includes(
-                "https://sv.haui.edu.vn/training/viewmodulescdiosv/xem-chi-tiet-hoc-phan.htm?id="
-            )
-        ) {
-            return;
-        }
-        const title = $("div.panel-heading");
-        const maHP = title.textContent.match(/([A-Z]{2})\d{4}/)[0];
-        const scoresType = $$("td.k-table-viewdetail > table > tbody:nth-child(2) > tr > td.tdTh1");
-        const heSoDiem = $$("td.k-table-viewdetail > table > tbody:nth-child(2) > tr > td.tdTh2");
+
+    function showScoreWeight() {
+        const title = document.querySelector("div.panel-heading");
+        const courseCode = title.textContent.match(/([A-Z]{2})\d{4}/)[0];
+        const scoresType = document.querySelectorAll(
+            "td.k-table-viewdetail > table > tbody:nth-child(2) > tr > td.tdTh1"
+        );
+        const scoreWeight = document.querySelectorAll(
+            "td.k-table-viewdetail > table > tbody:nth-child(2) > tr > td.tdTh2"
+        );
         const elementContainer = document.createElement("p");
         elementContainer.id = "he-so-diem";
         elementContainer.style.fontSize = "14px";
-        // Get hệ số điểm
-        let saveHeSo = {};
-        const isHPNotGPA = hpNotGPA.some((hp) => maHP.includes(hp));
-        if (!isHPNotGPA) {
-            saveHeSo = GM_getValue("heSoDiemCDIO", {});
+        // Lấy hệ số điểm
+        let saveScoreWeight = {};
+        const isnonCreditCourse = nonCreditCourse.some((hp) => courseCode.includes(hp));
+        if (!isnonCreditCourse) {
+            saveScoreWeight = GM_getValue("scoreWeight", {});
         }
         // reset hp hiện tại
-        saveHeSo[maHP] = "";
+        saveScoreWeight[courseCode] = "";
         let elementHtml = "";
         for (let i = 0; i < scoresType.length; i++) {
             const type = scoresType[i].textContent.trim();
-            const heSo = heSoDiem[i].textContent.trim();
+            const heSo = scoreWeight[i].textContent.trim();
             elementHtml += `${type}: ${heSo}<br>`;
-            saveHeSo[maHP] += heSo + " | ";
+            saveScoreWeight[courseCode] += heSo + " | ";
             // console.log(`${type}: ${heSo}`);
         }
         elementContainer.innerHTML = elementHtml;
         title.appendChild(elementContainer);
-        if (isHPNotGPA) return;
+        if (isnonCreditCourse) return;
         // Xử lý lại chuỗi
-        saveHeSo[maHP] = saveHeSo[maHP].slice(0, -3);
-        saveHeSo[maHP].replace(/\s+/g, "");
-        console.log("saveHeSo: ", saveHeSo[maHP]);
+        saveScoreWeight[courseCode] = saveScoreWeight[courseCode].slice(0, -3);
+        saveScoreWeight[courseCode].replace(/\s+/g, "");
+        console.log("score Weight: ", saveScoreWeight[courseCode]);
         // Lưu lại hệ số điểm
-        GM_setValue("heSoDiemCDIO", saveHeSo);
+        GM_setValue("scoreWeight", saveScoreWeight);
     }
-    // Show hệ số điểm trong xem điểm TX
-    function showHeSoDiemTX() {
-        if (
-            currentURL != "https://sv.haui.edu.vn/student/result/studyresults" &&
-            !currentURL.includes("https://sv.haui.edu.vn/student/result/viewstudyresult?code=")
-        ) {
-            return;
-        }
+
+    function calculateStudyScores() {
         let tx1Index = 4;
         let gk1Index = 14;
-        if (currentURL.includes("https://sv.haui.edu.vn/student/result/viewstudyresult?code=")) {
+        if (window.location.pathname == "/student/result/viewstudyresult") {
             tx1Index = 3;
             gk1Index = 9;
         }
 
-        const heSoDiem = GM_getValue("heSoDiemCDIO", {});
-        const hocPhan = $$("tr.kTableAltRow, tr.kTableRow", $("div.kGrid"));
-        for (const row of hocPhan) {
-            const maHP = row.children[2].textContent.match(/([A-Z]{2})\d{4}/)[0];
+        const scoreWeight = GM_getValue("scoreWeight", {});
+        const kgrid = document.querySelector("div.kGrid");
+        const courses = kgrid.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
+        for (const course of courses) {
+            const courseCode = course.children[2].textContent.match(/([A-Z]{2})\d{4}/)[0];
             // console.log("maHP: ", maHP);
-            if (heSoDiem[maHP] != "" && heSoDiem[maHP] != undefined) {
+            if (scoreWeight[courseCode] != "" && scoreWeight[courseCode] != undefined) {
                 // Hiển thị hệ số điểm vào cột cuối cùng
-                $("td:last-child", row).textContent = heSoDiem[maHP];
+                course.querySelector("td:last-child").textContent = scoreWeight[courseCode];
                 // Nếu có điểm giữ kỳ thì bỏ qua
-                if (row.children[gk1Index].textContent.trim() != "") continue;
+                if (course.children[gk1Index].textContent.trim() != "") continue;
                 // Nếu có điểm tx thì tính
-                if (row.children[tx1Index].textContent.trim() != "") {
-                    let heSoDiemRow = heSoDiem[maHP].split(" | ");
+                if (course.children[tx1Index].textContent.trim() != "") {
+                    let courseScoreWeight = scoreWeight[courseCode].split(" | ");
                     let tongDiem = 0;
-                    for (let i = 0; i < heSoDiemRow.length; i++) {
+                    for (let i = 0; i < courseScoreWeight.length; i++) {
                         tongDiem +=
-                            (Number(row.children[tx1Index + i].textContent.trim()) *
-                                Number(heSoDiemRow[i])) /
+                            (Number(course.children[tx1Index + i].textContent.trim()) *
+                                Number(courseScoreWeight[i])) /
                             100;
                         // console.log(row.children[tx1Index + i].textContent.trim());
                     }
-                    row.children[tx1Index + 5].innerHTML = `Tx*Hs:<br>${tongDiem.toFixed(2)}`;
-                    row.children[tx1Index + 5].style.backgroundColor = "rgb(255, 249, 227)";
+                    course.querySelector("td:last-child").innerHTML += `</br>🎯 ${tongDiem.toFixed(2)}`;
+                    course.querySelector("td:last-child").style.backgroundColor = "rgb(255, 249, 227)";
                 }
             }
         }
     }
-    // Note Chi tiết học phần
-    function showNoteChiTietHocPhan() {
-        if (
-            currentURL != "https://sv.haui.edu.vn/training/programmodulessemester" &&
-            currentURL != "https://sv.haui.edu.vn/training/viewcourseindustry"
-        ) {
-            return;
-        }
-        let noteHP = GM_getValue("noteHP", {});
 
-        const parent = $("table.table.table-bordered.table-striped");
-        let hp;
-        if (currentURL == "https://sv.haui.edu.vn/training/viewcourseindustry")
-            hp = $$("tbody > tr.kTableRow > td:nth-child(2)", parent);
-        else hp = $$("tbody > tr > td:nth-child(2)", parent);
+    //===============================================================
 
-        const regexMaHP = /([A-Z]{2})\d{4}/;
-        for (const maHPBox of hp) {
-            const maHP = maHPBox.textContent.trim();
-            if (!regexMaHP.test(maHP)) continue;
+    const nonCreditCourse = [
+        "FL609", // Tiếng Anh cơ bản FL609x
+        "PE60", // Giáo dục thể chất PE60xx
+        "DC600", // Giáo dục quốc phòng DC600x
+        "IC6005", // Công nghệ thông tin cơ bản
+        "IC6007", // Công nghệ thông tin nâng cao
+    ];
 
-            const label = noteHP[maHP] ? `${maHP}🔖` : maHP;
-            maHPBox.innerHTML = `<a class="note-hp" href="javascript:void(0);">${label}</a>`;
+    function run() {
+        console.log("sv.HaUI loaded: " + window.location.href);
 
-            $("a.note-hp", maHPBox).addEventListener("click", function (event) {
-                changeNoteHP(this);
-            });
-        }
-        GM_addStyle(`
-			a.note-hp {
-				color: rgb(49, 49, 120);
-			}
-			a.note-hp:hover {
-				background-color: rgb(208, 240, 219)
-			}	
-		`);
+        runOnUrl(changeTitle, "");
+        runOnUrl(changeHomePagePath, "");
+
+        runOnUrl(autoSurvey, /\/survey\//);
+
+        runOnUrl(customizeHomePage, "/home");
+
+        runOnUrl(sortExamSchedule, "/student/schedulefees/transactionmodules");
+        runOnUrl(highlightExamSchedule, "/student/schedulefees/transactionmodules");
+
+        runOnUrl(showExamPlan, "/student/schedulefees/examplant");
+
+        runOnUrl(
+            highlightExamScores,
+            "/student/result/examresult",
+            "/student/result/viewexamresult"
+        );
+        runOnUrl(
+            highlightStudyScores,
+            "/student/result/studyresults",
+            "/student/result/viewstudyresult"
+        );
+
+        runOnUrl(
+            toggleStudyAndExam,
+            "/student/result/examresult",
+            "/student/result/viewexamresult",
+            "/student/result/viewexamresultclass",
+            "/student/result/studyresults",
+            "/student/result/viewstudyresult",
+            "/student/result/viewstudyresultclass"
+        );
+
+        runOnUrl(
+            toggleCourseInfo,
+            "/training/viewmodulescdiosv/xem-chi-tiet-hoc-phan.htm",
+            "/training/viewcourseindustry2/xem-chi-tiet-hoc-phan.htm"
+        );
+
+        runOnUrl(
+            gotoCourseInfo,
+            "/student/result/examresult",
+            "/student/result/viewexamresult",
+            "/student/result/studyresults",
+            "/student/result/viewstudyresult"
+        );
+
+        runOnUrl(showScoreWeight, "/training/viewmodulescdiosv/xem-chi-tiet-hoc-phan.htm");
+        runOnUrl(
+            calculateStudyScores,
+            "/student/result/studyresults",
+            "/student/result/viewstudyresult"
+        );
     }
-    window.changeNoteHP = function (element) {
-        // console.log("changeNoteHP: ", element);
-        let noteHP = GM_getValue("noteHP", {});
-        const maHP = element.textContent.match(/([A-Z]{2})\d{4}/)[0];
 
-        let notePrompt = prompt(`Nhập ghi chú cho học phần ${maHP}:`, noteHP[maHP] || "");
-        console.log("notePrompt: ", notePrompt);
-
-        if (notePrompt === "") {
-            delete noteHP[maHP];
-        } else if (notePrompt !== null) {
-            noteHP[maHP] = notePrompt;
-        }
-
-        GM_setValue("noteHP", noteHP);
-
-        const label = noteHP[maHP] ? `${maHP}🔖` : maHP;
-        element.textContent = `${label}`;
-    };
-    // Hiển thị ghi chú trong trang xem điểm
-    function showNoteHPStudyExamResult() {
-        if (
-            currentURL != "https://sv.haui.edu.vn/student/result/examresult" &&
-            currentURL != "https://sv.haui.edu.vn/student/result/studyresults" &&
-            !currentURL.includes("https://sv.haui.edu.vn/student/result/viewexamresult?code=") &&
-            !currentURL.includes("https://sv.haui.edu.vn/student/result/viewstudyresult?code=")
-        ) {
-            return;
-        }
-        let maHPIndex = 1;
-        if (
-            currentURL.includes("https://sv.haui.edu.vn/student/result/studyresults") ||
-            currentURL.includes("https://sv.haui.edu.vn/student/result/viewstudyresult?code=")
-        ) {
-            maHPIndex = 2;
-        }
-
-        let noteHP = GM_getValue("noteHP", {});
-
-        const hocPhan = $$("tr.kTableAltRow, tr.kTableRow", $("div.kGrid"));
-        let dem = 0;
-        for (const row of hocPhan) {
-            const maHP = row.children[maHPIndex].textContent.match(/([A-Z]{2})\d{4}/)[0];
-            dem++;
-
-            const label = noteHP[maHP] ? `${dem}🔖` : dem;
-            row.children[0].innerHTML = `<a class="note-hp" href="javascript:void(0);"
-				>${label}</a>`;
-
-            $("a.note-hp", row).addEventListener("click", function (event) {
-                changeNoteHPSEResult(row, maHPIndex);
-            });
-        }
-        GM_addStyle(`
-			a.note-hp {
-				color: rgb(49, 49, 120);
-			}
-			a.note-hp:hover {
-				background-color: rgb(208, 240, 219)
-			}	
-		`);
-    }
-    window.changeNoteHPSEResult = function (element, maHPIndex) {
-        // console.log("changeNoteHP: ", element);
-        let noteHP = GM_getValue("noteHP", {});
-        const maHP = element.children[maHPIndex].textContent.match(/([A-Z]{2})\d{4}/)[0];
-
-        let notePrompt = prompt(`Nhập ghi chú cho học phần ${maHP}:`, noteHP[maHP] || "");
-
-        if (notePrompt === "") {
-            delete noteHP[maHP];
-        } else if (notePrompt !== null) {
-            noteHP[maHP] = notePrompt;
-        }
-
-        GM_setValue("noteHP", noteHP);
-        const noteElement = $("a.note-hp", element);
-        const rowIndex = noteElement.textContent.trim().match(/\d+/)[0];
-        const label = noteHP[maHP] ? `${rowIndex}🔖` : rowIndex;
-        noteElement.textContent = `${label}`;
-    };
-    // ======================================================================================
-    function autoSurvey() {
-        if (!currentURL.includes("https://sv.haui.edu.vn/survey/view?")) {
-            return;
-        }
-        setTimeout(() => {
-            const table = $("table.card-body.table-responsive.table.table-bordered.table-striped");
-            const scores = $$("thead > tr:nth-child(2) > td", table);
-            for (const score of scores) {
-                const scoreId = score.textContent.trim().match(/\d+/)[0];
-                const inputSelectScore = document.createElement("input");
-                inputSelectScore.type = "radio";
-                inputSelectScore.name = "select_score";
-                inputSelectScore.value = scoreId;
-                score.appendChild(inputSelectScore);
-
-                inputSelectScore.addEventListener("change", function () {
-                    const scoreElements = $$(`td[title="${scoreId} điểm"] > input`, table);
-                    for (const scoreElement of scoreElements) {
-                        scoreElement.checked = true;
-                    }
-                });
-            }
-        }, 1000);
-    }
-    // ======================================================================================
-    const changeHeaderInterval = controlInterval(changeHeader, 5000);
-    const showInfoAfterEditScoreInterval = controlInterval(showInfoAfterEditScore, 1000);
-    setTimeout(() => {
-        // Run
-        console.log("sv.HaUI loaded: " + currentURL);
-        // Thay đổi tiêu đề trang
-        changeHeaderInterval.start(5000, true);
-        // Sửa điểm
-        showInfoAfterEditScoreInterval.start(1000, false);
-
-        // Trang chủ tuỳ biến
-        customizeHomePage();
-        // Tạo panel lịch thi trong trang chủ
-        createExamSchedulePanelInHomePage();
-        // Tạo panel kế hoạch thi trong trang chủ
-        createExamPlanPanelInHomePage();
-
-        // Tô điểm học phần
-        highlightGradeScores();
-        // Thêm thông tin vào trang kết quả học phần
-        addSomeInfoInExamresult();
-
-        // Tô điểm TX
-        highlightStudyresultsScores();
-        // Hiển thị hệ số điểm trong xem điểm TX
-        showHeSoDiemTX();
-
-        // Chuyển đổi giữa kết quả thi và kết quả học tập
-        toggleExamresultAndStudyresults();
-        // Di chuyển sang trang chi tiết học phần
-        moveToChiTietHocPhan();
-        // Hiển thị ghi chú trong kết quả thi và kết quả học tập
-        showNoteHPStudyExamResult();
-
-        // Sắp xếp lịch thi
-        sortExamSchedule();
-        // Tô lịch thi
-        highlightExamSchedule();
-
-        // Hiển thị kế hoạch thi
-        showExamPlan();
-
-        // Kiểm tra tổng số tín chỉ
-        checkTotalCredits();
-        // Ghi chú chi tiết học phần
-        showNoteChiTietHocPhan();
-
-        // Chuyển đổi giữa chi tiết học phần và chi tiết học phần CDIO
-        toggleChiTietHocPhan();
-        // Kiểm tra hệ số điểm trong chi tiết học phần CDIO
-        checkHeSoDiemCDIO();
-
-        // Khảo sát, đánh giá giảng viên
-        autoSurvey();
-    }, 500);
+    waitForSelector("#frmMain", 5000, 100)
+        .then((el) => {
+            run();
+        })
+        .catch((err) => {
+            console.error("Lỗi:", err);
+        });
+    // ================================================================
 })();
