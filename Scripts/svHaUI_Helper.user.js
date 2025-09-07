@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      1.0.4
+// @version      1.0.5
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -759,6 +759,35 @@
         }
     }
 
+    function toggleStudyAndExam() {
+        const title = document.querySelector("div.panel-heading");
+
+        const toggleLinkContainer = document.createElement("p");
+        toggleLinkContainer.id = "toggle-link-container";
+        const toggleLink = document.createElement("a");
+        toggleLink.style.color = "gray";
+        toggleLink.style.fontSize = "12px";
+        toggleLinkContainer.appendChild(toggleLink);
+
+        if (window.location.pathname === "/student/result/studyresults") {
+			toggleLink.href = "https://sv.haui.edu.vn/student/result/examresult";
+			toggleLink.textContent = "➡️ Kết quả thi";
+        } else if (window.location.pathname === "/student/result/examresult") {
+			toggleLink.href = "https://sv.haui.edu.vn/student/result/studyresults";
+			toggleLink.textContent = "➡️ Kết quả học tập";
+        } else {
+            if (window.location.pathname.includes("exam")) {
+                toggleLink.href = window.location.href.replace("exam", "study");
+                toggleLink.textContent = "➡️ Kết quả học tập";
+            } else {
+                toggleLink.href = window.location.href.replace("study", "exam");
+                toggleLink.textContent = "➡️ Kết quả thi";
+            }
+        }
+
+        title.appendChild(toggleLinkContainer);
+    }
+
     //===============================================================
 
     const nonCreditCourse = [
@@ -795,7 +824,15 @@
             "/student/result/viewstudyresult"
         );
 
-        
+        runOnUrl(
+            toggleStudyAndExam,
+            "/student/result/examresult",
+            "/student/result/viewexamresult",
+            "/student/result/viewexamresultclass",
+            "/student/result/studyresults",
+            "/student/result/viewstudyresult",
+            "/student/result/viewstudyresultclass"
+        );
     }
 
     waitForSelector("#frmMain", 5000, 100)
