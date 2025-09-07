@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      1.0.7
+// @version      1.0.8
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -770,11 +770,11 @@
         toggleLinkContainer.appendChild(toggleLink);
 
         if (window.location.pathname === "/student/result/studyresults") {
-			toggleLink.href = "https://sv.haui.edu.vn/student/result/examresult";
-			toggleLink.textContent = "➡️ Kết quả thi";
+            toggleLink.href = "https://sv.haui.edu.vn/student/result/examresult";
+            toggleLink.textContent = "➡️ Kết quả thi";
         } else if (window.location.pathname === "/student/result/examresult") {
-			toggleLink.href = "https://sv.haui.edu.vn/student/result/studyresults";
-			toggleLink.textContent = "➡️ Kết quả học tập";
+            toggleLink.href = "https://sv.haui.edu.vn/student/result/studyresults";
+            toggleLink.textContent = "➡️ Kết quả học tập";
         } else {
             if (window.location.pathname.includes("exam")) {
                 toggleLink.href = window.location.href.replace("exam", "study");
@@ -788,7 +788,7 @@
         title.appendChild(toggleLinkContainer);
     }
 
-	function toggleCourseInfo() {
+    function toggleCourseInfo() {
         const title = document.querySelector("div.panel-heading");
 
         const toggleLinkContainer = document.createElement("p");
@@ -799,14 +799,59 @@
         toggleLinkContainer.appendChild(toggleLink);
 
         if (window.location.pathname === "/training/viewmodulescdiosv/xem-chi-tiet-hoc-phan.htm") {
-			toggleLink.href = window.location.href.replace("viewmodulescdiosv", "viewcourseindustry2");
-			toggleLink.textContent = "➡️ Chi tiết học phần theo ngành";
-        } else if (window.location.pathname === "/training/viewcourseindustry2/xem-chi-tiet-hoc-phan.htm") {
-			toggleLink.href = window.location.href.replace("viewcourseindustry2", "viewmodulescdiosv");
-			toggleLink.textContent = "➡️ Chi tiết học phần theo CDIO";
+            toggleLink.href = window.location.href.replace(
+                "viewmodulescdiosv",
+                "viewcourseindustry2"
+            );
+            toggleLink.textContent = "➡️ Chi tiết học phần theo ngành";
+        } else if (
+            window.location.pathname === "/training/viewcourseindustry2/xem-chi-tiet-hoc-phan.htm"
+        ) {
+            toggleLink.href = window.location.href.replace(
+                "viewcourseindustry2",
+                "viewmodulescdiosv"
+            );
+            toggleLink.textContent = "➡️ Chi tiết học phần theo CDIO";
         }
 
         title.appendChild(toggleLinkContainer);
+    }
+
+    function gotoCourseInfo() {
+        const kgrid = document.querySelector("div.kGrid");
+        if (window.location.pathname.includes("exam")) {
+            // Trang xem điểm học phần
+            let maHPtoMaIn = {};
+            const hocPhan = kgrid.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
+            for (const row of hocPhan) {
+                const maHP = row.children[1].textContent.trim();
+                const maIN = row.children[2].textContent.match(/\d+/)[0];
+                maHPtoMaIn[maHP] = maIN;
+                row.children[1].innerHTML = `<a class="di-den-chi-tiet-hp" 
+					href="https://sv.haui.edu.vn/training/viewmodulescdiosv/xem-chi-tiet-hoc-phan.htm?id=${maIN}&ver=2">
+						${maHP}
+				</a>`;
+            }
+            GM_setValue("maHPtoMaIn", maHPtoMaIn);
+        } else {
+            // Trang xem điểm TX
+            const maHPtoMaIn = GM_getValue("maHPtoMaIn");
+            console.log("maHPtoMaIn: ", maHPtoMaIn);
+            const hocPhan = kgrid.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
+            for (const row of hocPhan) {
+                const maHP = row.children[2].textContent.match(/([A-Z]{2})\d{4}/)[0];
+                row.children[2].innerHTML = `<a class="di-den-chi-tiet-hp" 
+					href="https://sv.haui.edu.vn/training/viewmodulescdiosv/xem-chi-tiet-hoc-phan.htm?id=${
+                        maHPtoMaIn[maHP]
+                    }&ver=2">
+					${row.children[2].textContent.trim()}
+				</a>`;
+            }
+        }
+        GM_addStyle(`
+			.di-den-chi-tiet-hp {
+				color: color:rgb(49, 49, 120);
+		}`);
     }
 
     //===============================================================
@@ -855,11 +900,19 @@
             "/student/result/viewstudyresultclass"
         );
 
-		runOnUrl(
-			toggleCourseInfo,
-			"/training/viewmodulescdiosv/xem-chi-tiet-hoc-phan.htm",
-			"/training/viewcourseindustry2/xem-chi-tiet-hoc-phan.htm"
-		);
+        runOnUrl(
+            toggleCourseInfo,
+            "/training/viewmodulescdiosv/xem-chi-tiet-hoc-phan.htm",
+            "/training/viewcourseindustry2/xem-chi-tiet-hoc-phan.htm"
+        );
+
+        runOnUrl(
+            gotoCourseInfo,
+            "/student/result/examresult",
+            "/student/result/viewexamresult",
+            "/student/result/studyresults",
+            "/student/result/viewstudyresult"
+        );
     }
 
     waitForSelector("#frmMain", 5000, 100)
