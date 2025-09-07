@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      1.0.9
+// @version      1.1.0
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -923,11 +923,136 @@
                             100;
                         // console.log(row.children[tx1Index + i].textContent.trim());
                     }
-                    course.querySelector("td:last-child").innerHTML += `</br>🎯 ${tongDiem.toFixed(2)}`;
-                    course.querySelector("td:last-child").style.backgroundColor = "rgb(255, 249, 227)";
+                    course.querySelector("td:last-child").innerHTML += `</br>🎯 ${tongDiem.toFixed(
+                        2
+                    )}`;
+                    course.querySelector("td:last-child").style.backgroundColor =
+                        "rgb(255, 249, 227)";
                 }
             }
         }
+    }
+
+    function createCSVCalendar() {
+        const exportBtnContainer = document.querySelector(
+            "div.boxpanel-mc > .form-horizontal > .form-group:nth-child(3) > div.col-sm-4"
+        );
+        const exportBtn = document.createElement("input");
+        exportBtn.type = "button";
+        exportBtn.className = "btn btn-primary btn-space hover";
+        exportBtn.value = "Xuất file CSV";
+        exportBtnContainer.appendChild(exportBtn);
+
+        exportBtn.addEventListener("click", async () => {
+            const calendarTable = document.querySelector(".panel-body > table > tbody");
+            const calendarRows = calendarTable.querySelectorAll("tr");
+            let csvContent = "Subject,Start Date,Start Time,End Time,Description,Location\n";
+            for (const row of calendarRows) {
+                let date = row.children[2].textContent.trim();
+                const dateParts = date.split("/");
+                if (dateParts.length !== 3) continue;
+                const formattedDate = `${dateParts[1].padStart(2, "0")}/${dateParts[0].padStart(
+                    2,
+                    "0"
+                )}/${dateParts[2]}`;
+
+                for (let i = 3; i <= 5; i++) {
+                    let timesOfDay = row.children[i].textContent;
+                    if (!timesOfDay) continue;
+
+                    const courses = timesOfDay.split(/\n?\d+\.\s/).filter(Boolean);
+                    if (courses.length === 0) continue;
+                    for (const courseData of courses) {
+                        // Subject
+                        const subject = courseData.match(/-\s*(.+?)\s*\(Lớp:/)?.[1];
+                        if (!subject) continue;
+
+                        const startPeriodToTime = {
+                            1: "07:00",
+                            2: "07:50",
+                            3: "08:50",
+                            4: "09:50",
+                            5: "10:40",
+                            6: "11:30",
+                            7: "12:30",
+                            8: "13:20",
+                            9: "14:20",
+                            10: "15:10",
+                            11: "16:10",
+                            12: "17:00",
+                            13: "17:30",
+                            14: "18:20",
+                            15: "19:10",
+                            16: "20:10",
+                        };
+
+                        const endPeriodToTime = {
+                            1: "07:50",
+                            2: "08:40",
+                            3: "09:40",
+                            4: "10:40",
+                            5: "11:30",
+                            6: "12:20",
+                            7: "13:20",
+                            8: "14:10",
+                            9: "15:10",
+                            10: "16:00",
+                            11: "17:00",
+                            12: "17:50",
+                            13: "18:20",
+                            14: "19:10",
+                            15: "20:10",
+                            16: "21:00",
+                        };
+
+                        const period = courseData.match(/\((\d+).+?(\d+)\)/);
+
+                        const startPeriod = parseInt(period[1]);
+                        const endPeriod = parseInt(period[2]);
+                        let startTime = startPeriodToTime[startPeriod];
+                        let endTime = endPeriodToTime[endPeriod];
+
+                        // Description
+                        const classCode = courseData.match(/\(Lớp:\s(.+?)\)/)?.[1];
+                        const GV = courseData.match(/GV:\s(.+?)\(/)?.[1];
+                        const sdt = courseData.match(/\s\((\d{10})\s/)?.[1];
+
+                        let description = `${GV} ${sdt} ${classCode}`;
+
+                        // Location
+                        const location = courseData.match(
+                            /\((\d{1,4}\s*\-\s*\w+?)\s*\-\s*.+\-.+\)/
+                        )?.[1];
+                        // console.log(location);
+                        // room.replace(" - Cơ sở 1 - Khu A", "").trim();
+                        // room.replace(" - Cơ sở 2 - Khu B", "").trim();
+                        // room.replace(" - Cơ sở 3 - Khu C", "").trim();
+
+                        let courseData1 = [
+                            subject || "",
+                            formattedDate || "",
+                            startTime || "",
+                            endTime || "",
+                            description || "",
+                            location || "",
+                        ];
+
+                        console.log(courseData1);
+
+                        csvContent += courseData1.join(",") + "\n";
+                    }
+                }
+            }
+            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", "Lich_hoc.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        });
     }
 
     //===============================================================
@@ -996,6 +1121,8 @@
             "/student/result/studyresults",
             "/student/result/viewstudyresult"
         );
+
+        runOnUrl(createCSVCalendar, "/timestable/calendarcl");
     }
 
     waitForSelector("#frmMain", 5000, 100)
