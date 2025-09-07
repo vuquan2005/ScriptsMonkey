@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      1.0.6
+// @version      1.0.7
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -788,6 +788,27 @@
         title.appendChild(toggleLinkContainer);
     }
 
+	function toggleCourseInfo() {
+        const title = document.querySelector("div.panel-heading");
+
+        const toggleLinkContainer = document.createElement("p");
+        toggleLinkContainer.id = "toggle-link-container";
+        const toggleLink = document.createElement("a");
+        toggleLink.style.color = "gray";
+        toggleLink.style.fontSize = "12px";
+        toggleLinkContainer.appendChild(toggleLink);
+
+        if (window.location.pathname === "/training/viewmodulescdiosv/xem-chi-tiet-hoc-phan.htm") {
+			toggleLink.href = window.location.href.replace("viewmodulescdiosv", "viewcourseindustry2");
+			toggleLink.textContent = "➡️ Chi tiết học phần theo ngành";
+        } else if (window.location.pathname === "/training/viewcourseindustry2/xem-chi-tiet-hoc-phan.htm") {
+			toggleLink.href = window.location.href.replace("viewcourseindustry2", "viewmodulescdiosv");
+			toggleLink.textContent = "➡️ Chi tiết học phần theo CDIO";
+        }
+
+        title.appendChild(toggleLinkContainer);
+    }
+
     //===============================================================
 
     const nonCreditCourse = [
@@ -833,6 +854,12 @@
             "/student/result/viewstudyresult",
             "/student/result/viewstudyresultclass"
         );
+
+		runOnUrl(
+			toggleCourseInfo,
+			"/training/viewmodulescdiosv/xem-chi-tiet-hoc-phan.htm",
+			"/training/viewcourseindustry2/xem-chi-tiet-hoc-phan.htm"
+		);
     }
 
     waitForSelector("#frmMain", 5000, 100)
