@@ -604,6 +604,7 @@
             examScheduleContainer.appendChild(examSchedule[i]);
         }
     }
+
     function highlightExamSchedule() {
         const examSchedule = document.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
         for (const examElement of examSchedule) {
@@ -618,6 +619,74 @@
                 // Hiển thị khoảng cách ngày
                 examElement.children[2].innerHTML += `<br>(${diffTime.toString()})`;
             }
+        }
+    }
+
+    function getCourseCode(scope = document) {
+        const listCourseCodeElement = scope.querySelectorAll(
+            "div:nth-child(3) > div > div > table > tbody > tr > td:nth-child(2) > a"
+        );
+        let listHPCode = [];
+        for (const element of listCourseCodeElement) {
+            const hpCode = element.textContent.trim();
+            if (hpCode) {
+                listHPCode.push(hpCode);
+            }
+        }
+        listHPCode.reverse();
+        return listHPCode;
+    }
+
+    async function getExamPlan(courseCode) {
+        const url = `https://sv.haui.edu.vn/student/schedulefees/examplant?code=${courseCode}`;
+        try {
+            const dom = await fetchDOM(url);
+            return dom.querySelector("#ctl02_ctl00_viewResult > div > div > table > tbody > tr");
+        } catch (err) {
+            console.error(`Lỗi khi lấy lịch thi cho ${getHPCode}: `, err);
+        }
+    }
+
+    async function showExamPlan() {
+        let listCourseCode = getCourseCode(document);
+        // Lấy 13 học phần gần nhất
+        listCourseCode = listCourseCode.slice(0, 12);
+        const examScheduleContainer = document.querySelector(
+            "#ctl02_ctl00_viewResult > div > div > table > tbody"
+        );
+        let i = 0;
+        for (const courseCode of listCourseCode) {
+            let examPlan = await getExamPlan(courseCode);
+            // console.log(courseCode, " : " , examPlan);
+            // Nếu không có lịch
+            if (examPlan == null) continue;
+            // Hiển thị kế hoạch thi
+
+            const examDate = examPlan.children[3].textContent.trim();
+            const examHour = examPlan.children[4].textContent.trim();
+            const examTime = `${examHour} ${examDate}`;
+            // Kiểm tra thời gian thi
+            const diffTime = getTimeDifference(examTime);
+
+            if ((diffTime.direction === -1 && diffTime.days <= 20) || diffTime.direction === 1) {
+                i++;
+                const indexItem = examPlan.children[0];
+
+                indexItem.textContent = `${i}`;
+
+                if (diffTime.direction === 1) {
+                    // Nếu chưa đến ngày thi thì tô màu vàng
+                    examPlan.style.backgroundColor = "rgb(248,226,135)";
+                    // Hiển thị khoảng cách ngày
+                    examPlan.children[3].innerHTML += `<br>(${diffTime.toString()})`;
+                } else {
+                    // Hiển thị khoảng cách ngày
+                    examPlan.children[3].innerHTML += `<br>(${diffTime.toString()})`;
+                }
+
+                examScheduleContainer.appendChild(examPlan);
+            }
+            await delay(10);
         }
     }
 
@@ -690,74 +759,6 @@
         }
     }
 
-    function getCourseCode(scope = document) {
-        const listCourseCodeElement = scope.querySelectorAll(
-            "div:nth-child(3) > div > div > table > tbody > tr > td:nth-child(2) > a"
-        );
-        let listHPCode = [];
-        for (const element of listCourseCodeElement) {
-            const hpCode = element.textContent.trim();
-            if (hpCode) {
-                listHPCode.push(hpCode);
-            }
-        }
-        listHPCode.reverse();
-        return listHPCode;
-    }
-
-    async function getExamPlan(courseCode) {
-        const url = `https://sv.haui.edu.vn/student/schedulefees/examplant?code=${courseCode}`;
-        try {
-            const dom = await fetchDOM(url);
-            return dom.querySelector("#ctl02_ctl00_viewResult > div > div > table > tbody > tr");
-        } catch (err) {
-            console.error(`Lỗi khi lấy lịch thi cho ${getHPCode}: `, err);
-        }
-    }
-
-    async function showExamPlan() {
-        let listCourseCode = getCourseCode(document);
-        // Lấy 13 học phần gần nhất
-        listCourseCode = listCourseCode.slice(0, 12);
-        const examScheduleContainer = document.querySelector(
-            "#ctl02_ctl00_viewResult > div > div > table > tbody"
-        );
-        let i = 0;
-        for (const courseCode of listCourseCode) {
-            let examPlan = await getExamPlan(courseCode);
-            // console.log(courseCode, " : " , examPlan);
-            // Nếu không có lịch
-            if (examPlan == null) continue;
-            // Hiển thị kế hoạch thi
-
-            const examDate = examPlan.children[3].textContent.trim();
-            const examHour = examPlan.children[4].textContent.trim();
-            const examTime = `${examHour} ${examDate}`;
-            // Kiểm tra thời gian thi
-            const diffTime = getTimeDifference(examTime);
-
-            if ((diffTime.direction === -1 && diffTime.days <= 20) || diffTime.direction === 1) {
-                i++;
-                const indexItem = examPlan.children[0];
-
-                indexItem.textContent = `${i}`;
-
-                if (diffTime.direction === 1) {
-                    // Nếu chưa đến ngày thi thì tô màu vàng
-                    examPlan.style.backgroundColor = "rgb(248,226,135)";
-                    // Hiển thị khoảng cách ngày
-                    examPlan.children[3].innerHTML += `<br>(${diffTime.toString()})`;
-                } else {
-                    // Hiển thị khoảng cách ngày
-                    examPlan.children[3].innerHTML += `<br>(${diffTime.toString()})`;
-                }
-
-                examScheduleContainer.appendChild(examPlan);
-            }
-            await delay(10);
-        }
-    }
-
     //===============================================================
 
     const nonCreditCourse = [
@@ -781,6 +782,8 @@
         runOnUrl(sortExamSchedule, "/student/schedulefees/transactionmodules");
         runOnUrl(highlightExamSchedule, "/student/schedulefees/transactionmodules");
 
+		runOnUrl(showExamPlan, "/student/schedulefees/examplant");
+
         runOnUrl(
             highlightExamResult,
             "/student/result/examresult",
@@ -792,7 +795,7 @@
             "/student/result/viewstudyresult"
         );
 
-        runOnUrl(showExamPlan, "/student/schedulefees/examplant");
+        
     }
 
     waitForSelector("#frmMain", 5000, 100)
