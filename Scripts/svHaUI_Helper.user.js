@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      1.0.8
+// @version      1.0.9
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -854,6 +854,82 @@
 		}`);
     }
 
+    function showScoreWeight() {
+        const title = document.querySelector("div.panel-heading");
+        const courseCode = title.textContent.match(/([A-Z]{2})\d{4}/)[0];
+        const scoresType = document.querySelectorAll(
+            "td.k-table-viewdetail > table > tbody:nth-child(2) > tr > td.tdTh1"
+        );
+        const scoreWeight = document.querySelectorAll(
+            "td.k-table-viewdetail > table > tbody:nth-child(2) > tr > td.tdTh2"
+        );
+        const elementContainer = document.createElement("p");
+        elementContainer.id = "he-so-diem";
+        elementContainer.style.fontSize = "14px";
+        // Lấy hệ số điểm
+        let saveScoreWeight = {};
+        const isnonCreditCourse = nonCreditCourse.some((hp) => courseCode.includes(hp));
+        if (!isnonCreditCourse) {
+            saveScoreWeight = GM_getValue("scoreWeight", {});
+        }
+        // reset hp hiện tại
+        saveScoreWeight[courseCode] = "";
+        let elementHtml = "";
+        for (let i = 0; i < scoresType.length; i++) {
+            const type = scoresType[i].textContent.trim();
+            const heSo = scoreWeight[i].textContent.trim();
+            elementHtml += `${type}: ${heSo}<br>`;
+            saveScoreWeight[courseCode] += heSo + " | ";
+            // console.log(`${type}: ${heSo}`);
+        }
+        elementContainer.innerHTML = elementHtml;
+        title.appendChild(elementContainer);
+        if (isnonCreditCourse) return;
+        // Xử lý lại chuỗi
+        saveScoreWeight[courseCode] = saveScoreWeight[courseCode].slice(0, -3);
+        saveScoreWeight[courseCode].replace(/\s+/g, "");
+        console.log("score Weight: ", saveScoreWeight[courseCode]);
+        // Lưu lại hệ số điểm
+        GM_setValue("scoreWeight", saveScoreWeight);
+    }
+
+    function calculateStudyScores() {
+        let tx1Index = 4;
+        let gk1Index = 14;
+        if (window.location.pathname == "/student/result/viewstudyresult") {
+            tx1Index = 3;
+            gk1Index = 9;
+        }
+
+        const scoreWeight = GM_getValue("scoreWeight", {});
+        const kgrid = document.querySelector("div.kGrid");
+        const courses = kgrid.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
+        for (const course of courses) {
+            const courseCode = course.children[2].textContent.match(/([A-Z]{2})\d{4}/)[0];
+            // console.log("maHP: ", maHP);
+            if (scoreWeight[courseCode] != "" && scoreWeight[courseCode] != undefined) {
+                // Hiển thị hệ số điểm vào cột cuối cùng
+                course.querySelector("td:last-child").textContent = scoreWeight[courseCode];
+                // Nếu có điểm giữ kỳ thì bỏ qua
+                if (course.children[gk1Index].textContent.trim() != "") continue;
+                // Nếu có điểm tx thì tính
+                if (course.children[tx1Index].textContent.trim() != "") {
+                    let courseScoreWeight = scoreWeight[courseCode].split(" | ");
+                    let tongDiem = 0;
+                    for (let i = 0; i < courseScoreWeight.length; i++) {
+                        tongDiem +=
+                            (Number(course.children[tx1Index + i].textContent.trim()) *
+                                Number(courseScoreWeight[i])) /
+                            100;
+                        // console.log(row.children[tx1Index + i].textContent.trim());
+                    }
+                    course.querySelector("td:last-child").innerHTML += `</br>🎯 ${tongDiem.toFixed(2)}`;
+                    course.querySelector("td:last-child").style.backgroundColor = "rgb(255, 249, 227)";
+                }
+            }
+        }
+    }
+
     //===============================================================
 
     const nonCreditCourse = [
@@ -910,6 +986,13 @@
             gotoCourseInfo,
             "/student/result/examresult",
             "/student/result/viewexamresult",
+            "/student/result/studyresults",
+            "/student/result/viewstudyresult"
+        );
+
+        runOnUrl(showScoreWeight, "/training/viewmodulescdiosv/xem-chi-tiet-hoc-phan.htm");
+        runOnUrl(
+            calculateStudyScores,
             "/student/result/studyresults",
             "/student/result/viewstudyresult"
         );
