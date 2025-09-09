@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.0.0
+// @version      2.0.1
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -1261,9 +1261,6 @@
         else if (editedGPA >= 2.0)
             document.getElementById("edited-study").textContent = "Trung bình";
         else if (editedGPA < 2.0) document.getElementById("edited-study").textContent = "Yếu";
-    }
-
-        }
     }
 
     //===============================================================
