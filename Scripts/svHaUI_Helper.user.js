@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.1.0
+// @version      2.1.1
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -1229,36 +1229,7 @@
     // Hiển thị GPA đã chỉnh sửa
     function showGPAEdited() {}
 
-    // Xử lý khi ô điểm được chỉnh sửa
-    function onScoreCellUpdated() {
-        highlightExamScores();
-        const editedGPA = calculateGPA();
-
-        document.getElementById("edited-gpa").textContent = editedGPA.toFixed(3);
-
-        if (editedGPA >= 3.6) document.getElementById("edited-study").textContent = "Xuất sắc";
-        else if (editedGPA >= 3.2) document.getElementById("edited-study").textContent = "Giỏi";
-        else if (editedGPA >= 2.5) document.getElementById("edited-study").textContent = "Khá";
-        else if (editedGPA >= 2.0)
-            document.getElementById("edited-study").textContent = "Trung bình";
-        else if (editedGPA < 2.0) document.getElementById("edited-study").textContent = "Yếu";
-
-        const currentCredits = calculateCredits();
-        const currentGPA = calculateGPA();
-		const totalCredits = document.getElementById("total-credits").textContent.trim();
-		console.log("totalCredits: ", totalCredits, "currentCredits: ", currentCredits, "currentGPA: ", currentGPA);
-        const remainingCredits = totalCredits - currentCredits;
-        const scoresToGPA25 = (2.5 * totalCredits - currentGPA * currentCredits) / remainingCredits;
-        const scoresToGPA32 = (3.2 * totalCredits - currentGPA * currentCredits) / remainingCredits;
-        const scoresToGPA36 = (3.6 * totalCredits - currentGPA * currentCredits) / remainingCredits;
-
-		document.getElementById("current-credits").textContent = currentCredits;
-		document.getElementById("remaining-credits").textContent = remainingCredits;
-		document.getElementById("target-2.5").textContent = scoresToGPA25.toFixed(3);
-		document.getElementById("target-3.2").textContent = scoresToGPA32.toFixed(3);
-		document.getElementById("target-3.6").textContent = scoresToGPA36.toFixed(3);
-    }
-
+	// Hiển thị thêm thông tin trong trang kết quả thi
     function showMoreInfoInExamResult() {
         let isSameTotalCredits = true;
         if (window.location.pathname.includes("/student/result/viewexamresult")) {
@@ -1301,12 +1272,18 @@
         const currentCreditsContainer = lastTable.querySelector(
             "tbody > tr:last-child > td:first-child"
         );
-        currentCreditsContainer.innerHTML += `<span class="study-info">/<span id="total-credits">???</span></span>`;
+        currentCreditsContainer.innerHTML += `<span class="study-info"> / <span id="total-credits">???</span></span>`;
         if (isSameTotalCredits) {
             const totalCredits = GM_getValue("totalCredits");
             document.getElementById("total-credits").textContent = totalCredits;
         } else {
-            document.getElementById("total-credits").setAttribute("contenteditable", "true");
+            const totalCreditsSpan = document.getElementById("total-credits");
+			totalCreditsSpan.setAttribute("contenteditable", "true");
+			totalCreditsSpan.addEventListener("blur", (e) => {
+				e.target.textContent = e.target.textContent.replace(/[^\d]/g, '');
+				if (e.target.textContent == '') e.target.textContent = '200';
+				onScoreCellUpdated();
+			});
         }
 
         // Mục tiêu GPA
@@ -1336,7 +1313,44 @@
 				font-size: 14px;
 			}
 		`);
-		onScoreCellUpdated();
+        onScoreCellUpdated();
+    }
+
+    // Xử lý khi ô điểm được chỉnh sửa
+    function onScoreCellUpdated() {
+        highlightExamScores();
+        const editedGPA = calculateGPA();
+
+        document.getElementById("edited-gpa").textContent = editedGPA.toFixed(3);
+
+        if (editedGPA >= 3.6) document.getElementById("edited-study").textContent = "Xuất sắc";
+        else if (editedGPA >= 3.2) document.getElementById("edited-study").textContent = "Giỏi";
+        else if (editedGPA >= 2.5) document.getElementById("edited-study").textContent = "Khá";
+        else if (editedGPA >= 2.0)
+            document.getElementById("edited-study").textContent = "Trung bình";
+        else if (editedGPA < 2.0) document.getElementById("edited-study").textContent = "Yếu";
+
+        const currentCredits = calculateCredits();
+        const currentGPA = calculateGPA();
+        const totalCredits = document.getElementById("total-credits").textContent.trim();
+        console.log(
+            "totalCredits: ",
+            totalCredits,
+            "currentCredits: ",
+            currentCredits,
+            "currentGPA: ",
+            currentGPA
+        );
+        const remainingCredits = totalCredits - currentCredits;
+        const scoresToGPA25 = (2.5 * totalCredits - currentGPA * currentCredits) / remainingCredits;
+        const scoresToGPA32 = (3.2 * totalCredits - currentGPA * currentCredits) / remainingCredits;
+        const scoresToGPA36 = (3.6 * totalCredits - currentGPA * currentCredits) / remainingCredits;
+
+        document.getElementById("current-credits").textContent = currentCredits;
+        document.getElementById("remaining-credits").textContent = remainingCredits;
+        document.getElementById("target-2.5").textContent = scoresToGPA25.toFixed(3);
+        document.getElementById("target-3.2").textContent = scoresToGPA32.toFixed(3);
+        document.getElementById("target-3.6").textContent = scoresToGPA36.toFixed(3);
     }
 
     //===============================================================
