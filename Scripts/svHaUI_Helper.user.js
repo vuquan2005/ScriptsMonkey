@@ -1,7 +1,6 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      1.1.0
 // @version      1.1.1
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
@@ -136,6 +135,7 @@
     }
 
     //===============================================================
+	// Sửa tiêu đề trang
     function changeTitle() {
         let title = document.querySelector("span.k-panel-header-text:first-child")?.textContent;
         if (title) {
@@ -150,12 +150,15 @@
         }
     }
 
+	// Thay đổi đường dẫn trang chủ
     function changeHomePagePath() {
         const sideBar = document.querySelector("div.left-sidebar-content");
         const homeElement = sideBar.querySelector("a[href='/']");
         homeElement.href = "/home";
     }
 
+	// Khảo sát nhanh
+    function fastSurvey() {
         waitForSelector("table.card-body.table-responsive.table.table-bordered.table-striped").then(
             (element) => {
                 const scores = element.querySelectorAll("thead > tr:nth-child(2) > td");
@@ -180,6 +183,7 @@
         );
     }
 
+	// Tùy biến trang chủ
     function customizeHomePage() {
         const frmMain = document.querySelector("form#frmMain");
         if (frmMain) {
@@ -511,6 +515,7 @@
         showExamScheduleInHomePage();
     }
 
+	// Hiển thị kế hoạch thi trên trang kế hoạch thi
     async function showExamPlanInHomePage() {
         const examPlanDOM = await fetchDOM("https://sv.haui.edu.vn/student/schedulefees/examplant");
         let listCourseCode = getCourseCode(examPlanDOM);
@@ -554,6 +559,7 @@
         if (i === 0) console.warn("Không có kế hoạch thi nào.");
     }
 
+	// Hiển thị lịch thi trên trang kế hoạch thi
     async function showExamScheduleInHomePage() {
         const examScheduleDOM = await fetchDOM(
             "https://sv.haui.edu.vn/student/schedulefees/transactionmodules"
@@ -593,6 +599,7 @@
         if (i === 0) console.warn("Không có lịch thi nào.");
     }
 
+	// Xắp xếp lịch thi
     function sortExamSchedule() {
         // xắp xếp lịch thi
         const examScheduleContainer = document.querySelector(
@@ -605,6 +612,7 @@
         }
     }
 
+	// Tô màu lịch thi
     function highlightExamSchedule() {
         const examSchedule = document.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
         for (const examElement of examSchedule) {
@@ -622,6 +630,7 @@
         }
     }
 
+	// Lấy mã học phần từ trang kế hoạch thi
     function getCourseCode(scope = document) {
         const listCourseCodeElement = scope.querySelectorAll(
             "div:nth-child(3) > div > div > table > tbody > tr > td:nth-child(2) > a"
@@ -637,6 +646,7 @@
         return listHPCode;
     }
 
+	// Lấy kế hoạch thi của học phần
     async function getExamPlan(courseCode) {
         const url = `https://sv.haui.edu.vn/student/schedulefees/examplant?code=${courseCode}`;
         try {
@@ -647,6 +657,7 @@
         }
     }
 
+	// Hiển thị toàn bộ kế hoạch thi các học phần
     async function showExamPlan() {
         let listCourseCode = getCourseCode(document);
         // Lấy 13 học phần gần nhất
@@ -690,6 +701,7 @@
         }
     }
 
+	// Tô màu điểm thi
     function highlightExamScores() {
         const scoresBoxColor = {
             4.0: "rgb(64,212,81)", // A
@@ -740,6 +752,7 @@
         }
     }
 
+	// Tô màu điểm TX
     function highlightStudyScores() {
         let tx1Index = 4;
         if (window.location.pathname.includes("student/result/viewstudyresult")) {
@@ -759,6 +772,7 @@
         }
     }
 
+	// Chuyển đổi giữa trang kết quả học tập và kết quả thi
     function toggleStudyAndExam() {
         const title = document.querySelector("div.panel-heading");
 
@@ -788,6 +802,7 @@
         title.appendChild(toggleLinkContainer);
     }
 
+	// Chuyển đổi giữa trang chi tiết học phần theo CDIO và theo ngành
     function toggleCourseInfo() {
         const title = document.querySelector("div.panel-heading");
 
@@ -817,6 +832,7 @@
         title.appendChild(toggleLinkContainer);
     }
 
+	// Thêm link đến trang chi tiết học phần
     function gotoCourseInfo() {
         const kgrid = document.querySelector("div.kGrid");
         if (window.location.pathname.includes("exam")) {
@@ -854,6 +870,7 @@
 		}`);
     }
 
+	// Hiển thị hệ số điểm trong chi tiết học phần
     function showScoreWeight() {
         const title = document.querySelector("div.panel-heading");
         const courseCode = title.textContent.match(/([A-Z]{2})\d{4}/)[0];
@@ -893,6 +910,7 @@
         GM_setValue("scoreWeight", saveScoreWeight);
     }
 
+	// Tính điểm TX dựa trên hệ số điểm
     function calculateStudyScores() {
         let tx1Index = 4;
         let gk1Index = 14;
@@ -933,6 +951,7 @@
         }
     }
 
+	// Tạo file CSV lịch học
     function createCSVCalendar() {
         const exportBtnContainer = document.querySelector(
             "div.boxpanel-mc > .form-horizontal > .form-group:nth-child(3) > div.col-sm-4"
@@ -1055,6 +1074,7 @@
         });
     }
 
+	// Lấy tổng số tín chỉ
 	function getTotalCredits() {
         let totalCredits = document.querySelector(
             "#ctl02_dvList > tbody > tr:nth-child(7) > td.k-table-viewdetail"
@@ -1066,6 +1086,7 @@
         console.log("totalCredits: ", totalCreditsNumber);
     }
 
+	// Lấy tín chỉ hiện tại và GPA hiện tại
 	function getCreditsAndGPA(tableContainer) {
         const currentCredits = document.querySelector("tbody > tr:last-child > td:first-child", tableContainer);
         const currentCreditsNumber = Number(
@@ -1080,6 +1101,7 @@
         console.log("currentGPA: ", currentGPAValue);
     }
 
+	// Tính GPA
     function calculateGPA() {
         const kgrid = document.querySelector("div.kGrid");
         const hocPhan = kgrid.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
@@ -1104,6 +1126,7 @@
 
 
 
+	// Cho phép chỉnh sửa điểm
     function enableEditScore() {
         const toggleBtn = document.createElement("span");
         toggleBtn.textContent = "✏️";
@@ -1160,6 +1183,7 @@
         runOnUrl(changeTitle, "");
         runOnUrl(changeHomePagePath, "");
 
+        runOnUrl(fastSurvey, /\/survey\//);
 
         runOnUrl(customizeHomePage, "/home");
 
