@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      1.1.1
+// @version      2.0.0
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -135,7 +135,7 @@
     }
 
     //===============================================================
-	// Sửa tiêu đề trang
+    // Sửa tiêu đề trang
     function changeTitle() {
         let title = document.querySelector("span.k-panel-header-text:first-child")?.textContent;
         if (title) {
@@ -150,14 +150,14 @@
         }
     }
 
-	// Thay đổi đường dẫn trang chủ
+    // Thay đổi đường dẫn trang chủ
     function changeHomePagePath() {
         const sideBar = document.querySelector("div.left-sidebar-content");
         const homeElement = sideBar.querySelector("a[href='/']");
         homeElement.href = "/home";
     }
 
-	// Khảo sát nhanh
+    // Khảo sát nhanh
     function fastSurvey() {
         waitForSelector("table.card-body.table-responsive.table.table-bordered.table-striped").then(
             (element) => {
@@ -183,7 +183,7 @@
         );
     }
 
-	// Tùy biến trang chủ
+    // Tùy biến trang chủ
     function customizeHomePage() {
         const frmMain = document.querySelector("form#frmMain");
         if (frmMain) {
@@ -515,7 +515,7 @@
         showExamScheduleInHomePage();
     }
 
-	// Hiển thị kế hoạch thi trên trang kế hoạch thi
+    // Hiển thị kế hoạch thi trên trang kế hoạch thi
     async function showExamPlanInHomePage() {
         const examPlanDOM = await fetchDOM("https://sv.haui.edu.vn/student/schedulefees/examplant");
         let listCourseCode = getCourseCode(examPlanDOM);
@@ -559,7 +559,7 @@
         if (i === 0) console.warn("Không có kế hoạch thi nào.");
     }
 
-	// Hiển thị lịch thi trên trang kế hoạch thi
+    // Hiển thị lịch thi trên trang kế hoạch thi
     async function showExamScheduleInHomePage() {
         const examScheduleDOM = await fetchDOM(
             "https://sv.haui.edu.vn/student/schedulefees/transactionmodules"
@@ -599,7 +599,7 @@
         if (i === 0) console.warn("Không có lịch thi nào.");
     }
 
-	// Xắp xếp lịch thi
+    // Xắp xếp lịch thi
     function sortExamSchedule() {
         // xắp xếp lịch thi
         const examScheduleContainer = document.querySelector(
@@ -612,7 +612,7 @@
         }
     }
 
-	// Tô màu lịch thi
+    // Tô màu lịch thi
     function highlightExamSchedule() {
         const examSchedule = document.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
         for (const examElement of examSchedule) {
@@ -630,7 +630,7 @@
         }
     }
 
-	// Lấy mã học phần từ trang kế hoạch thi
+    // Lấy mã học phần từ trang kế hoạch thi
     function getCourseCode(scope = document) {
         const listCourseCodeElement = scope.querySelectorAll(
             "div:nth-child(3) > div > div > table > tbody > tr > td:nth-child(2) > a"
@@ -646,7 +646,7 @@
         return listHPCode;
     }
 
-	// Lấy kế hoạch thi của học phần
+    // Lấy kế hoạch thi của học phần
     async function getExamPlan(courseCode) {
         const url = `https://sv.haui.edu.vn/student/schedulefees/examplant?code=${courseCode}`;
         try {
@@ -657,7 +657,7 @@
         }
     }
 
-	// Hiển thị toàn bộ kế hoạch thi các học phần
+    // Hiển thị toàn bộ kế hoạch thi các học phần
     async function showExamPlan() {
         let listCourseCode = getCourseCode(document);
         // Lấy 13 học phần gần nhất
@@ -701,7 +701,7 @@
         }
     }
 
-	// Tô màu điểm thi
+    // Tô màu điểm thi
     function highlightExamScores() {
         const scoresBoxColor = {
             4.0: "rgb(64,212,81)", // A
@@ -752,7 +752,7 @@
         }
     }
 
-	// Tô màu điểm TX
+    // Tô màu điểm TX
     function highlightStudyScores() {
         let tx1Index = 4;
         if (window.location.pathname.includes("student/result/viewstudyresult")) {
@@ -772,7 +772,7 @@
         }
     }
 
-	// Chuyển đổi giữa trang kết quả học tập và kết quả thi
+    // Chuyển đổi giữa trang kết quả học tập và kết quả thi
     function toggleStudyAndExam() {
         const title = document.querySelector("div.panel-heading");
 
@@ -802,7 +802,7 @@
         title.appendChild(toggleLinkContainer);
     }
 
-	// Chuyển đổi giữa trang chi tiết học phần theo CDIO và theo ngành
+    // Chuyển đổi giữa trang chi tiết học phần theo CDIO và theo ngành
     function toggleCourseInfo() {
         const title = document.querySelector("div.panel-heading");
 
@@ -832,7 +832,7 @@
         title.appendChild(toggleLinkContainer);
     }
 
-	// Thêm link đến trang chi tiết học phần
+    // Thêm link đến trang chi tiết học phần
     function gotoCourseInfo() {
         const kgrid = document.querySelector("div.kGrid");
         if (window.location.pathname.includes("exam")) {
@@ -870,7 +870,7 @@
 		}`);
     }
 
-	// Hiển thị hệ số điểm trong chi tiết học phần
+    // Hiển thị hệ số điểm trong chi tiết học phần
     function showScoreWeight() {
         const title = document.querySelector("div.panel-heading");
         const courseCode = title.textContent.match(/([A-Z]{2})\d{4}/)[0];
@@ -910,7 +910,7 @@
         GM_setValue("scoreWeight", saveScoreWeight);
     }
 
-	// Tính điểm TX dựa trên hệ số điểm
+    // Tính điểm TX dựa trên hệ số điểm
     function calculateStudyScores() {
         let tx1Index = 4;
         let gk1Index = 14;
@@ -951,7 +951,7 @@
         }
     }
 
-	// Tạo file CSV lịch học
+    // Tạo file CSV lịch học
     function createCSVCalendar() {
         const exportBtnContainer = document.querySelector(
             "div.boxpanel-mc > .form-horizontal > .form-group:nth-child(3) > div.col-sm-4"
@@ -1074,11 +1074,11 @@
         });
     }
 
-	// Lấy tổng số tín chỉ
-	function getTotalCredits() {
-        let totalCredits = document.querySelector(
-            "#ctl02_dvList > tbody > tr:nth-child(7) > td.k-table-viewdetail"
-        ).textContent.trim();
+    // Lấy tổng số tín chỉ
+    function getYourTotalCredits() {
+        let totalCredits = document
+            .querySelector("#ctl02_dvList > tbody > tr:nth-child(7) > td.k-table-viewdetail")
+            .textContent.trim();
         totalCredits = totalCredits.replace("(tín chỉ)", "");
         const totalCreditsNumber = Number(totalCredits);
 
@@ -1086,22 +1086,31 @@
         console.log("totalCredits: ", totalCreditsNumber);
     }
 
-	// Lấy tín chỉ hiện tại và GPA hiện tại
-	function getCreditsAndGPA(tableContainer) {
-        const currentCredits = document.querySelector("tbody > tr:last-child > td:first-child", tableContainer);
+    // Lấy tín chỉ hiện tại, GPA hiện tại, mã lớp
+    function getYourLearningProgress() {
+        const classCode = document
+            .querySelector(
+                "#frmMain > div.panel.panel-default.panel-border-color.panel-border-color-primary > div.k-panel-bwrap > div > div > div > div:nth-child(1) > div > table > tbody > tr:nth-child(3) > td:nth-child(2) > strong"
+            )
+            .textContent.trim();
+        GM_setValue("classCode", classCode);
+        console.log("classCode: ", classCode);
+
+        const kgrid = document.querySelector("div.kGrid");
+        const currentCredits = kgrid.querySelector("tbody > tr:last-child > td:first-child");
         const currentCreditsNumber = Number(
             currentCredits.textContent.trim().match(/(\d+)(?:\.\d+)?/g)[0]
         );
         GM_setValue("currentCredits", currentCreditsNumber);
         console.log("currentCredits: ", currentCreditsNumber);
 
-        const currentGPA = document.querySelector("tbody > tr:nth-last-child(2) > td:nth-child(2)", tableContainer);
+        const currentGPA = kgrid.querySelector("tbody > tr:nth-last-child(2) > td:nth-child(2)");
         const currentGPAValue = Number(currentGPA.textContent.trim().match(/(\d+)(?:\.\d+)?/g)[0]);
         GM_setValue("currentGPA", currentGPAValue);
         console.log("currentGPA: ", currentGPAValue);
     }
 
-	// Tính GPA
+    // Tính GPA
     function calculateGPA() {
         const kgrid = document.querySelector("div.kGrid");
         const hocPhan = kgrid.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
@@ -1124,10 +1133,8 @@
         return GPA;
     }
 
-
-
-	// Cho phép chỉnh sửa điểm
-    function enableEditScore() {
+    // Cho phép chỉnh sửa điểm
+    function editScoreBtn() {
         const toggleBtn = document.createElement("span");
         toggleBtn.textContent = "✏️";
         toggleBtn.style.cursor = "pointer";
@@ -1139,10 +1146,10 @@
 
             if (toggleBtn.textContent === "✏️") {
                 toggleBtn.textContent = "📝";
-                isEnableEditScore(true);
+                onEditScore(true);
             } else {
                 toggleBtn.textContent = "✏️";
-                isEnableEditScore(false);
+                onEditScore(false);
             }
         });
         const container = document.querySelector(
@@ -1151,19 +1158,111 @@
         container.appendChild(toggleBtn);
     }
 
-    function isEnableEditScore(isEnable) {
+	// Xử lý chỉnh sửa điểm
+    function onEditScore(isEnable) {
         console.log("isEnableEditScore", isEnable);
         const kgrid = document.querySelector("div.kGrid");
-		const courses = kgrid.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
+        const courses = kgrid.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
 
         if (isEnable) {
-			for (const course of courses) {
-                course.children[13].setAttribute("contenteditable", "true");
-			}
+            for (const course of courses) {
+                if (nonCreditCourse.some((hp) => course.children[1].textContent.includes(hp)))
+                    continue;
+                const scoreCell = course.children[13];
+
+                const originalScore = scoreCell.textContent.trim();
+
+                scoreCell.setAttribute("contenteditable", "true");
+
+                scoreCell.addEventListener("blur", (e) => {
+                    const cell = e.target;
+                    cell.textContent = cell.textContent.trim().toUpperCase();
+                    cell.textContent = cell.textContent.replace(/^B.+$/g, "B+");
+                    cell.textContent = cell.textContent.replace(/^C.+$/g, "C+");
+                    cell.textContent = cell.textContent.replace(/^D.+$/g, "D+");
+
+                    if (!["A", "B+", "B", "C+", "C", "D+", "D", "F"].includes(cell.textContent)) {
+                        alert("Điểm không hợp lệ! \nVui lòng nhập lại (A, B+, B, C+, C, D+, D, F)");
+                        cell.textContent = originalScore;
+                    }
+
+                    course.children[12].textContent = {
+                        A: "4.0",
+                        "B+": "3.5",
+                        B: "3.0",
+                        "C+": "2.5",
+                        C: "2.0",
+                        "D+": "1.5",
+                        D: "1.0",
+                        F: "0.0",
+                    }[cell.textContent];
+
+                    onScoreCellUpdated(cell);
+                });
+            }
         } else {
-			for (const course of courses) {
+            for (const course of courses) {
                 course.children[13].setAttribute("contenteditable", "false");
+            }
+        }
+    }
+
+	// Hiển thị GPA đã chỉnh sửa
+    function showGPAEdited() {
+        const kgrid = document.querySelector("div.kGrid");
+        const table = kgrid.querySelector("table");
+
+        const currentGPAContainer = table.querySelector(
+            "tbody > tr:nth-last-child(2) > td:nth-child(2)"
+        );
+        const currentStuydyContainer = table.querySelector(
+            "tbody > tr:last-child > td:nth-child(2)"
+        );
+
+        currentGPAContainer.setAttribute("colspan", "6");
+        currentStuydyContainer.setAttribute("colspan", "6");
+
+        const editedGPA = document.createElement("td");
+        editedGPA.setAttribute("colspan", "2");
+        const editedGPASpan = document.createElement("span");
+        editedGPASpan.classList.add("study-info");
+        editedGPASpan.innerHTML = `🎯: <span id ="edited-gpa"></span>`;
+        editedGPA.appendChild(editedGPASpan);
+        currentGPAContainer.insertAdjacentElement("afterend", editedGPA);
+
+        const editedStudy = document.createElement("td");
+        editedStudy.setAttribute("colspan", "2");
+        const editedStudySpan = document.createElement("span");
+        editedStudySpan.classList.add("study-info");
+        editedStudySpan.innerHTML = `🎯: <span id ="edited-study"></span>`;
+        editedStudy.appendChild(editedStudySpan);
+        currentStuydyContainer.insertAdjacentElement("afterend", editedStudy);
+
+        GM_addStyle(`
+			.study-info {
+				color: Red;
+				font-weight: bold;
+				float: left;
+				font-size: 12px;
+				padding-left: 5px;
 			}
+		`);
+    }
+
+	// Xử lý khi ô điểm được chỉnh sửa
+    function onScoreCellUpdated() {
+        highlightExamScores();
+        const editedGPA = calculateGPA();
+
+        document.getElementById("edited-gpa").textContent = editedGPA.toFixed(4);
+        if (editedGPA >= 3.6) document.getElementById("edited-study").textContent = "Xuất sắc";
+        else if (editedGPA >= 3.2) document.getElementById("edited-study").textContent = "Giỏi";
+        else if (editedGPA >= 2.5) document.getElementById("edited-study").textContent = "Khá";
+        else if (editedGPA >= 2.0)
+            document.getElementById("edited-study").textContent = "Trung bình";
+        else if (editedGPA < 2.0) document.getElementById("edited-study").textContent = "Yếu";
+    }
+
         }
     }
 
@@ -1236,11 +1335,18 @@
 
         runOnUrl(createCSVCalendar, "/timestable/calendarcl");
 
-		runOnUrl(getTotalCredits, "/training/viewcourseindustry");
-		runOnUrl(getCreditsAndGPA, "/student/result/examresult");
+        runOnUrl(getYourTotalCredits, "/training/viewcourseindustry");
+        runOnUrl(getYourLearningProgress, "/student/result/examresult");
+        runOnUrl(
+            showMoreInfoInExamResult,
+            "/student/result/examresult",
+            "/student/result/viewexamresult"
+        );
 
         runOnUrl(calculateGPA, "/student/result/examresult", "/student/result/viewexamresult");
-        runOnUrl(enableEditScore, "/student/result/examresult", "/student/result/viewexamresult");
+
+        runOnUrl(editScoreBtn, "/student/result/examresult", "/student/result/viewexamresult");
+        runOnUrl(showGPAEdited, "/student/result/examresult", "/student/result/viewexamresult");
     }
 
     waitForSelector("#frmMain", 5000, 100)
