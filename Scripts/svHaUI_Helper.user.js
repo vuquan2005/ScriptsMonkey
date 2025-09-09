@@ -2,6 +2,7 @@
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
 // @version      1.1.0
+// @version      1.1.1
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -155,7 +156,6 @@
         homeElement.href = "/home";
     }
 
-    function autoSurvey() {
         waitForSelector("table.card-body.table-responsive.table.table-bordered.table-striped").then(
             (element) => {
                 const scores = element.querySelectorAll("thead > tr:nth-child(2) > td");
@@ -1055,6 +1055,95 @@
         });
     }
 
+	function getTotalCredits() {
+        let totalCredits = document.querySelector(
+            "#ctl02_dvList > tbody > tr:nth-child(7) > td.k-table-viewdetail"
+        ).textContent.trim();
+        totalCredits = totalCredits.replace("(tín chỉ)", "");
+        const totalCreditsNumber = Number(totalCredits);
+
+        GM_setValue("totalCredits", totalCreditsNumber);
+        console.log("totalCredits: ", totalCreditsNumber);
+    }
+
+	function getCreditsAndGPA(tableContainer) {
+        const currentCredits = document.querySelector("tbody > tr:last-child > td:first-child", tableContainer);
+        const currentCreditsNumber = Number(
+            currentCredits.textContent.trim().match(/(\d+)(?:\.\d+)?/g)[0]
+        );
+        GM_setValue("currentCredits", currentCreditsNumber);
+        console.log("currentCredits: ", currentCreditsNumber);
+
+        const currentGPA = document.querySelector("tbody > tr:nth-last-child(2) > td:nth-child(2)", tableContainer);
+        const currentGPAValue = Number(currentGPA.textContent.trim().match(/(\d+)(?:\.\d+)?/g)[0]);
+        GM_setValue("currentGPA", currentGPAValue);
+        console.log("currentGPA: ", currentGPAValue);
+    }
+
+    function calculateGPA() {
+        const kgrid = document.querySelector("div.kGrid");
+        const hocPhan = kgrid.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
+
+        let diemTong = 0;
+        let tongTinChi = 0;
+        for (const row of hocPhan) {
+            if (nonCreditCourse.some((hp) => row.children[1].textContent.includes(hp))) continue;
+            const oDiem = row.children[12];
+            if (oDiem.textContent.trim() == "") continue;
+            if (oDiem.textContent.trim() == "0") continue;
+
+            const diemSo = Number(oDiem.textContent.trim());
+            const tinChi = Number(row.children[5].textContent.trim());
+            diemTong += diemSo * tinChi;
+            tongTinChi += tinChi;
+        }
+        const GPA = diemTong / tongTinChi;
+        console.log("GPA: ", GPA.toFixed(2));
+        return GPA;
+    }
+
+
+
+    function enableEditScore() {
+        const toggleBtn = document.createElement("span");
+        toggleBtn.textContent = "✏️";
+        toggleBtn.style.cursor = "pointer";
+        toggleBtn.title = "Bật/Tắt chỉnh sửa điểm";
+        toggleBtn.style.fontSize = "24px";
+
+        toggleBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+
+            if (toggleBtn.textContent === "✏️") {
+                toggleBtn.textContent = "📝";
+                isEnableEditScore(true);
+            } else {
+                toggleBtn.textContent = "✏️";
+                isEnableEditScore(false);
+            }
+        });
+        const container = document.querySelector(
+            "div.kGrid > table > thead > tr:nth-child(1) > td:nth-child(10)"
+        );
+        container.appendChild(toggleBtn);
+    }
+
+    function isEnableEditScore(isEnable) {
+        console.log("isEnableEditScore", isEnable);
+        const kgrid = document.querySelector("div.kGrid");
+		const courses = kgrid.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
+
+        if (isEnable) {
+			for (const course of courses) {
+                course.children[13].setAttribute("contenteditable", "true");
+			}
+        } else {
+			for (const course of courses) {
+                course.children[13].setAttribute("contenteditable", "false");
+			}
+        }
+    }
+
     //===============================================================
 
     const nonCreditCourse = [
@@ -1071,7 +1160,6 @@
         runOnUrl(changeTitle, "");
         runOnUrl(changeHomePagePath, "");
 
-        runOnUrl(autoSurvey, /\/survey\//);
 
         runOnUrl(customizeHomePage, "/home");
 
@@ -1123,6 +1211,12 @@
         );
 
         runOnUrl(createCSVCalendar, "/timestable/calendarcl");
+
+		runOnUrl(getTotalCredits, "/training/viewcourseindustry");
+		runOnUrl(getCreditsAndGPA, "/student/result/examresult");
+
+        runOnUrl(calculateGPA, "/student/result/examresult", "/student/result/viewexamresult");
+        runOnUrl(enableEditScore, "/student/result/examresult", "/student/result/viewexamresult");
     }
 
     waitForSelector("#frmMain", 5000, 100)
