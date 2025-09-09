@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.0.1
+// @version      2.0.2
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -852,7 +852,7 @@
         } else {
             // Trang xem điểm TX
             const maHPtoMaIn = GM_getValue("maHPtoMaIn");
-            console.log("maHPtoMaIn: ", maHPtoMaIn);
+            // console.log("maHPtoMaIn: ", maHPtoMaIn);
             const hocPhan = kgrid.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
             for (const row of hocPhan) {
                 const maHP = row.children[2].textContent.match(/([A-Z]{2})\d{4}/)[0];
@@ -966,6 +966,45 @@
             const calendarTable = document.querySelector(".panel-body > table > tbody");
             const calendarRows = calendarTable.querySelectorAll("tr");
             let csvContent = "Subject,Start Date,Start Time,End Time,Description,Location\n";
+
+            const startPeriodToTime = {
+                1: "07:00",
+                2: "07:50",
+                3: "08:45",
+                4: "09:40",
+                5: "10:35",
+                6: "11:25",
+                7: "12:30",
+                8: "13:20",
+                9: "14:15",
+                10: "15:10",
+                11: "16:05",
+                12: "16:55",
+                13: "18:00",
+                14: "18:50",
+                15: "19:45",
+                16: "20:35",
+            };
+
+            const endPeriodToTime = {
+                1: "07:50",
+                2: "08:40",
+                3: "09:35",
+                4: "10:30",
+                5: "11:25",
+                6: "12:15",
+                7: "13:20",
+                8: "14:10",
+                9: "15:05",
+                10: "16:00",
+                11: "16:55",
+                12: "17:45",
+                13: "18:50",
+                14: "19:40",
+                15: "20:35",
+                16: "21:25",
+            };
+
             for (const row of calendarRows) {
                 let date = row.children[2].textContent.trim();
                 const dateParts = date.split("/");
@@ -985,44 +1024,6 @@
                         // Subject
                         const subject = courseData.match(/-\s*(.+?)\s*\(Lớp:/)?.[1];
                         if (!subject) continue;
-
-                        const startPeriodToTime = {
-                            1: "07:00",
-                            2: "07:50",
-                            3: "08:45",
-                            4: "09:40",
-                            5: "10:35",
-                            6: "11:25",
-                            7: "12:30",
-                            8: "13:20",
-                            9: "14:15",
-                            10: "15:10",
-                            11: "16:05",
-                            12: "16:55",
-                            13: "18:00",
-                            14: "18:50",
-                            15: "19:45",
-                            16: "20:35",
-                        };
-
-                        const endPeriodToTime = {
-                            1: "07:50",
-                            2: "08:40",
-                            3: "09:35",
-                            4: "10:30",
-                            5: "11:25",
-                            6: "12:15",
-                            7: "13:20",
-                            8: "14:10",
-                            9: "15:05",
-                            10: "16:00",
-                            11: "16:55",
-                            12: "17:45",
-                            13: "18:50",
-                            14: "19:40",
-                            15: "20:35",
-                            16: "21:25",
-                        };
 
                         const period = courseData.match(/\((\d+).+?(\d+)\)/);
 
@@ -1056,12 +1057,14 @@
                             location || "",
                         ];
 
-                        console.log(courseData1);
+                        // console.log(courseData1);
 
                         csvContent += courseData1.join(",") + "\n";
                     }
                 }
             }
+            console.log("csvContent: ", csvContent);
+
             const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
@@ -1129,7 +1132,7 @@
             tongTinChi += tinChi;
         }
         const GPA = diemTong / tongTinChi;
-        console.log("GPA: ", GPA.toFixed(2));
+        // console.log("GPA: ", GPA.toFixed(2));
         return GPA;
     }
 
@@ -1158,7 +1161,7 @@
         container.appendChild(toggleBtn);
     }
 
-	// Xử lý chỉnh sửa điểm
+    // Xử lý chỉnh sửa điểm
     function onEditScore(isEnable) {
         console.log("isEnableEditScore", isEnable);
         const kgrid = document.querySelector("div.kGrid");
@@ -1207,7 +1210,7 @@
         }
     }
 
-	// Hiển thị GPA đã chỉnh sửa
+    // Hiển thị GPA đã chỉnh sửa
     function showGPAEdited() {
         const kgrid = document.querySelector("div.kGrid");
         const table = kgrid.querySelector("table");
@@ -1249,7 +1252,7 @@
 		`);
     }
 
-	// Xử lý khi ô điểm được chỉnh sửa
+    // Xử lý khi ô điểm được chỉnh sửa
     function onScoreCellUpdated() {
         highlightExamScores();
         const editedGPA = calculateGPA();
@@ -1261,6 +1264,22 @@
         else if (editedGPA >= 2.0)
             document.getElementById("edited-study").textContent = "Trung bình";
         else if (editedGPA < 2.0) document.getElementById("edited-study").textContent = "Yếu";
+    }
+
+    function showMoreInfoInExamResult() {
+        const yourClassCode = GM_getValue("classCode");
+        const classCode = document
+            .querySelector(
+                "#frmMain > div.panel.panel-default.panel-border-color.panel-border-color-primary > div.k-panel-bwrap > div > div > div > div:nth-child(1) > div > table > tbody > tr:nth-child(3) > td:nth-child(2) > strong"
+            )
+            .textContent.trim();
+        classCode.replace(/\d+$/, "");
+
+        if (yourClassCode.includes(classCode)) {
+            //
+        } else {
+            console.log("Không cùng ngành, khác tổng tín chỉ");
+        }
     }
 
     //===============================================================
