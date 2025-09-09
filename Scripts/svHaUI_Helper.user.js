@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.1.1
+// @version      20.1.2
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -1216,6 +1216,11 @@
                         F: "0.0",
                     }[cell.textContent];
 
+                    if (cell.textContent !== originalScore)
+                        course.children[12].style.backgroundColor = "#fff5d1ff";
+					else
+						course.children[12].style.backgroundColor = "#ffffff";
+
                     onScoreCellUpdated(cell);
                 });
             }
@@ -1229,7 +1234,7 @@
     // Hiển thị GPA đã chỉnh sửa
     function showGPAEdited() {}
 
-	// Hiển thị thêm thông tin trong trang kết quả thi
+    // Hiển thị thêm thông tin trong trang kết quả thi
     function showMoreInfoInExamResult() {
         let isSameTotalCredits = true;
         if (window.location.pathname.includes("/student/result/viewexamresult")) {
@@ -1278,12 +1283,12 @@
             document.getElementById("total-credits").textContent = totalCredits;
         } else {
             const totalCreditsSpan = document.getElementById("total-credits");
-			totalCreditsSpan.setAttribute("contenteditable", "true");
-			totalCreditsSpan.addEventListener("blur", (e) => {
-				e.target.textContent = e.target.textContent.replace(/[^\d]/g, '');
-				if (e.target.textContent == '') e.target.textContent = '200';
-				onScoreCellUpdated();
-			});
+            totalCreditsSpan.setAttribute("contenteditable", "true");
+            totalCreditsSpan.addEventListener("blur", (e) => {
+                e.target.textContent = e.target.textContent.replace(/[^\d]/g, "");
+                if (e.target.textContent == "") e.target.textContent = "200";
+                onScoreCellUpdated();
+            });
         }
 
         // Mục tiêu GPA
