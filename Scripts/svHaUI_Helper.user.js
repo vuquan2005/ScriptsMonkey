@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.0.2
+// @version      2.1.0
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -1113,13 +1113,13 @@
         console.log("currentGPA: ", currentGPAValue);
     }
 
-    // Tính GPA
+    // Tính GPA hiện tại (kể cả sửa)
     function calculateGPA() {
         const kgrid = document.querySelector("div.kGrid");
         const hocPhan = kgrid.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
 
         let diemTong = 0;
-        let tongTinChi = 0;
+        let tongTinChi = calculateCredits();
         for (const row of hocPhan) {
             if (nonCreditCourse.some((hp) => row.children[1].textContent.includes(hp))) continue;
             const oDiem = row.children[12];
@@ -1129,11 +1129,28 @@
             const diemSo = Number(oDiem.textContent.trim());
             const tinChi = Number(row.children[5].textContent.trim());
             diemTong += diemSo * tinChi;
-            tongTinChi += tinChi;
         }
         const GPA = diemTong / tongTinChi;
         // console.log("GPA: ", GPA.toFixed(2));
         return GPA;
+    }
+
+    // Tính tổng tín chỉ hiện đang có (kể cả sửa)
+    function calculateCredits() {
+        const kgrid = document.querySelector("div.kGrid");
+        const hocPhan = kgrid.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
+
+        let tongTinChi = 0;
+        for (const row of hocPhan) {
+            if (nonCreditCourse.some((hp) => row.children[1].textContent.includes(hp))) continue;
+            const oDiem = row.children[12];
+            if (oDiem.textContent.trim() == "") continue;
+            if (oDiem.textContent.trim() == "0") continue;
+
+            const tinChi = Number(row.children[5].textContent.trim());
+            tongTinChi += tinChi;
+        }
+        return tongTinChi;
     }
 
     // Cho phép chỉnh sửa điểm
@@ -1155,15 +1172,14 @@
                 onEditScore(false);
             }
         });
-        const container = document.querySelector(
-            "div.kGrid > table > thead > tr:nth-child(1) > td:nth-child(10)"
-        );
+        const kGrid = document.querySelector("div.kGrid");
+        const container = kGrid.querySelector("table > thead > tr:nth-child(1) > td:nth-child(10)");
         container.appendChild(toggleBtn);
     }
 
     // Xử lý chỉnh sửa điểm
     function onEditScore(isEnable) {
-        console.log("isEnableEditScore", isEnable);
+        console.log("onEditScore", isEnable);
         const kgrid = document.querySelector("div.kGrid");
         const courses = kgrid.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
 
@@ -1211,35 +1227,101 @@
     }
 
     // Hiển thị GPA đã chỉnh sửa
-    function showGPAEdited() {
-        const kgrid = document.querySelector("div.kGrid");
-        const table = kgrid.querySelector("table");
+    function showGPAEdited() {}
 
-        const currentGPAContainer = table.querySelector(
+    // Xử lý khi ô điểm được chỉnh sửa
+    function onScoreCellUpdated() {
+        highlightExamScores();
+        const editedGPA = calculateGPA();
+
+        document.getElementById("edited-gpa").textContent = editedGPA.toFixed(3);
+
+        if (editedGPA >= 3.6) document.getElementById("edited-study").textContent = "Xuất sắc";
+        else if (editedGPA >= 3.2) document.getElementById("edited-study").textContent = "Giỏi";
+        else if (editedGPA >= 2.5) document.getElementById("edited-study").textContent = "Khá";
+        else if (editedGPA >= 2.0)
+            document.getElementById("edited-study").textContent = "Trung bình";
+        else if (editedGPA < 2.0) document.getElementById("edited-study").textContent = "Yếu";
+
+        const currentCredits = calculateCredits();
+        const currentGPA = calculateGPA();
+		const totalCredits = document.getElementById("total-credits").textContent.trim();
+		console.log("totalCredits: ", totalCredits, "currentCredits: ", currentCredits, "currentGPA: ", currentGPA);
+        const remainingCredits = totalCredits - currentCredits;
+        const scoresToGPA25 = (2.5 * totalCredits - currentGPA * currentCredits) / remainingCredits;
+        const scoresToGPA32 = (3.2 * totalCredits - currentGPA * currentCredits) / remainingCredits;
+        const scoresToGPA36 = (3.6 * totalCredits - currentGPA * currentCredits) / remainingCredits;
+
+		document.getElementById("current-credits").textContent = currentCredits;
+		document.getElementById("remaining-credits").textContent = remainingCredits;
+		document.getElementById("target-2.5").textContent = scoresToGPA25.toFixed(3);
+		document.getElementById("target-3.2").textContent = scoresToGPA32.toFixed(3);
+		document.getElementById("target-3.6").textContent = scoresToGPA36.toFixed(3);
+    }
+
+    function showMoreInfoInExamResult() {
+        let isSameTotalCredits = true;
+        if (window.location.pathname.includes("/student/result/viewexamresult")) {
+            const yourClassCode = GM_getValue("classCode");
+            const classCode = document
+                .querySelector(
+                    "div.kGrid > div > div > div > table > tbody > tr:nth-child(3) > td:nth-child(2) > strong"
+                )
+                .textContent.trim();
+            classCode.replace(/\d+$/, "");
+            isSameTotalCredits = yourClassCode.includes(classCode);
+            console.log("isSameTotalCredits: ", isSameTotalCredits);
+        }
+
+        const kgrid = document.querySelector("div.kGrid");
+        const tables = kgrid.querySelectorAll("table");
+        const lastTable = tables[tables.length - 1];
+
+        // GPA
+        const currentGPAContainer = lastTable.querySelector(
             "tbody > tr:nth-last-child(2) > td:nth-child(2)"
         );
-        const currentStuydyContainer = table.querySelector(
-            "tbody > tr:last-child > td:nth-child(2)"
-        );
-
         currentGPAContainer.setAttribute("colspan", "6");
-        currentStuydyContainer.setAttribute("colspan", "6");
-
         const editedGPA = document.createElement("td");
         editedGPA.setAttribute("colspan", "2");
-        const editedGPASpan = document.createElement("span");
-        editedGPASpan.classList.add("study-info");
-        editedGPASpan.innerHTML = `🎯: <span id ="edited-gpa"></span>`;
-        editedGPA.appendChild(editedGPASpan);
+        editedGPA.innerHTML = `<span class="study-info">🎯: <span id="edited-gpa"></span></span>`;
         currentGPAContainer.insertAdjacentElement("afterend", editedGPA);
 
+        // Học lực
+        const currentStuydyContainer = lastTable.querySelector(
+            "tbody > tr:last-child > td:nth-child(2)"
+        );
+        currentStuydyContainer.setAttribute("colspan", "6");
         const editedStudy = document.createElement("td");
         editedStudy.setAttribute("colspan", "2");
-        const editedStudySpan = document.createElement("span");
-        editedStudySpan.classList.add("study-info");
-        editedStudySpan.innerHTML = `🎯: <span id ="edited-study"></span>`;
-        editedStudy.appendChild(editedStudySpan);
+        editedStudy.innerHTML = `<span class="study-info">🎯: <span id="edited-study"></span></span>`;
         currentStuydyContainer.insertAdjacentElement("afterend", editedStudy);
+
+        // Tín chỉ
+        const currentCreditsContainer = lastTable.querySelector(
+            "tbody > tr:last-child > td:first-child"
+        );
+        currentCreditsContainer.innerHTML += `<span class="study-info">/<span id="total-credits">???</span></span>`;
+        if (isSameTotalCredits) {
+            const totalCredits = GM_getValue("totalCredits");
+            document.getElementById("total-credits").textContent = totalCredits;
+        } else {
+            document.getElementById("total-credits").setAttribute("contenteditable", "true");
+        }
+
+        // Mục tiêu GPA
+        const requiredScoreContainer = lastTable.querySelector("tbody > tr:last-child");
+        const requiredScore = document.createElement("tr");
+        requiredScore.style.backgroundColor = "#ffffff";
+
+        requiredScore.innerHTML = `<td colspan="18"><span class="study-info"><span id="requiredScore">
+			Số tín tích luỹ: <span id="current-credits">0</span></br>
+			Số tín tích luỹ còn lại: <span id="remaining-credits">0</span></br>
+			3.6🎯: <span id="target-3.6">0</span></br>
+			3.2🎯: <span id="target-3.2">0</span></br>
+			2.5🎯: <span id="target-2.5">0</span></br>
+		</span></span></td>`;
+        requiredScoreContainer.insertAdjacentElement("afterend", requiredScore);
 
         GM_addStyle(`
 			.study-info {
@@ -1249,37 +1331,12 @@
 				font-size: 12px;
 				padding-left: 5px;
 			}
+			#requiredScore {
+				background-color: #ffffff;
+				font-size: 14px;
+			}
 		`);
-    }
-
-    // Xử lý khi ô điểm được chỉnh sửa
-    function onScoreCellUpdated() {
-        highlightExamScores();
-        const editedGPA = calculateGPA();
-
-        document.getElementById("edited-gpa").textContent = editedGPA.toFixed(4);
-        if (editedGPA >= 3.6) document.getElementById("edited-study").textContent = "Xuất sắc";
-        else if (editedGPA >= 3.2) document.getElementById("edited-study").textContent = "Giỏi";
-        else if (editedGPA >= 2.5) document.getElementById("edited-study").textContent = "Khá";
-        else if (editedGPA >= 2.0)
-            document.getElementById("edited-study").textContent = "Trung bình";
-        else if (editedGPA < 2.0) document.getElementById("edited-study").textContent = "Yếu";
-    }
-
-    function showMoreInfoInExamResult() {
-        const yourClassCode = GM_getValue("classCode");
-        const classCode = document
-            .querySelector(
-                "#frmMain > div.panel.panel-default.panel-border-color.panel-border-color-primary > div.k-panel-bwrap > div > div > div > div:nth-child(1) > div > table > tbody > tr:nth-child(3) > td:nth-child(2) > strong"
-            )
-            .textContent.trim();
-        classCode.replace(/\d+$/, "");
-
-        if (yourClassCode.includes(classCode)) {
-            //
-        } else {
-            console.log("Không cùng ngành, khác tổng tín chỉ");
-        }
+		onScoreCellUpdated();
     }
 
     //===============================================================
