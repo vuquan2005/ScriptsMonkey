@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.4.2
+// @version      2.4.3
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -15,7 +15,7 @@
 (function () {
     "use strict";
 
-	console.log("EOP Helper: Script loaded successfully!");
+    console.log("EOP Helper: Script loaded successfully!");
 
     const $ = (selector, scope = document) => scope.querySelector(selector);
     const $$ = (selector, scope = document) => scope.querySelectorAll(selector);
@@ -37,6 +37,37 @@
                 intervalId = null;
             },
         };
+    }
+
+    function waitForSelector(selector, timeout = 10000, delay = 10) {
+        return new Promise((resolve, reject) => {
+            const element = document.querySelector(selector);
+            if (element) {
+                return setTimeout(() => resolve(element), delay);
+            }
+
+            let timeoutId;
+            if (timeout > 0) {
+                timeoutId = setTimeout(() => {
+                    observer.disconnect();
+                    reject(new Error(`Timeout: Không tìm thấy "${selector}" trong ${timeout}ms.`));
+                }, timeout);
+            }
+
+            const observer = new MutationObserver(() => {
+                const element = document.querySelector(selector);
+                if (element) {
+                    clearTimeout(timeoutId);
+                    observer.disconnect();
+                    setTimeout(() => resolve(element), delay);
+                }
+            });
+
+            observer.observe(document.documentElement, {
+                childList: true,
+                subtree: true,
+            });
+        });
     }
     // =====================================================================================
     // Bỏ chặn một số thứ
@@ -68,15 +99,16 @@
         const captchaInput = $("div.dgcaptcha > input#txtcaptcha");
         if (captchaInput) {
             captchaInput.setAttribute("lang", "en");
-            // Dùng event input để tự động chuyển đổi chữ thường thành chữ hoa liên tục
-            captchaInput.addEventListener("input", function () {
-                this.value = this.value.toUpperCase();
-            });
-            // Tự động click vào nút xem kết quả học tập khi nhấn enter hoặc ngừng nhập,...
+            captchaInput.setAttribute("placeholder", "");
+            captchaInput.style.textTransform = "uppercase";
             const btnCheck = $("button.btn.btn-info[title='Xem kết quả học tập']");
+
             captchaInput.addEventListener("change", function () {
-                btnCheck.click();
-                intervalCheckDiemht0.start(50, false);
+                this.value = this.value.toUpperCase();
+                if (this.value.length == 4) {
+                    intervalCheckDiemht0.start(50, false);
+                    btnCheck.click();
+                }
             });
             // khi click vào nút xem kết quả học tập
             btnCheck.addEventListener("click", function () {
@@ -242,9 +274,10 @@
         }
     }
     // =====================================================================================
-    const waitWebLoad = setInterval(() => {
-        if ($("div.panel-body")) {
-            clearInterval(waitWebLoad);
+
+    waitForSelector("div.panel-body", 10000, 50)
+        .then(() => {
+            console.log("EOP Helper: waitForSelector div.panel-body loaded");
             BoChan();
             if (currentURL.includes("/study/unit/")) {
                 console.log("EOP Helper: showTasks()");
@@ -259,7 +292,8 @@
                 console.log("EOP Helper: turnOffDoneSound()");
                 turnOffDoneSound();
             }
-        }
-    }, 50);
-    //
+        })
+        .catch((error) => {
+            console.error(error);
+        });
 })();
