@@ -1276,6 +1276,13 @@
 
                 scoreCell.setAttribute("contenteditable", "true");
 
+                scoreCell.addEventListener("keydown", (e) => {
+                    if (e.key === "Enter") {
+                        e.preventDefault();
+                        scoreCell.blur();
+                    }
+                });
+
                 scoreCell.addEventListener("blur", (e) => {
                     scoreCell.textContent = scoreCell.textContent.trim().toUpperCase();
                     scoreCell.textContent = scoreCell.textContent.replace(/^.*?(?=[ABCDF])/, "");
@@ -1326,7 +1333,7 @@
                     }[scoreCell.textContent];
 
                     if (scoreCell.textContent !== originalScore)
-                        score4Cell.style.backgroundColor = "#fff5d1ff";
+                        score4Cell.style.backgroundColor = "#fcefc3ff";
                     else score4Cell.style.backgroundColor = "#ffffff";
 
                     onScoreCellUpdated(scoreCell);
