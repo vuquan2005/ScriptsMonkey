@@ -1,9 +1,11 @@
 // ==UserScript==
 // @name         PTIT Helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      0.2.1
+// @version      0.2.2
 // @description  Công cụ hỗ trợ cho sinh viên PTIT
 // @author       QuanVu
+// @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svPTIT_Helper.user.js
+// @updateURL    https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svPTIT_Helper.user.js
 // @match        https://qldt.ptit.edu.vn/*
 // @grant        GM_addStyle
 // @grant        GM_getValue
@@ -81,18 +83,6 @@
 
         observer.observe(document.body, { childList: true, subtree: true });
     }
-
-    const letterScoreTo4 = {
-        "A+": 4.0,
-        A: 3.7,
-        "B+": 3.5,
-        B: 3.0,
-        "C+": 2.5,
-        C: 2.0,
-        "D+": 1.5,
-        D: 1.0,
-        F: 0.0,
-    };
 
     function showInfo() {
         const container = document.querySelector("app-right");
@@ -270,6 +260,11 @@
 
         for (const row of rows) {
             row.children[8].setAttribute("contenteditable", "true");
+            row.children[8].addEventListener("blur", (event) => {
+                convertLetterScoreTo4();
+                highlight();
+                calculateEditGPA();
+            });
         }
     }
 
@@ -278,17 +273,30 @@
         const rows = maintable.querySelectorAll("tr.text-center");
 
         for (const row of rows) {
-            let match = row.children[8].textContent.match(/^([ABCDF]\+?)$/);
-            if (match) {
-                row.children[7].textContent = letterScoreTo4[row.children[8].textContent.trim()];
-            } else {
-                let match1 = row.children[8].textContent.match(/([abcdf]\+?)/);
-                if (match1) {
-                    row.children[8].textContent = match1[0].toUpperCase();
-                    row.children[7].textContent =
-                        letterScoreTo4[row.children[8].textContent.trim()];
-                } else row.children[8].textContent = "";
+            const cell = row.children[8];
+            cell.textContent = cell.textContent.trim().toUpperCase();
+            cell.textContent = cell.textContent.replace(/^A.+$/g, "A+");
+            cell.textContent = cell.textContent.replace(/^B.+$/g, "B+");
+            cell.textContent = cell.textContent.replace(/^C.+$/g, "C+");
+            cell.textContent = cell.textContent.replace(/^D.+$/g, "D+");
+
+            if (!["A+", "A", "B+", "B", "C+", "C", "D+", "D", "F"].includes(cell.textContent)) {
+                alert("Điểm không hợp lệ! \nVui lòng nhập lại (A+, A, B+, B, C+, C, D+, D, F)");
+                cell.textContent = originalScore;
             }
+
+            row.children[7].textContent =
+                {
+                    "A+": 4.0,
+                    A: 3.7,
+                    "B+": 3.5,
+                    B: 3.0,
+                    "C+": 2.5,
+                    C: 2.0,
+                    "D+": 1.5,
+                    D: 1.0,
+                    F: 0.0,
+                }[cell.textContent];
         }
     }
 
@@ -300,12 +308,6 @@
                 showInfo();
                 calculateGPA();
                 highlight();
-
-                setInterval(() => {
-                    convertLetterScoreTo4();
-                    highlight();
-                    calculateEditGPA();
-                }, 1000);
             },
             700
         );
