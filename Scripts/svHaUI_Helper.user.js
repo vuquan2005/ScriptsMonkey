@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.4.0
+// @version      20.4.1
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -1184,7 +1184,7 @@
             sumCredits += credit;
         }
         const GPA = sumScore / sumCredits;
-        console.log(courseCodeMap);
+        // console.log(courseCodeMap);
         return { currentGPA: GPA, currentCredits: sumCredits };
     }
 
@@ -1224,7 +1224,7 @@
             sumCredits += credit;
         }
         const GPA = sumScore / sumCredits;
-        console.log(courseCodeMap);
+        // console.log(courseCodeMap);
         return { editedGPA: GPA, editedCredits: sumCredits };
     }
 
@@ -1288,8 +1288,10 @@
                 });
 
                 scoreCell.addEventListener("blur", (e) => {
+					// Upcase
                     scoreCell.textContent = scoreCell.textContent.trim().toUpperCase();
-                    scoreCell.textContent = scoreCell.textContent.replace(/^.*?(?=[ABCDF])/, "");
+					// 
+                    scoreCell.textContent = scoreCell.textContent.replace(/.+(?=[ABCDF].*)/, ""); console.log(scoreCell.textContent);
                     if (/^[ABCDF].*/.test(scoreCell.textContent)) {
                         scoreCell.textContent = scoreCell.textContent.replace(/^A.*$/g, "A");
                         scoreCell.textContent = scoreCell.textContent.replace(/^B.+$/g, "B+");
