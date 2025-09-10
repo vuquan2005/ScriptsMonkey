@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.3.1
+// @version      20.3.3
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -1277,18 +1277,41 @@
                 scoreCell.setAttribute("contenteditable", "true");
 
                 scoreCell.addEventListener("blur", (e) => {
-                    const cell = e.target;
-                    cell.textContent = cell.textContent.trim().toUpperCase();
-                    cell.textContent = cell.textContent.replace(/^B.+$/g, "B+");
-                    cell.textContent = cell.textContent.replace(/^C.+$/g, "C+");
-                    cell.textContent = cell.textContent.replace(/^D.+$/g, "D+");
-
-                    if (!["A", "B+", "B", "C+", "C", "D+", "D", "F"].includes(cell.textContent)) {
-                        alert("Điểm không hợp lệ! \nVui lòng nhập lại (A, B+, B, C+, C, D+, D, F)");
-                        cell.textContent = originalScore;
+                    scoreCell.textContent = scoreCell.textContent.trim().toUpperCase();
+                    if (/^[ABCDF]/.test(scoreCell.textContent)) {
+                        scoreCell.textContent = scoreCell.textContent.replace(/^B.+$/g, "B+");
+                        scoreCell.textContent = scoreCell.textContent.replace(/^C.+$/g, "C+");
+                        scoreCell.textContent = scoreCell.textContent.replace(/^D.+$/g, "D+");
+                    } else {
+                        scoreCell.textContent =
+                            Math.ceil(scoreCell.textContent.match(/\d\.*\d*/)[0] * 2) / 2;
+                        if (scoreCell.textContent > 0 || scoreCell.textContent <= 4.0) {
+                            scoreCell.textContent = {
+                                4.0: "A",
+                                3.5: "B+",
+                                3: "B",
+                                3.0: "B",
+                                2.5: "C+",
+                                2: "C",
+                                2.0: "C",
+                                1.5: "D+",
+                                1: "D",
+                                1.0: "D",
+                                0: "F",
+                                0.0: "F",
+                            }[scoreCell.textContent];
+                        }
                     }
 
-                    course.children[12].textContent = {
+                    if (scoreCell.textContent == originalScore) return;
+                    if (
+                        !["A", "B+", "B", "C+", "C", "D+", "D", "F"].includes(scoreCell.textContent)
+                    ) {
+                        alert("Điểm không hợp lệ! \nVui lòng nhập lại (A, B+, B, C+, C, D+, D, F)");
+                        scoreCell.textContent = originalScore;
+                    }
+                    const score4Cell = course.children[12];
+                    score4Cell.textContent = {
                         A: "4.0",
                         "B+": "3.5",
                         B: "3.0",
@@ -1297,13 +1320,13 @@
                         "D+": "1.5",
                         D: "1.0",
                         F: "0.0",
-                    }[cell.textContent];
+                    }[scoreCell.textContent];
 
-                    if (cell.textContent !== originalScore)
-                        course.children[12].style.backgroundColor = "#fff5d1ff";
-                    else course.children[12].style.backgroundColor = "#ffffff";
+                    if (scoreCell.textContent !== originalScore)
+                        score4Cell.style.backgroundColor = "#fff5d1ff";
+                    else score4Cell.style.backgroundColor = "#ffffff";
 
-                    onScoreCellUpdated(cell);
+                    onScoreCellUpdated(scoreCell);
                 });
             }
         } else {
