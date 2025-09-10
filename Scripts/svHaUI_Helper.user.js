@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.3.3
+// @version      20.3.4
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -1278,11 +1278,14 @@
 
                 scoreCell.addEventListener("blur", (e) => {
                     scoreCell.textContent = scoreCell.textContent.trim().toUpperCase();
-                    if (/^[ABCDF]/.test(scoreCell.textContent)) {
+                    scoreCell.textContent = scoreCell.textContent.replace(/^.*?(?=[ABCDF])/, "");
+                    if (/^[ABCDF].*/.test(scoreCell.textContent)) {
+                        scoreCell.textContent = scoreCell.textContent.replace(/^A.*$/g, "A");
                         scoreCell.textContent = scoreCell.textContent.replace(/^B.+$/g, "B+");
                         scoreCell.textContent = scoreCell.textContent.replace(/^C.+$/g, "C+");
                         scoreCell.textContent = scoreCell.textContent.replace(/^D.+$/g, "D+");
-                    } else {
+                        scoreCell.textContent = scoreCell.textContent.replace(/^F.*$/g, "F");
+                    } else if (/\d\.*\d*/.test(scoreCell.textContent)) {
                         scoreCell.textContent =
                             Math.ceil(scoreCell.textContent.match(/\d\.*\d*/)[0] * 2) / 2;
                         if (scoreCell.textContent > 0 || scoreCell.textContent <= 4.0) {
