@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.4.1
+// @version      20.4.2
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -1163,6 +1163,7 @@
             const scorse4 = Number(course.children[12].textContent.trim());
 
             if (nonCreditCourse.some((hp) => code.includes(hp))) continue;
+			if (Number.isNaN(scorse4)) continue;
             if (scorse4 == "") continue;
             if (scorse4 == "0") continue;
 
@@ -1204,6 +1205,7 @@
             const scorse4 = Number(course.children[12].textContent.trim());
 
             if (nonCreditCourse.some((hp) => code.includes(hp))) continue;
+			if (Number.isNaN(scorse4)) continue;
             if (scorse4 == "") continue;
 
             if (courseCodeMap.has(code)) {
