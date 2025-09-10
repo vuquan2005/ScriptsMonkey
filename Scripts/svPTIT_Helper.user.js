@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PTIT Helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      0.2.2
+// @version      0.2.3
 // @description  Công cụ hỗ trợ cho sinh viên PTIT
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svPTIT_Helper.user.js
@@ -260,6 +260,12 @@
 
         for (const row of rows) {
             row.children[8].setAttribute("contenteditable", "true");
+			row.children[8].addEventListener("keydown", (e) => {
+                    if (e.key === "Enter") {
+                        e.preventDefault();
+                        row.children[8].blur();
+                    }
+                });
             row.children[8].addEventListener("blur", (event) => {
                 convertLetterScoreTo4();
                 highlight();
