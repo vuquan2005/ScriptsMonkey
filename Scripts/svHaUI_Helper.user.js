@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.3.0
+// @version      20.3.1
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -821,17 +821,17 @@
 
         if (window.location.pathname === "/student/result/studyresults") {
             toggleLink.href = "https://sv.haui.edu.vn/student/result/examresult";
-            toggleLink.textContent = "➡️ Kết quả thi";
+            toggleLink.textContent = "➡️🎯Kết quả thi";
         } else if (window.location.pathname === "/student/result/examresult") {
             toggleLink.href = "https://sv.haui.edu.vn/student/result/studyresults";
-            toggleLink.textContent = "➡️ Kết quả học tập";
+            toggleLink.textContent = "➡️🎯Kết quả học tập";
         } else {
             if (window.location.pathname.includes("exam")) {
                 toggleLink.href = window.location.href.replace("exam", "study");
-                toggleLink.textContent = "➡️ Kết quả học tập";
+                toggleLink.textContent = "➡️🎯Kết quả học tập";
             } else {
                 toggleLink.href = window.location.href.replace("study", "exam");
-                toggleLink.textContent = "➡️ Kết quả thi";
+                toggleLink.textContent = "➡️🎯Kết quả thi";
             }
         }
 
@@ -1386,13 +1386,13 @@
         const requiredScore = document.createElement("tr");
         requiredScore.style.backgroundColor = "#ffffff";
 
-        requiredScore.innerHTML = `<td colspan="7">
+        requiredScore.innerHTML = `<td colspan="4">
 			<span id="requiredScore" class="study-info">
 				✏️: <span id="edited-gpa">0</span> / <span id="edited-credits">0</span></br>
 				🎯: <span id="current-gpa1">0</span> / <span id="current-credits">0</span></br>
 				Số tín tích luỹ còn lại: <span id="remaining-credits">0</span></br>
 			</span>
-		</td><td colspan="10">
+		</td><td colspan="14">
 			<span id="requiredScore" class="study-info">
 				3.6🎯: <span id="target-3.6">0</span></br>
 				3.2🎯: <span id="target-3.2">0</span></br>
