@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.1.2
+// @version      20.3.0
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -155,6 +155,42 @@
         const sideBar = document.querySelector("div.left-sidebar-content");
         const homeElement = sideBar.querySelector("a[href='/']");
         homeElement.href = "/home";
+    }
+
+    // Hiển thị GPA trên thanh menu
+    function displayGPA() {
+        const menuTitle = document.querySelector("ul.sidebar-elements");
+
+        const container = document.createElement("li");
+        container.className = "bar-container";
+        container.innerHTML = `
+			<div><a class="bar-data" href="/student/result/examresult">GPA: ${
+                GM_getValue("currentGPA") || "N/A"
+            }</a></div>
+			<div><a class="bar-data" href="/training/viewcourseindustry">${
+                GM_getValue("currentCredits") || "0"
+            } / ${GM_getValue("totalCredits") || "0"}</a></div>
+		`;
+        menuTitle.insertAdjacentElement("afterbegin", container);
+
+        GM_addStyle(`
+			.bar-container {
+				width: 80%;
+				margin: auto;
+				display: flex;
+			}
+			.bar-data {
+				color: #1c274d;
+				font-size: 14px;
+				font-weight: bold;
+				padding: 10px;
+				margin: auto;
+				background-color: white;
+				border-radius: 8px;
+				text-align: center;
+				display: inline-block;
+			}
+		`);
     }
 
     // Khảo sát nhanh
@@ -851,7 +887,8 @@
             GM_setValue("maHPtoMaIn", maHPtoMaIn);
         } else {
             // Trang xem điểm TX
-            const maHPtoMaIn = GM_getValue("maHPtoMaIn");
+            const maHPtoMaIn = GM_getValue("maHPtoMaIn", undefined);
+            if (maHPtoMaIn == undefined) return;
             // console.log("maHPtoMaIn: ", maHPtoMaIn);
             const hocPhan = kgrid.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
             for (const row of hocPhan) {
@@ -1153,13 +1190,59 @@
         return tongTinChi;
     }
 
+    // Tính những điểm đã chỉnh sửa
+    function calculateEditedScores() {
+        const kgrid = document.querySelector("div.kGrid");
+        const hocPhan = kgrid.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
+        let tong = 0;
+        const credits = totalEditedCredits();
+        for (const row of hocPhan) {
+            if (nonCreditCourse.some((hp) => row.children[1].textContent.includes(hp))) continue;
+            const oDiem = row.children[12];
+            if (oDiem.style.backgroundColor === "rgb(255, 245, 209)") {
+                const diemSo = Number(oDiem.textContent.trim());
+                const tinChi = Number(row.children[5].textContent.trim());
+                tong += diemSo * tinChi;
+            }
+        }
+        return tong / credits;
+    }
+
+    // Tổng tín đã sửa
+    function totalEditedCredits() {
+        const kgrid = document.querySelector("div.kGrid");
+        const hocPhan = kgrid.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
+        let tongTinChiDaSua = 0;
+        for (const row of hocPhan) {
+            if (nonCreditCourse.some((hp) => row.children[1].textContent.includes(hp))) continue;
+            const oDiem = row.children[12];
+            if (oDiem.style.backgroundColor === "rgb(255, 245, 209)") {
+                const tinChi = Number(row.children[5].textContent.trim());
+                tongTinChiDaSua += tinChi;
+            }
+        }
+        return tongTinChiDaSua;
+    }
+
     // Cho phép chỉnh sửa điểm
     function editScoreBtn() {
         const toggleBtn = document.createElement("span");
+        toggleBtn.id = "toggle-edit-score-btn";
         toggleBtn.textContent = "✏️";
-        toggleBtn.style.cursor = "pointer";
         toggleBtn.title = "Bật/Tắt chỉnh sửa điểm";
-        toggleBtn.style.fontSize = "24px";
+
+        GM_addStyle(`
+			#toggle-edit-score-btn {
+				cursor: pointer;
+				font-size: 24px;
+				transition: transform 0.2s;
+				display: inline-block;
+				margin-left: 8px;
+			}
+			#toggle-edit-score-btn:hover {
+				transform: scale(1.2);
+			}
+		`);
 
         toggleBtn.addEventListener("click", (e) => {
             e.stopPropagation();
@@ -1218,8 +1301,7 @@
 
                     if (cell.textContent !== originalScore)
                         course.children[12].style.backgroundColor = "#fff5d1ff";
-					else
-						course.children[12].style.backgroundColor = "#ffffff";
+                    else course.children[12].style.backgroundColor = "#ffffff";
 
                     onScoreCellUpdated(cell);
                 });
@@ -1230,9 +1312,6 @@
             }
         }
     }
-
-    // Hiển thị GPA đã chỉnh sửa
-    function showGPAEdited() {}
 
     // Hiển thị thêm thông tin trong trang kết quả thi
     function showMoreInfoInExamResult() {
@@ -1260,7 +1339,7 @@
         currentGPAContainer.setAttribute("colspan", "6");
         const editedGPA = document.createElement("td");
         editedGPA.setAttribute("colspan", "2");
-        editedGPA.innerHTML = `<span class="study-info">🎯: <span id="edited-gpa"></span></span>`;
+        editedGPA.innerHTML = `<span class="study-info">🎯: <span id="current-gpa"></span></span>`;
         currentGPAContainer.insertAdjacentElement("afterend", editedGPA);
 
         // Học lực
@@ -1278,15 +1357,26 @@
             "tbody > tr:last-child > td:first-child"
         );
         currentCreditsContainer.innerHTML += `<span class="study-info"> / <span id="total-credits">???</span></span>`;
-        if (isSameTotalCredits) {
-            const totalCredits = GM_getValue("totalCredits");
+        const totalCredits = GM_getValue("totalCredits", 0);
+        if (isSameTotalCredits && totalCredits > 0) {
             document.getElementById("total-credits").textContent = totalCredits;
         } else {
             const totalCreditsSpan = document.getElementById("total-credits");
             totalCreditsSpan.setAttribute("contenteditable", "true");
+            GM_addStyle(`
+				#total-credits {
+					border-bottom: 2px dashed gray;
+				}
+				#total-credits:focus {
+					outline: none;
+					background-color: #fff5d1ff;
+				}
+			`);
+            totalCreditsSpan.title =
+                "Nhấp để chỉnh sửa tổng tín chỉ\nHoặc vào khung chương trình đào tạo để tự động lấy";
             totalCreditsSpan.addEventListener("blur", (e) => {
                 e.target.textContent = e.target.textContent.replace(/[^\d]/g, "");
-                if (e.target.textContent == "") e.target.textContent = "200";
+                if (e.target.textContent == "") e.target.textContent = "142";
                 onScoreCellUpdated();
             });
         }
@@ -1296,13 +1386,19 @@
         const requiredScore = document.createElement("tr");
         requiredScore.style.backgroundColor = "#ffffff";
 
-        requiredScore.innerHTML = `<td colspan="18"><span class="study-info"><span id="requiredScore">
-			Số tín tích luỹ: <span id="current-credits">0</span></br>
-			Số tín tích luỹ còn lại: <span id="remaining-credits">0</span></br>
-			3.6🎯: <span id="target-3.6">0</span></br>
-			3.2🎯: <span id="target-3.2">0</span></br>
-			2.5🎯: <span id="target-2.5">0</span></br>
-		</span></span></td>`;
+        requiredScore.innerHTML = `<td colspan="7">
+			<span id="requiredScore" class="study-info">
+				✏️: <span id="edited-gpa">0</span> / <span id="edited-credits">0</span></br>
+				🎯: <span id="current-gpa1">0</span> / <span id="current-credits">0</span></br>
+				Số tín tích luỹ còn lại: <span id="remaining-credits">0</span></br>
+			</span>
+		</td><td colspan="10">
+			<span id="requiredScore" class="study-info">
+				3.6🎯: <span id="target-3.6">0</span></br>
+				3.2🎯: <span id="target-3.2">0</span></br>
+				2.5🎯: <span id="target-2.5">0</span></br>
+			</span>
+		</td>`;
         requiredScoreContainer.insertAdjacentElement("afterend", requiredScore);
 
         GM_addStyle(`
@@ -1324,19 +1420,18 @@
     // Xử lý khi ô điểm được chỉnh sửa
     function onScoreCellUpdated() {
         highlightExamScores();
-        const editedGPA = calculateGPA();
+        const currentGPA = calculateGPA();
 
-        document.getElementById("edited-gpa").textContent = editedGPA.toFixed(3);
+        document.getElementById("current-gpa").textContent = currentGPA.toFixed(3);
 
-        if (editedGPA >= 3.6) document.getElementById("edited-study").textContent = "Xuất sắc";
-        else if (editedGPA >= 3.2) document.getElementById("edited-study").textContent = "Giỏi";
-        else if (editedGPA >= 2.5) document.getElementById("edited-study").textContent = "Khá";
-        else if (editedGPA >= 2.0)
+        if (currentGPA >= 3.6) document.getElementById("edited-study").textContent = "Xuất sắc";
+        else if (currentGPA >= 3.2) document.getElementById("edited-study").textContent = "Giỏi";
+        else if (currentGPA >= 2.5) document.getElementById("edited-study").textContent = "Khá";
+        else if (currentGPA >= 2.0)
             document.getElementById("edited-study").textContent = "Trung bình";
-        else if (editedGPA < 2.0) document.getElementById("edited-study").textContent = "Yếu";
+        else if (currentGPA < 2.0) document.getElementById("edited-study").textContent = "Yếu";
 
         const currentCredits = calculateCredits();
-        const currentGPA = calculateGPA();
         const totalCredits = document.getElementById("total-credits").textContent.trim();
         console.log(
             "totalCredits: ",
@@ -1351,6 +1446,9 @@
         const scoresToGPA32 = (3.2 * totalCredits - currentGPA * currentCredits) / remainingCredits;
         const scoresToGPA36 = (3.6 * totalCredits - currentGPA * currentCredits) / remainingCredits;
 
+        document.getElementById("edited-gpa").textContent = calculateEditedScores().toFixed(3);
+        document.getElementById("edited-credits").textContent = totalEditedCredits();
+        document.getElementById("current-gpa1").textContent = currentGPA.toFixed(3);
         document.getElementById("current-credits").textContent = currentCredits;
         document.getElementById("remaining-credits").textContent = remainingCredits;
         document.getElementById("target-2.5").textContent = scoresToGPA25.toFixed(3);
@@ -1368,11 +1466,14 @@
         "IC6007", // Công nghệ thông tin nâng cao
     ];
 
+    //===============================================================
+
     function run() {
         console.log("sv.HaUI loaded: " + window.location.href);
 
         runOnUrl(changeTitle, "");
         runOnUrl(changeHomePagePath, "");
+        runOnUrl(displayGPA, "");
 
         runOnUrl(fastSurvey, /\/survey\//);
 
@@ -1429,16 +1530,14 @@
 
         runOnUrl(getYourTotalCredits, "/training/viewcourseindustry");
         runOnUrl(getYourLearningProgress, "/student/result/examresult");
+
+        runOnUrl(calculateGPA, "/student/result/examresult", "/student/result/viewexamresult");
+        runOnUrl(editScoreBtn, "/student/result/examresult", "/student/result/viewexamresult");
         runOnUrl(
             showMoreInfoInExamResult,
             "/student/result/examresult",
             "/student/result/viewexamresult"
         );
-
-        runOnUrl(calculateGPA, "/student/result/examresult", "/student/result/viewexamresult");
-
-        runOnUrl(editScoreBtn, "/student/result/examresult", "/student/result/viewexamresult");
-        runOnUrl(showGPAEdited, "/student/result/examresult", "/student/result/viewexamresult");
     }
 
     waitForSelector("#frmMain", 5000, 100)
