@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.4.3
+// @version      20.4.4
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -165,11 +165,11 @@
         container.className = "bar-container";
         container.innerHTML = `
 			<div><a class="bar-data" href="/student/result/examresult">GPA: ${
-                GM_getValue("currentGPA") || "N/A"
+                GM_getValue("currentGPA") || "..."
             }</a></div>
 			<div><a class="bar-data" href="/training/viewcourseindustry">${
-                GM_getValue("currentCredits") || "0"
-            } / ${GM_getValue("totalCredits") || "0"}</a></div>
+                GM_getValue("currentCredits") || "..."
+            } / ${GM_getValue("totalCredits") || "..."}</a></div>
 		`;
         menuTitle.insertAdjacentElement("afterbegin", container);
 
@@ -1482,7 +1482,7 @@
         const scoresToGPA32 = (3.2 * totalCredits - currentGPA * currentCredits) / remainingCredits;
         const scoresToGPA36 = (3.6 * totalCredits - currentGPA * currentCredits) / remainingCredits;
 
-        document.getElementById("edited-gpa").textContent = editedGPA.toFixed(3);
+        document.getElementById("edited-gpa").textContent = isNaN(editedGPA)? "0" : editedGPA.toFixed(3);
         document.getElementById("edited-credits").textContent = editedCredits;
         document.getElementById("current-gpa1").textContent = currentGPA.toFixed(3);
         document.getElementById("current-credits").textContent = currentCredits;
