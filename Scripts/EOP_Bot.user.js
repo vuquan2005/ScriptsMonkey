@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Bot
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      4.12
+// @version      4.13
 // @description  A bot working on eop.edu.vn
 // @author       QuanVu
 // @match        https://eop.edu.vn/study/*
@@ -183,7 +183,7 @@
         await delay(100);
         const btnReW = document.querySelector('button.btn.btn-primary.dnut[type="button"]');
         if (btnReW) btnReW.click();
-        const inputFields = document.querySelectorAll("input[type='text']");
+        const inputFields = document.querySelectorAll("input.danw.dinline[type='text']");
         inputFields.forEach((input, index) => {
             if (answersTxt[index]) {
                 input.value = answersTxt[index];
