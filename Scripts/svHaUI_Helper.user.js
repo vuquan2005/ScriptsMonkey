@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.4.2
+// @version      20.4.3
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -880,7 +880,7 @@
                 const maIN = row.children[2].textContent.match(/\d+/)[0];
                 maHPtoMaIn[maHP] = maIN;
                 row.children[1].innerHTML = `<a class="di-den-chi-tiet-hp" 
-					href="https://sv.haui.edu.vn/training/viewmodulescdiosv/xem-chi-tiet-hoc-phan.htm?id=${maIN}&ver=2">
+					href="https://sv.haui.edu.vn/training/viewmodulescdiosv/xem-chi-tiet-hoc-phan.htm?id=${maIN}&ver=1">
 						${maHP}
 				</a>`;
             }
