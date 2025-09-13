@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.5.4
+// @version      20.5.5
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -171,9 +171,7 @@
                             title + " " + (name ? name : "") + ": " + (className ? className : "")
                         );
                     },
-                    "/student/result/examresult",
                     "/student/result/viewexamresult",
-                    "/student/result/studyresults",
                     "/student/result/viewstudyresult"
                 ) || title;
 
