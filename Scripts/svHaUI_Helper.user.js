@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.5.2
+// @version      20.5.3
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -65,6 +65,7 @@
                     console.log(
                         `${callback.name || new Error().stack.replace("Error", "Callback: ")} :`,
                         link
+                    );
                     return callback();
                 }
             }
@@ -154,6 +155,7 @@
                 .replace("Kết quả học tập các học phần", "🎯 Điểm TX");
 
             title =
+                runOnUrl(
                     () => {
                         const kgrid = document.querySelector("div.kGrid");
                         const name = kgrid
@@ -178,6 +180,8 @@
 
             title =
                 runOnUrl(
+                    () => {
+                        const className = document
                             .querySelector("table > tbody > tr > td:nth-child(2)")
                             .textContent.trim();
                         const classCode = document
