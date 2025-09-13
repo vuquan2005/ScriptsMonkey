@@ -2,6 +2,7 @@
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
 // @version      20.4.4
+// @version      20.5.0
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -54,11 +55,13 @@
             if (typeof link === "string") {
                 if (link === pathname || link === href || link === "") {
                     console.log(`${callback.name || "'Callback'"} :`, link);
+                        link || "All"
                     return callback();
                 }
             } else if (link instanceof RegExp) {
                 if (link.test(href)) {
                     console.log(`${callback.name || "'Callback'"} :`, link);
+                        `${callback.name || new Error().stack.replace("Error", "Callback: ")} :`,
                     return callback();
                 }
             }
@@ -146,6 +149,7 @@
                 .replace("CHI TIẾT", "ℹ️")
                 .replace("Kết quả thi các môn", "🎯 Điểm học phần")
                 .replace("Kết quả học tập các học phần", "🎯 Điểm TX");
+                            .querySelector("table > tbody > tr > td:nth-child(2)")
             document.title = title;
         }
     }
