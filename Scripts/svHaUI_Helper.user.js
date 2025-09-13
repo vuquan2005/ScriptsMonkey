@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.5.5
+// @version      20.5.6
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -1421,12 +1421,12 @@
         let isSameTotalCredits = true;
         if (window.location.pathname.includes("/student/result/viewexamresult")) {
             const yourClassCode = GM_getValue("classCode");
-            const classCode = document
+            let classCode = document
                 .querySelector(
                     "div.kGrid > div > div > div > table > tbody > tr:nth-child(3) > td:nth-child(2) > strong"
                 )
                 .textContent.trim();
-            classCode.replace(/\d+$/, "");
+            classCode = classCode.match(/\d{4}\D+/);
             isSameTotalCredits = yourClassCode.includes(classCode);
             console.log("isSameTotalCredits: ", isSameTotalCredits);
         }
