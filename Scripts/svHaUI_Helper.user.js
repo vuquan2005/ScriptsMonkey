@@ -1,9 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.4.4
-// @version      20.5.0
-// @version      20.5.1
+// @version      20.5.2
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -154,7 +152,32 @@
                 .replace("CHI TIẾT", "ℹ️")
                 .replace("Kết quả thi các môn", "🎯 Điểm học phần")
                 .replace("Kết quả học tập các học phần", "🎯 Điểm TX");
+
+            title =
+                    () => {
                         const kgrid = document.querySelector("div.kGrid");
+                        const name = kgrid
+                            .querySelector("table > tbody > tr > td:nth-child(2)")
+                            .textContent.trim();
+                        const className = kgrid
+                            .querySelector("table > tbody > tr:nth-child(3) > td:nth-child(2)")
+                            .textContent.trim();
+
+                        title = title.replace("🎯 Điểm học phần", "🎯 Điểm: ");
+                        title = title.replace("Kết quả học tập các môn", "🎯 Điểm TX: ");
+
+                        return (
+                            title + " " + (name ? name : "") + ": " + (className ? className : "")
+                        );
+                    },
+                    "/student/result/examresult",
+                    "/student/result/viewexamresult",
+                    "/student/result/studyresults",
+                    "/student/result/viewstudyresult"
+                ) || title;
+
+            title =
+                runOnUrl(
                             .querySelector("table > tbody > tr > td:nth-child(2)")
                             .textContent.trim();
                         const classCode = document
