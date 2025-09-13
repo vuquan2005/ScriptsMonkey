@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.5.3
+// @version      20.5.4
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -61,7 +61,6 @@
                 }
             } else if (link instanceof RegExp) {
                 if (link.test(href)) {
-                    console.log(`${callback.name || "'Callback'"} :`, link);
                     console.log(
                         `${callback.name || new Error().stack.replace("Error", "Callback: ")} :`,
                         link
@@ -833,10 +832,9 @@
             row.children[creditIndex].style.color = "#FFFFFF";
 
             // Bỏ qua những học phần không có điểm
-            if (row.children[score4Index].textContent.trim() == "") {
-                row.children[scoreLetterIndex].style.backgroundColor = "rgba(0, 0, 0, 0)";
-                continue;
-            }
+            if (row.children[score4Index].textContent.trim() == "") continue;
+            if (row.children[score4Index].textContent.trim() == "**") continue;
+
             const diemSo = 0.0 + Number(row.children[score4Index].textContent.trim());
             // console.log(diemSo);
             // Tô màu điểm
@@ -1207,7 +1205,7 @@
         console.log("currentGPA: ", currentGPAValue);
     }
 
-	// Tính toàn bộ
+    // Tính toàn bộ
     function calculateStudyStats() {
         const kgrid = document.querySelector("div.kGrid");
         const courses = kgrid.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
@@ -1220,15 +1218,21 @@
             const scorse4 = Number(course.children[12].textContent.trim());
 
             if (nonCreditCourse.some((hp) => code.includes(hp))) continue;
-			if (Number.isNaN(scorse4)) continue;
+            if (Number.isNaN(credit)) continue;
+            if (Number.isNaN(scorse4)) continue;
             if (scorse4 == "") continue;
             if (scorse4 == "0") continue;
+
+            course.children[15].style.backgroundColor = "rgb(252, 239, 195)";
 
             if (courseCodeMap.has(code)) {
                 const old = courseCodeMap.get(code);
                 if (scorse4 > old.scorse4) {
                     courseCodeMap.delete(code);
                     courseCodeMap.set(code, { scorse4: scorse4, credit: credit });
+
+                    // console.log(course);
+                    // course.children[14].style.backgroundColor = "rgb(252, 239, 195)";
                 }
             } else {
                 courseCodeMap.set(code, { scorse4: scorse4, credit: credit });
@@ -1246,7 +1250,7 @@
         return { currentGPA: GPA, currentCredits: sumCredits };
     }
 
-	// Chỉ tính học phần đã sửa, tính cả học phần F
+    // Chỉ tính học phần đã sửa, tính cả học phần F
     function calculateStudyStatsEdited() {
         const kgrid = document.querySelector("div.kGrid");
         const courses = kgrid.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
@@ -1262,7 +1266,8 @@
             const scorse4 = Number(course.children[12].textContent.trim());
 
             if (nonCreditCourse.some((hp) => code.includes(hp))) continue;
-			if (Number.isNaN(scorse4)) continue;
+            if (Number.isNaN(credit)) continue;
+            if (Number.isNaN(scorse4)) continue;
             if (scorse4 == "") continue;
 
             if (courseCodeMap.has(code)) {
@@ -1347,10 +1352,11 @@
                 });
 
                 scoreCell.addEventListener("blur", (e) => {
-					// Upcase
+                    // Upcase
                     scoreCell.textContent = scoreCell.textContent.trim().toUpperCase();
-					// 
-                    scoreCell.textContent = scoreCell.textContent.replace(/.+(?=[ABCDF].*)/, ""); console.log(scoreCell.textContent);
+                    //
+                    scoreCell.textContent = scoreCell.textContent.replace(/.+(?=[ABCDF].*)/, "");
+                    console.log(scoreCell.textContent);
                     if (/^[ABCDF].*/.test(scoreCell.textContent)) {
                         scoreCell.textContent = scoreCell.textContent.replace(/^A.*$/g, "A");
                         scoreCell.textContent = scoreCell.textContent.replace(/^B.+$/g, "B+");
@@ -1539,7 +1545,9 @@
         const scoresToGPA32 = (3.2 * totalCredits - currentGPA * currentCredits) / remainingCredits;
         const scoresToGPA36 = (3.6 * totalCredits - currentGPA * currentCredits) / remainingCredits;
 
-        document.getElementById("edited-gpa").textContent = isNaN(editedGPA)? "0" : editedGPA.toFixed(3);
+        document.getElementById("edited-gpa").textContent = isNaN(editedGPA)
+            ? "0"
+            : editedGPA.toFixed(3);
         document.getElementById("edited-credits").textContent = editedCredits;
         document.getElementById("current-gpa1").textContent = currentGPA.toFixed(3);
         document.getElementById("current-credits").textContent = currentCredits;
