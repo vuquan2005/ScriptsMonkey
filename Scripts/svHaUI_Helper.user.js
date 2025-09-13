@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.5.6
+// @version      20.7.0
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -10,6 +10,7 @@
 // @grant        GM_addStyle
 // @grant        GM_getValue
 // @grant        GM_setValue
+// @require      https://cdn.jsdelivr.net/npm/notyf/notyf.min.js
 // ==/UserScript==
 
 (function () {
@@ -140,6 +141,10 @@
         };
     }
 
+    GM_addStyle(`
+      @import url("https://cdn.jsdelivr.net/npm/notyf/notyf.min.css");
+    `);
+
     //===============================================================
     // Sửa tiêu đề trang
     function changeTitle() {
@@ -258,7 +263,9 @@
                     inputSelectScore.type = "radio";
                     inputSelectScore.name = "select_score";
                     inputSelectScore.value = scoreId;
-                    score.appendChild(inputSelectScore);
+                    score.prepend(inputSelectScore);
+
+                    const notyf = new Notyf();
 
                     inputSelectScore.addEventListener("change", function () {
                         const scoreElements = element.querySelectorAll(
@@ -267,6 +274,7 @@
                         for (const scoreElement of scoreElements) {
                             scoreElement.checked = true;
                         }
+                        notyf.success(`Đã chọn ${scoreId} điểm`);
                     });
                 }
             }
@@ -646,7 +654,10 @@
             }
             await delay(10);
         }
-        if (i === 0) console.warn("Không có kế hoạch thi nào.");
+        var notyf = new Notyf();
+
+        if (i === 0) notyf.error("Không có kế hoạch thi");
+        else notyf.success("Đã lấy thành công kế hoạch thi");
     }
 
     // Hiển thị lịch thi trên trang kế hoạch thi
@@ -686,7 +697,10 @@
                 examScheduleContainer.appendChild(examScheduleElement);
             }
         }
-        if (i === 0) console.warn("Không có lịch thi nào.");
+        var notyf = new Notyf();
+
+        if (i === 0) notyf.error("Không có lịch thi");
+        else notyf.success("Đã lấy thành công lịch thi");
     }
 
     // Xắp xếp lịch thi
@@ -744,6 +758,8 @@
             return dom.querySelector("#ctl02_ctl00_viewResult > div > div > table > tbody > tr");
         } catch (err) {
             console.error(`Lỗi khi lấy lịch thi cho ${getHPCode}: `, err);
+            var notyf = new Notyf();
+            notyf.error(`Lỗi khi lấy lịch thi cho ${getHPCode}: `, err);
         }
     }
 
@@ -1164,6 +1180,9 @@
             link.click();
             document.body.removeChild(link);
             URL.revokeObjectURL(url);
+
+            var notyf = new Notyf();
+            notyf.success("Đã xuất lịch học");
         });
     }
 
@@ -1310,15 +1329,19 @@
 			}
 		`);
 
+        const notyf = new Notyf();
+
         toggleBtn.addEventListener("click", (e) => {
             e.stopPropagation();
 
             if (toggleBtn.textContent === "✏️") {
                 toggleBtn.textContent = "📝";
                 onEditScore(true);
+                notyf.success("Đã bật chỉnh sửa điểm");
             } else {
                 toggleBtn.textContent = "✏️";
                 onEditScore(false);
+                notyf.error("Tắt chỉnh sửa điểm");
             }
         });
         const kGrid = document.querySelector("div.kGrid");
