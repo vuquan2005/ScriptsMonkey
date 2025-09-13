@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.7.0
+// @version      20.7.1
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -846,8 +846,13 @@
             row.children[creditIndex].style.color = "#FFFFFF";
 
             // Bỏ qua những học phần không có điểm
-            if (row.children[score4Index].textContent.trim() == "") continue;
-            if (row.children[score4Index].textContent.trim() == "**") continue;
+            if (
+                row.children[score4Index].textContent.trim() == "" ||
+                row.children[score4Index].textContent.trim() == "**"
+            ) {
+                row.children[scoreLetterIndex].style.backgroundColor = "rgba(0, 0, 0, 0)";
+                continue;
+            }
 
             const diemSo = 0.0 + Number(row.children[score4Index].textContent.trim());
             // console.log(diemSo);
@@ -1372,6 +1377,8 @@
                     }
                 });
 
+                var notyf = new Notyf();
+
                 scoreCell.addEventListener("blur", (e) => {
                     // Upcase
                     scoreCell.textContent = scoreCell.textContent.trim().toUpperCase();
@@ -1410,7 +1417,9 @@
                     if (
                         !["A", "B+", "B", "C+", "C", "D+", "D", "F"].includes(scoreCell.textContent)
                     ) {
-                        alert("Điểm không hợp lệ! \nVui lòng nhập lại (A, B+, B, C+, C, D+, D, F)");
+                        notyf.error(
+                            "Điểm không hợp lệ! \nVui lòng nhập lại (A, B+, B, C+, C, D+, D, F)"
+                        );
                         scoreCell.textContent = originalScore;
                     }
                     const score4Cell = course.children[12];
