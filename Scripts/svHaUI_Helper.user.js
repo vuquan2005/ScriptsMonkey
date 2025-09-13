@@ -1245,8 +1245,6 @@
             if (scorse4 == "") continue;
             if (scorse4 == "0") continue;
 
-            course.children[15].style.backgroundColor = "rgb(252, 239, 195)";
-
             if (courseCodeMap.has(code)) {
                 const old = courseCodeMap.get(code);
                 if (scorse4 > old.scorse4) {
