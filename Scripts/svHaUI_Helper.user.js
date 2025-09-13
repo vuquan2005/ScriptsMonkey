@@ -3,6 +3,7 @@
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
 // @version      20.4.4
 // @version      20.5.0
+// @version      20.5.1
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -54,14 +55,18 @@
         for (const link of validLinks) {
             if (typeof link === "string") {
                 if (link === pathname || link === href || link === "") {
-                    console.log(`${callback.name || "'Callback'"} :`, link);
+                    console.log(
+                        `${callback.name || new Error().stack.replace("Error", "Callback: ")} :`,
                         link || "All"
+                    );
                     return callback();
                 }
             } else if (link instanceof RegExp) {
                 if (link.test(href)) {
                     console.log(`${callback.name || "'Callback'"} :`, link);
+                    console.log(
                         `${callback.name || new Error().stack.replace("Error", "Callback: ")} :`,
+                        link
                     return callback();
                 }
             }
@@ -149,7 +154,28 @@
                 .replace("CHI TIẾT", "ℹ️")
                 .replace("Kết quả thi các môn", "🎯 Điểm học phần")
                 .replace("Kết quả học tập các học phần", "🎯 Điểm TX");
+                        const kgrid = document.querySelector("div.kGrid");
                             .querySelector("table > tbody > tr > td:nth-child(2)")
+                            .textContent.trim();
+                        const classCode = document
+                            .querySelector("table > tbody > tr:nth-child(3) > td:nth-child(2)")
+                            .textContent.trim();
+
+                        title = title.replace("Kết quả học tập trên lớp", "🎯 Điểm TX: ");
+                        title = title.replace("Bảng kết quả thi", "🎯 Điểm thi: ");
+
+                        return (
+                            title +
+                            " " +
+                            (className ? className : "") +
+                            ": " +
+                            (classCode ? classCode : "")
+                        );
+                    },
+                    "/student/result/viewexamresultclass",
+                    "/student/result/viewstudyresultclass"
+                ) || title;
+
             document.title = title;
         }
     }
