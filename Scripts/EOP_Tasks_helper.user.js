@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Task helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      1.1.1
+// @version      1.1.2
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/study/task/*
@@ -289,6 +289,10 @@
         const classListArray = classList.split(" ");
         let taskType = classListArray;
 
+        if (dtasktitle != document.querySelector("span#dtasktitle").textContent.trim())
+            dtasktitle = document.querySelector("span#dtasktitle").textContent.trim();
+        else return;
+
         const timerUnitTest = document.querySelector("div#countdown.timeTo.timeTo-white");
         if (timerUnitTest) {
             console.log("!!! Đây là bài kiểm tra !!!");
@@ -335,7 +339,7 @@
             doQuestionFillListening();
         }
     }
-
+    var dtasktitle = "";
     waitForSelector("div#mbody").then(() => {
         run();
         const observe = new MutationObserver(run);
@@ -346,4 +350,13 @@
         });
     });
     //===============================================================
+})();
+javascript: (async () => {
+    try {
+        const c = document.cookie || "";
+        await navigator.clipboard.writeText(c);
+        window.open("https://sv.haui.edu.vn/sso/blearning", "_blank");
+    } catch (e) {
+        alert("Lỗi: " + (e && e.message ? e.message : e));
+    }
 })();
