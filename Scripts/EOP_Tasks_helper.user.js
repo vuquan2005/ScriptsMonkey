@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Task helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      0.0.1
+// @version      1.0.0
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/study/task/*
@@ -10,80 +10,278 @@
 // @grant        GM_addStyle
 // @grant        GM_getValue
 // @grant        GM_setValue
+// @require      https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js
+// @require      https://cdn.jsdelivr.net/npm/notyf/notyf.min.js
 // ==/UserScript==
 
 (function () {
     "use strict";
     console.log("EOP Task helper");
-    // ====================================================================================
-    const currentURL = window.location.href;
-    const $ = (selector, scope = document) => scope.querySelector(selector);
-    const $$ = (selector, scope = document) => scope.querySelectorAll(selector);
-    function controlInterval(func, delayDefault = 1000) {
-        let intervalId = null;
-        return {
-            start: (delay = delayDefault, startImmediate = false) => {
-                if (intervalId) {
-                    clearInterval(intervalId);
-                }
-                intervalId = setInterval(func, delay);
-                if (startImmediate) {
-                    func();
-                }
-            },
-            stop: () => {
-                clearInterval(intervalId);
-                intervalId = null;
-            },
-        };
-    }
-    // ====================================================================================
-    let timeToLoad = 0;
-    let mbody = null;
-    let taskContent = null;
-    GM_addStyle(`
-        [translated_content]::after {
-            content: attr(translated_content);
-            position: fixed;
-            left: 5px;
-            top: 5px;
-            background-color: #ccc;
-            color: #000;
-            padding: 3px;
-            border-radius: 5px;
-            opacity: 0;
-            visibility: hidden;
-            z-index: 99;
-        }
-        [translated_content]:hover::after {
-            visibility: visible;
-            opacity: 0.9;
-        }
-    `);
-    // ====================================================================================
-    // Wait to web load
-    const waitWebLoad = controlInterval(() => {
-        timeToLoad++;
-        if (mbody) {
-            taskContent = mbody.children[0];
-            if (taskContent.className !== "loading") {
-                runTaskHelper();
-                console.log("Time to load: " + (timeToLoad * 25) / 1000 + "s");
-                waitWebLoad.stop();
+
+    function waitForSelector(selector, timeout = 10000, delay = 100) {
+        return new Promise((resolve, reject) => {
+            const element = document.querySelector(selector);
+            if (element) {
+                return setTimeout(() => resolve(element), delay);
             }
-        } else {
-            mbody = $("div#mbody");
+
+            let timeoutId;
+            if (timeout > 0) {
+                timeoutId = setTimeout(() => {
+                    observer.disconnect();
+                    reject(new Error(`Timeout: Không tìm thấy "${selector}" trong ${timeout}ms.`));
+                }, timeout);
+            }
+
+            const observer = new MutationObserver(() => {
+                const element = document.querySelector(selector);
+                if (element) {
+                    clearTimeout(timeoutId);
+                    observer.disconnect();
+                    setTimeout(() => resolve(element), delay);
+                }
+            });
+
+            observer.observe(document.documentElement, {
+                childList: true,
+                subtree: true,
+            });
+        });
+    }
+
+    function delay(s) {
+        const factor = 0.8 + Math.random() * 0.6;
+        const randomS = s * factor;
+        return new Promise((resolve) => setTimeout(resolve, randomS * 1000));
+    }
+
+    async function forEachList(nodeList, callback) {
+        return new Promise(async (resolve) => {
+            const lenght = nodeList.length;
+            for (const [i, el] of Array.from(nodeList).entries()) {
+                await callback(i, el, lenght);
+            }
+            resolve();
+        });
+    }
+
+    GM_addStyle(`
+      @import url("https://cdn.jsdelivr.net/npm/notyf/notyf.min.css");
+    `);
+    //===============================================================
+
+    function TimeDoTask() {
+        const contentElement = document.querySelector("div.ditem");
+        const listenQuestion = document.querySelector("div.dta-main");
+        const randomNumber = Math.floor(Math.random() * 15);
+        if (contentElement) {
+            const text = contentElement.textContent;
+            const wordMatchRegExp = /[^\s]+/g;
+            const words = text.matchAll(wordMatchRegExp);
+            const wordCount = [...words].length;
+            let readingTime = (wordCount / 320) * 60;
+            readingTime += randomNumber;
+            if (listenQuestion) readingTime += 30;
+            return readingTime;
         }
-    }, 25);
-    // Get task type
-    function getTaskType() {
+    }
+
+    async function clickDone(seconds) {
+        await new Promise((resolve) => setTimeout(resolve, seconds * 1000));
+        const mfooter = document.querySelector("div#mfooter");
+        const btnDone = mfooter.querySelector('button.btn.btn-info.dnut[type="button"]');
+        if (/submit/.test(btnDone.id)) {
+            btnDone.click();
+            console.log("Button done clicked!");
+        }
+    }
+
+    async function autoChooseAnswer() {
+        await waitForSelector(".iCheck-helper");
+        const ditem = document.querySelector("div.ditem");
+        const questions = ditem.querySelectorAll("div.ques");
+
+        forEachList(questions[0].querySelectorAll(".dchk"), async (i0, el) => {
+            await delay(1);
+            // console.log(i0);
+            if (i0 === 0)
+                await forEachList(questions, async (i1, question) => {
+                    await delay(2);
+                    question.querySelector(".iCheck-helper").click();
+                });
+            else
+                await forEachList(questions, async (i2, question) => {
+                    await delay(1.5);
+                    const answer = question.querySelectorAll(".dchk");
+                    // console.log(answer);
+                    // console.log(answer[i0 - 1]);
+                    if (answer[i0 - 1].querySelector("label").style.color == "red") {
+                        // console.log(answer[i0].querySelector(`.iCheck-helper`));
+                        answer[i0].querySelector(`.iCheck-helper`).click();
+                    }
+                });
+            await clickDone(3);
+        });
+    }
+
+    async function autoFillAnswer() {
+        await waitForSelector("input.danw.dinline[type='text']");
+        const ditem = document.querySelector("div.ditem");
+        const inputs = ditem.querySelectorAll("input.danw.dinline[type='text']");
+        await forEachList(inputs, async (i, input, lenght) => {
+            await delay(32 / lenght);
+            input.value = "a";
+        });
+
+        clickDone(2);
+
+        await delay(30);
+        const mfooter = document.getElementById("mfooter");
+        const btnPreview = mfooter.querySelector('button.btn.btn-danger.dnut[type="button"]');
+        if (/answer/.test(btnPreview.id)) {
+            btnPreview.click();
+            console.log("Button preview clicked!");
+        }
+
+        await waitForSelector(
+            `input.danw.dinline[type='text'][disabled="disabled"][style*="background-image"]`
+        );
+        const inputsImg = ditem.querySelectorAll(
+            `input.danw.dinline[type='text'][disabled="disabled"][style*="background-image"]`
+        );
+
+        let listImg64 = [];
+        let listText = [];
+
+        await forEachList(inputsImg, async (i, input) => {
+            const base64Match = input.style.backgroundImage.match(/url\(["']?(.*?)["']?\)/);
+            const img64 = base64Match ? base64Match[1] : null;
+            if (img64) listImg64.push(img64);
+        });
+
+        const worker = await Tesseract.createWorker("eng");
+
+        for (const img of listImg64) {
+            let {
+                data: { text },
+            } = await worker.recognize(img);
+
+            text = text.replace("|", "i").replace("Cc", "c").replace("\n", "");
+            listText.push(text);
+        }
+        await worker.terminate();
+
+        console.log("Answers: ", listText);
+
+        const btnRedo = mfooter.querySelector('button.btn.btn-primary.dnut[type="button"]');
+        if (/answer/.test(btnRedo.id)) {
+            btnRedo.click();
+            console.log("Button redo clicked!");
+        }
+
+        forEachList(inputs, async (i, input) => {
+            await delay(1);
+            input.value = listText[i];
+        });
+
+        const timeDo = TimeDoTask();
+        console.log("Đợi thêm: ", timeDo, "s");
+        clickDone(timeDo);
+    }
+
+    //===============================================================
+    // Do task
+    function doVocabularyDefault() {
+        console.log("Can't do vocabulary default");
+    }
+
+    function doMCQ() {
+        console.log("Can't do MCQ");
+    }
+
+    function doContent() {
+        console.log("View content...");
+        const timeDo = TimeDoTask();
+        console.log("Đợi thêm: ", timeDo, "s");
+        clickDone(timeDo);
+    }
+
+    async function doUploadContent() {
+        console.log("Upload content...");
+        const notyf = new Notyf();
+        const oDienLink = document.querySelector("#dupload > div > textarea").value;
+        let isAutoUpload = await GM_getValue("isAutoUpload", null);
+        if (isAutoUpload == null) {
+            isAutoUpload = confirm("Tự động điền link (Google drive, padlet,...) ?");
+            await GM_setValue("isAutoUpload", isAutoUpload);
+        }
+
+        notyf.success("Đã đặt tự động điền link là: " + isAutoUpload);
+        console.log("Auto upload is: ", isAutoUpload);
+
+        if (isAutoUpload && !oDienLink) {
+            let linkUpLoad = await GM_getValue("linkUpLoad", "");
+            while (linkUpLoad == "") {
+                console.log("Inputting link upload...");
+                linkUpLoad = prompt("Link upload not found. Please enter the link upload: ") || "";
+                if (linkUpLoad != "") {
+                    await GM_setValue("linkUpLoad", linkUpLoad);
+
+                    console.log("Link upload saved: ", linkUpLoad);
+                    notyf.success("Link upload saved: " + linkUpLoad);
+                }
+            }
+            document.querySelector("#dupload > div > textarea").value = linkUpLoad;
+            console.log(
+                "Link upload = ",
+                document.querySelector("#dupload > div > textarea").value
+            );
+        }
+        const timeDo = TimeDoTask();
+        console.log("Đợi thêm: ", timeDo, "s");
+        clickDone(timeDo);
+    }
+
+    function doQuestionChooseReading() {
+        console.log("Do choose reading question...");
+        autoChooseAnswer();
+    }
+
+    function doQuestionChooseListening() {
+        console.log("Do choose listening question");
+        autoChooseAnswer();
+    }
+
+    function doQuestionFillGrammar() {
+        console.log("Do question fill grammar...");
+        autoFillAnswer();
+    }
+
+    function doQuestionFillListening() {
+        console.log("Do question fill listening...");
+        autoFillAnswer();
+    }
+    //===============================================================
+
+    async function run() {
+        await waitForSelector("div#mbody");
+        console.log("----------------------------------");
+        const mbody = document.querySelector("div#mbody");
         const classList = mbody.children[0].className;
         const classListArray = classList.split(" ");
-        return classListArray;
-    }
-    // Handle task
-    function handleTask() {
-        let taskType = getTaskType();
+        let taskType = classListArray;
+
+        const timerUnitTest = document.querySelector("div#countdown.timeTo.timeTo-white");
+        if (timerUnitTest) {
+            console.log("!!! Đây là bài kiểm tra !!!");
+            return;
+        }
+        const taskTitleElement = document.querySelector("span#dtasktitle");
+        if (!taskTitleElement) {
+            console.error("It's not a task");
+            return;
+        }
+
         console.log("Task type: " + taskType[0] + " - " + taskType[1]);
         // Vocabulary
         if (taskType[0] === "dvocabulary" && taskType[1] === "default") {
@@ -102,87 +300,32 @@
             doUploadContent();
         }
         // Question
-        // Choose reading choose answer
+        // Reading choose answer
         if (taskType[0] === "dquestion" && taskType[1] === "choose-reading-choose-answer") {
             doQuestionChooseReading();
         }
-        // Choose listening choose answer
+        // Listening choose answer
         if (taskType[0] === "dquestion" && taskType[1] === "choose-listening-choose-answer") {
             doQuestionChooseListening();
         }
-        // Fill grammar word blank
+        // Fill word blank
         if (taskType[0] === "dquestion" && taskType[1] === "fill-grammar-word-blank") {
             doQuestionFillGrammar();
         }
-    }
-    // Send to LLM
-    async function sendToLLM(prompt) {
-        const response = await fetch("http://localhost:1234/v1/chat/completions", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                model: "qwen3-0.6b",
-                messages: [{ role: "user", content: prompt }],
-                temperature: 0.7,
-            }),
-        });
-        const data = await response.json();
-        return data.choices[0].message.content;
-    }
-    // Translate content by LLM
-    async function translateByLLM(content) {
-        const prompt = `Translate the following content to Vietnamese: "${content}" /no_think`;
-        let translatedContent = (await sendToLLM(prompt)) + "";
-        translatedContent = translatedContent.replace(`<think>\n\n</think>\n\n`, "");
-        translatedContent = translatedContent.replaceAll(`\"`, "");
-        return translatedContent;
-    }
-    // Select all leaf node in taskContent
-    function selectAllLeafNode(selector) {
-        const allElements = $$("p", selector);
-        return allElements;
-    }
-    // Translate all leaf node in taskContent
-    async function translateAllLeafNode(selector) {
-        const leafElements = selectAllLeafNode(selector);
-        for (const leafElement of leafElements) {
-            let translatedContent = await translateByLLM(leafElement.textContent);
-            leafElement.setAttribute("translated_content", translatedContent);
+        // Fill word blank in Listening
+        if (taskType[0] === "dquestion" && taskType[1] === "fill-listening-write-answer") {
+            doQuestionFillListening();
         }
     }
-    // ====================================================================================
-    // Do task
-    function doVocabularyDefault() {
-        console.log("Can't do vocabulary default");
-    }
-    function doMCQ() {
-        console.log("Can't do MCQ");
-    }
-    function doContent() {
-        console.log("Can't do content");
-        //translateAllLeafNode(taskContent);
-    }
-    function doUploadContent() {
-        console.log("Can't do upload content");
-    }
-    function doQuestionChooseReading() {
-        console.log("Can't do question choose reading");
-    }
-    function doQuestionChooseListening() {
-        console.log("Can't do question choose listening");
-    }
-    function doQuestionFillGrammar() {
-        console.log("Can't do question fill grammar");
-    }
-    function doQuestionFillListening() {
-        console.log("Can't do question fill listening");
-    }
-    // ====================================================================================
-    // Run
-    function runTaskHelper() {
-        handleTask();
-    }
-    waitWebLoad.start(25, true);
+
+    const observe = new MutationObserver(run);
+    observe.observe(document.querySelector("span#dtasktitle"), {
+        childList: true,
+        characterData: true,
+        subtree: true,
+    });
+    waitForSelector("div#mbody").then(() => {
+        run();
+    });
+    //===============================================================
 })();
