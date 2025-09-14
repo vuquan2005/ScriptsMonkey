@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Task helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      1.0.0
+// @version      1.1.1
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/study/task/*
@@ -191,8 +191,26 @@
 
     //===============================================================
     // Do task
-    function doVocabularyDefault() {
-        console.log("Can't do vocabulary default");
+    async function doVocabularyDefault() {
+        console.log("Do vocabulary default...");
+        await waitForSelector("i.fa.daudio.fa-play-circle");
+        const mbody = document.querySelector("div#mbody");
+        const playBtns = mbody.querySelectorAll("i.fa.daudio.fa-play-circle");
+        console.log(playBtns);
+
+        playBtns[0].addEventListener(
+            "click",
+            async () => {
+                for (const [i, playBtn] of playBtns.entries()) {
+                    if (i === 0) continue;
+                    await delay(2);
+                    playBtn.click();
+                }
+
+                await clickDone(3);
+            },
+            { once: true }
+        );
     }
 
     function doMCQ() {
@@ -318,14 +336,14 @@
         }
     }
 
-    const observe = new MutationObserver(run);
-    observe.observe(document.querySelector("span#dtasktitle"), {
-        childList: true,
-        characterData: true,
-        subtree: true,
-    });
     waitForSelector("div#mbody").then(() => {
         run();
+        const observe = new MutationObserver(run);
+        observe.observe(document.querySelector("span#dtasktitle"), {
+            childList: true,
+            characterData: true,
+            subtree: true,
+        });
     });
     //===============================================================
 })();
