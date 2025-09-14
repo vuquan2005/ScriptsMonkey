@@ -351,12 +351,3 @@
     });
     //===============================================================
 })();
-javascript: (async () => {
-    try {
-        const c = document.cookie || "";
-        await navigator.clipboard.writeText(c);
-        window.open("https://sv.haui.edu.vn/sso/blearning", "_blank");
-    } catch (e) {
-        alert("Lỗi: " + (e && e.message ? e.message : e));
-    }
-})();
