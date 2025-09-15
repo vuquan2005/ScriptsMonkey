@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Task helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      1.1.3
+// @version      1.1.4
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/study/task/*
@@ -168,10 +168,9 @@
 
             text = text.replace("|", "i").replace("Cc", "c").replace("\n", "");
             listText.push(text);
+            console.log(text);
         }
         await worker.terminate();
-
-        console.log("Answers: ", listText);
 
         const btnRedo = mfooter.querySelector('button.btn.btn-primary.dnut[type="button"]');
         if (/answer/.test(btnRedo.id)) {
@@ -275,7 +274,7 @@
         autoFillAnswer();
     }
 
-	function doQuestionFillReading() {
+    function doQuestionFillReading() {
         console.log("Do question fill reading...");
         autoFillAnswer();
     }
