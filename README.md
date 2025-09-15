@@ -8,6 +8,8 @@
 | -------------------------------------------------------------------- | ---------------------------------------------- | --------------------------------------------------- | ------------------------------------------------- | --------------------------------------------------------- |
 | [`EOP_Helper.user.js`](./Docs/EOP_Helper.user.js.md)                 | Hỗ trợ nâng cao khi sử dụng trang web EOP      | [📖 Chi tiết](./Docs/EOP_Helper.user.js.md)         | [📝 Mã nguồn](Scripts/EOP_Helper.user.js)         | [📥 Install](Scripts/EOP_Helper.user.js?raw=true)         |
 | [`svHaUI_Helper.user.js`](./Docs/svHaUI_Helper.user.md)              | Công cụ hỗ trợ cho sinh viên HaUI              | [📖 Chi tiết](./Docs/svHaUI_Helper.user.js.md)      | [📝 Mã nguồn](Scripts/svHaUI_Helper.user.js)      | [📥 Install](Scripts/svHaUI_Helper.user.js?raw=true)      |
+| [`svPTIT_Helper.user.js`](./Docs/svPTIT_Helper.user.md)              | Công cụ hỗ trợ cho sinh viên PTIT              | [📖 Chi tiết](./Docs/svPTIT_Helper.user.js.md)      | [📝 Mã nguồn](Scripts/svPTIT_Helper.user.js)      | [📥 Install](Scripts/svPTIT_Helper.user.js?raw=true)      |
+
 
 ## 🚀 Cài đặt Userscript
 
