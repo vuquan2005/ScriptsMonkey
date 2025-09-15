@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.7.1
+// @version      20.7.2
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -1359,6 +1359,8 @@
         const courses = kgrid.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
 
         if (isEnable) {
+            var notyf = new Notyf();
+
             for (const course of courses) {
                 if (nonCreditCourse.some((hp) => course.children[1].textContent.includes(hp)))
                     continue;
@@ -1374,8 +1376,6 @@
                         scoreCell.blur();
                     }
                 });
-
-                var notyf = new Notyf();
 
                 scoreCell.addEventListener("blur", (e) => {
                     // Upcase
@@ -1396,22 +1396,17 @@
                             scoreCell.textContent = {
                                 4.0: "A",
                                 3.5: "B+",
-                                3: "B",
                                 3.0: "B",
                                 2.5: "C+",
-                                2: "C",
                                 2.0: "C",
                                 1.5: "D+",
-                                1: "D",
                                 1.0: "D",
-                                0: "F",
                                 0.0: "F",
                             }[scoreCell.textContent];
                         }
                     }
-                    if (originalScore != "") {
-                        if (scoreCell.textContent == originalScore) return;
-                    }
+                    if (scoreCell.textContent == originalScore && originalScore != "") return;
+
                     if (
                         !["A", "B+", "B", "C+", "C", "D+", "D", "F"].includes(scoreCell.textContent)
                     ) {
