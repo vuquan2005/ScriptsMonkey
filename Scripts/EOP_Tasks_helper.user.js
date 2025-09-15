@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Task helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      1.1.4
+// @version      1.1.5
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/study/task/*
@@ -18,9 +18,9 @@
     "use strict";
     console.log("EOP Task helper");
 
-    function waitForSelector(selector, timeout = 10000, delay = 100) {
+    function waitForSelector(selector, timeout = 10000, delay = 100, scope = document) {
         return new Promise((resolve, reject) => {
-            const element = document.querySelector(selector);
+            const element = scope.querySelector(selector);
             if (element) {
                 return setTimeout(() => resolve(element), delay);
             }
@@ -34,7 +34,7 @@
             }
 
             const observer = new MutationObserver(() => {
-                const element = document.querySelector(selector);
+                const element = scope.querySelector(selector);
                 if (element) {
                     clearTimeout(timeoutId);
                     observer.disconnect();
@@ -42,7 +42,7 @@
                 }
             });
 
-            observer.observe(document.documentElement, {
+            observer.observe(scope.documentElement, {
                 childList: true,
                 subtree: true,
             });
@@ -89,6 +89,7 @@
     async function clickDone(seconds) {
         await new Promise((resolve) => setTimeout(resolve, seconds * 1000));
         const mfooter = document.querySelector("div#mfooter");
+        await waitForSelector("button.btn.btn - info.dnut[(type = button)]", 1000, 100, mfooter);
         const btnDone = mfooter.querySelector('button.btn.btn-info.dnut[type="button"]');
         if (/submit/.test(btnDone.id)) {
             btnDone.click();
