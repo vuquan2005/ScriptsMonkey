@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Task helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      1.1.2
+// @version      1.1.3
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/study/task/*
@@ -275,6 +275,11 @@
         autoFillAnswer();
     }
 
+	function doQuestionFillReading() {
+        console.log("Do question fill reading...");
+        autoFillAnswer();
+    }
+
     function doQuestionFillListening() {
         console.log("Do question fill listening...");
         autoFillAnswer();
@@ -333,6 +338,10 @@
         // Fill word blank
         if (taskType[0] === "dquestion" && taskType[1] === "fill-grammar-word-blank") {
             doQuestionFillGrammar();
+        }
+        // Fill word blank
+        if (taskType[0] === "dquestion" && taskType[1] === "fill-reading-word-blank") {
+            doQuestionFillReading();
         }
         // Fill word blank in Listening
         if (taskType[0] === "dquestion" && taskType[1] === "fill-listening-write-answer") {
