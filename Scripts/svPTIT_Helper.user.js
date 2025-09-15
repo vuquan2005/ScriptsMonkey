@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         PTIT Helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      0.2.4
+// @version      0.1.0
 // @description  Công cụ hỗ trợ cho sinh viên PTIT
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svPTIT_Helper.user.js
@@ -179,7 +179,6 @@
 
             if (row.children[8].textContent.trim() == "") continue;
 
-            console.log(row.children[7].textContent.trim());
             const diemSo = 0.0 + Number(row.children[7].textContent.trim());
             row.children[8].style.backgroundColor = scoresBoxColor[diemSo];
         }
@@ -267,76 +266,74 @@
         const rows = maintable.querySelectorAll("tr.text-center");
 
         for (const row of rows) {
-            row.children[8].setAttribute("contenteditable", "true");
-            row.children[8].addEventListener("keydown", (e) => {
+            const scoreCell = row.children[8];
+            const score4Cell = row.children[7];
+            scoreCell.setAttribute("contenteditable", "true");
+
+            const originalScore = scoreCell.textContent.trim();
+            var notyf = new Notyf();
+
+            scoreCell.addEventListener("keydown", (e) => {
                 if (e.key === "Enter") {
                     e.preventDefault();
-                    row.children[8].blur();
+                    scoreCell.blur();
                 }
             });
-            row.children[8].addEventListener("blur", (event) => {
-                convertScore();
+            scoreCell.addEventListener("blur", (event) => {
+                scoreCell.textContent = scoreCell.textContent.trim().toUpperCase();
+                scoreCell.textContent = scoreCell.textContent.replace(/.+(?=[ABCDF].*)/, "");
+                if (/\d\.*\d*/.test(scoreCell.textContent)) {
+                    scoreCell.textContent =
+                        Math.ceil(scoreCell.textContent.match(/\d\.*\d*/)[0] * 2) / 2;
+                    if (scoreCell.textContent > 0 || scoreCell.textContent <= 4.0) {
+                        scoreCell.textContent = {
+                            4.0: "A+",
+                            3.7: "A",
+                            3.5: "B+",
+                            3.0: "B",
+                            2.5: "C+",
+                            2.0: "C",
+                            1.5: "D+",
+                            1.0: "D",
+                            0.0: "F",
+                        }[scoreCell.textContent];
+                    }
+                } else if (/^[ABCDF].*/.test(scoreCell.textContent)) {
+                    scoreCell.textContent = scoreCell.textContent.replace(/^A.+$/g, "A+");
+                    scoreCell.textContent = scoreCell.textContent.replace(/^B.+$/g, "B+");
+                    scoreCell.textContent = scoreCell.textContent.replace(/^C.+$/g, "C+");
+                    scoreCell.textContent = scoreCell.textContent.replace(/^D.+$/g, "D+");
+                }
+                console.log(originalScore);
+                if (
+                    !["A+", "A", "B+", "B", "C+", "C", "D+", "D", "F"].includes(
+                        scoreCell.textContent
+                    )
+                ) {
+                    notyf.error(
+                        "Điểm không hợp lệ! \nVui lòng nhập lại (A+, A, B+, B, C+, C, D+, D, F)"
+                    );
+                    scoreCell.textContent = originalScore;
+                }
+
+                score4Cell.textContent = {
+                    "A+": 4.0,
+                    A: 3.7,
+                    "B+": 3.5,
+                    B: 3.0,
+                    "C+": 2.5,
+                    C: 2.0,
+                    "D+": 1.5,
+                    D: 1.0,
+                    F: 0.0,
+                }[scoreCell.textContent];
+                if (scoreCell.textContent !== originalScore)
+                    score4Cell.style.backgroundColor = "#fcefc3ff";
+                else score4Cell.style.backgroundColor = "#ffffff";
+
                 highlight();
                 calculateEditGPA();
             });
-        }
-    }
-
-    function convertScore() {
-        const maintable = document.querySelector("#excel-table > tbody");
-        const rows = maintable.querySelectorAll("tr.text-center");
-
-        var notyf = new Notyf();
-
-        for (const row of rows) {
-            const cell = row.children[8];
-            const originalScore = cell.textContent.trim();
-
-            cell.textContent = cell.textContent.trim().toUpperCase();
-            cell.textContent = cell.textContent.replace(/.+(?=[ABCDF].*)/, "");
-            if (/\d\.*\d*/.test(cell.textContent)) {
-                cell.textContent = Math.ceil(cell.textContent.match(/\d\.*\d*/)[0] * 2) / 2;
-                if (cell.textContent > 0 || cell.textContent <= 4.0) {
-                    scoreCell.textContent = {
-                        4.0: "A+",
-                        3.7: "A",
-                        3.5: "B+",
-                        3.0: "B",
-                        2.5: "C+",
-                        2.0: "C",
-                        1.5: "D+",
-                        1.0: "D",
-                        0.0: "F",
-                    }[scoreCell.textContent];
-                }
-            } else if (/^[ABCDF].*/.test(cell.textContent)) {
-                cell.textContent = cell.textContent.replace(/^A.+$/g, "A+");
-                cell.textContent = cell.textContent.replace(/^B.+$/g, "B+");
-                cell.textContent = cell.textContent.replace(/^C.+$/g, "C+");
-                cell.textContent = cell.textContent.replace(/^D.+$/g, "D+");
-            }
-
-            if (!["A+", "A", "B+", "B", "C+", "C", "D+", "D", "F"].includes(cell.textContent)) {
-                alenotyf.error(
-                    "Điểm không hợp lệ! \nVui lòng nhập lại (A+, A, B+, B, C+, C, D+, D, F)"
-                );
-                cell.textContent = originalScore;
-            }
-
-            row.children[7].textContent = {
-                "A+": 4.0,
-                A: 3.7,
-                "B+": 3.5,
-                B: 3.0,
-                "C+": 2.5,
-                C: 2.0,
-                "D+": 1.5,
-                D: 1.0,
-                F: 0.0,
-            }[cell.textContent];
-            if (scoreCell.textContent !== originalScore)
-                score4Cell.style.backgroundColor = "#fcefc3ff";
-            else score4Cell.style.backgroundColor = "#ffffff";
         }
     }
 
