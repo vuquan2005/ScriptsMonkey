@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Task helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      1.1.5
+// @version      1.1.6
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/study/task/*
@@ -89,7 +89,7 @@
     async function clickDone(seconds) {
         await new Promise((resolve) => setTimeout(resolve, seconds * 1000));
         const mfooter = document.querySelector("div#mfooter");
-        await waitForSelector("button.btn.btn - info.dnut[(type = button)]", 1000, 100, mfooter);
+        await waitForSelector('button.btn.btn-info.dnut[type="button"]', 1000, 100, mfooter);
         const btnDone = mfooter.querySelector('button.btn.btn-info.dnut[type="button"]');
         if (/submit/.test(btnDone.id)) {
             btnDone.click();
@@ -349,7 +349,7 @@
         }
     }
     var dtasktitle = "";
-    waitForSelector("div#mbody").then(() => {
+    waitForSelector("div#mbody", 10000, 500).then(() => {
         run();
         const observe = new MutationObserver(run);
         observe.observe(document.querySelector("span#dtasktitle"), {
