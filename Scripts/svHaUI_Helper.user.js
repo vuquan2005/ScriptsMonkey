@@ -301,7 +301,7 @@
         });
     }
 
-    function captchaHelperSignIn() {
+    function captchaHelperLogin() {
         captchaHelper(
             document.querySelector("input#ctl00_txtimgcode"),
             document.querySelector("input#ctl00_butLogin")
@@ -1707,7 +1707,11 @@
         })
         .catch((err) => {
             console.error("Lỗi:", err);
-			captchaHelperSignIn();
         });
+		
+    if (window.location.pathname == "/sso")
+        waitForSelector("input#ctl00_txtimgcode").then(captchaHelperLogin);
+    if (window.location.pathname == "/") window.location.href = "https://sv.haui.edu.vn/home";
     // ================================================================
+    // console.log("svHaUI_Helper.user.js loaded: ", window.location);
 })();
