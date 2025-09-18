@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.8.0
+// @version      20.9.0
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -27,7 +27,9 @@
             if (timeout > 0) {
                 timeoutId = setTimeout(() => {
                     observer.disconnect();
-                    reject(new Error(`Timeout: Không tìm thấy "${selector}" trong ${timeout}ms.`));
+                    reject(
+                        new Error(`⏱️ Timeout: Không tìm thấy "${selector}" trong ${timeout}ms.`)
+                    );
                 }, timeout);
             }
 
@@ -89,7 +91,7 @@
             const doc = parser.parseFromString(html, "text/html");
             return doc;
         } catch (err) {
-            console.error("Lỗi khi fetch dữ liệu:", err);
+            console.error("❌ Lỗi khi fetch dữ liệu:", err);
             throw err;
         }
     }
@@ -791,7 +793,7 @@
             const dom = await fetchDOM(url);
             return dom.querySelector("#ctl02_ctl00_viewResult > div > div > table > tbody > tr");
         } catch (err) {
-            console.error(`Lỗi khi lấy lịch thi cho ${getHPCode}: `, err);
+            console.error(`❌ Lỗi khi lấy lịch thi cho ${getHPCode}: `, err);
             var notyf = new Notyf();
             notyf.error(`Lỗi khi lấy lịch thi cho ${getHPCode}: `, err);
         }
@@ -1629,7 +1631,7 @@
     //===============================================================
 
     function run() {
-        console.log("sv.HaUI loaded: " + window.location.href);
+        // console.log("✅ sv.HaUI loaded: " + window.location.href);
 
         runOnUrl(changeTitle, "");
         runOnUrl(changeHomePagePath, "");
@@ -1706,12 +1708,12 @@
             run();
         })
         .catch((err) => {
-            console.error("Lỗi:", err);
+            console.warn(err);
         });
-		
+
     if (window.location.pathname == "/sso")
         waitForSelector("input#ctl00_txtimgcode").then(captchaHelperLogin);
     if (window.location.pathname == "/") window.location.href = "https://sv.haui.edu.vn/home";
     // ================================================================
-    // console.log("svHaUI_Helper.user.js loaded: ", window.location);
+    console.log("✅ svHaUI_Helper.user.js loaded: ", window.location);
 })();
