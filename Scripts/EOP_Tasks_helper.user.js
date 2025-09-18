@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Task helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      1.2.0
+// @version      1.2.1
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/study/task/*
@@ -135,7 +135,7 @@
             5: "s",
             Cc: "C",
             intermet: "internet",
-            Intemet: "Intenet",
+            Intemet: "Internet",
         };
 
         text = text.replace("|", "i");
