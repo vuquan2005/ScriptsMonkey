@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.9.0
+// @version      20.9.1
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -51,28 +51,23 @@
 
     function runOnUrl(callback, ...validLinks) {
         const href = window.location.href;
-        const pathname = window.location.pathname;
+        const pathname = window.location.pathname.replace(/\/+$/, "") || "/";
+        const callbackName = callback.name || new Error().stack.replace("Error", "Callback: ");
 
         for (const link of validLinks) {
             if (typeof link === "string") {
                 if (link === pathname || link === href || link === "") {
-                    console.log(
-                        `${callback.name || new Error().stack.replace("Error", "Callback: ")} :`,
-                        link || "All"
-                    );
+                    console.log(`✅ ${callbackName} :`, link || "All");
                     return callback();
                 }
             } else if (link instanceof RegExp) {
                 if (link.test(href)) {
-                    console.log(
-                        `${callback.name || new Error().stack.replace("Error", "Callback: ")} :`,
-                        link
-                    );
+                    console.log(`✅ ${callbackName} :`, link);
                     return callback();
                 }
             }
         }
-        // console.log(`! ${callback.name || "'Callback'"} :`, validLinks);
+        // console.log(`❌ ${callback.name || "'Callback'"} :`, validLinks);
     }
 
     async function fetchDOM(url) {
@@ -285,6 +280,8 @@
 
     // Hỗ trợ captcha
     function captchaHelper(captchaInput, captchaSubmit) {
+        captchaInput.style.textTransform = "lowercase";
+
         captchaInput.addEventListener("keydown", (e) => {
             if (e.key === "Enter") {
                 e.preventDefault();
@@ -1711,9 +1708,10 @@
             console.warn(err);
         });
 
-    if (window.location.pathname == "/sso")
+    runOnUrl(() => {
         waitForSelector("input#ctl00_txtimgcode").then(captchaHelperLogin);
-    if (window.location.pathname == "/") window.location.href = "https://sv.haui.edu.vn/home";
+    }, "/sso");
+    runOnUrl(() => (window.location.href = "https://sv.haui.edu.vn/home"), "/");
     // ================================================================
     console.log("✅ svHaUI_Helper.user.js loaded: ", window.location);
 })();
