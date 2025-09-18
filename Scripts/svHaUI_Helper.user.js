@@ -281,6 +281,40 @@
         );
     }
 
+    // Hỗ trợ captcha
+    function captchaHelper(captchaInput, captchaSubmit) {
+        captchaInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                captchaInput.blur();
+            }
+        });
+
+        captchaInput.addEventListener("blur", (e) => {
+            captchaInput.value = captchaInput.value.trim().toLowerCase();
+            captchaInput.value = captchaInput.value
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .replace(/đ/g, "d");
+
+            if (captchaInput.value.length == 5) captchaSubmit.click();
+        });
+    }
+
+    function captchaHelperSignIn() {
+        captchaHelper(
+            document.querySelector("input#ctl00_txtimgcode"),
+            document.querySelector("input#ctl00_butLogin")
+        );
+    }
+
+    function captchaHelperRegister() {
+        captchaHelper(
+            document.querySelector("input#ctl02_txtimgcode"),
+            document.querySelector("input#ctl02_btnSubmit")
+        );
+    }
+
     // Tùy biến trang chủ
     function customizeHomePage() {
         const frmMain = document.querySelector("form#frmMain");
@@ -1380,9 +1414,11 @@
                 scoreCell.addEventListener("blur", (e) => {
                     // Upcase
                     scoreCell.textContent = scoreCell.textContent.trim().toUpperCase();
-                    //
+                    scoreCell.textContent = scoreCell.textContent
+                        .normalize("NFD")
+                        .replace(/[\u0300-\u036f]/g, "")
+                        .replace(/Đ/g, "D");
                     scoreCell.textContent = scoreCell.textContent.replace(/.+(?=[ABCDF].*)/, "");
-                    console.log(scoreCell.textContent);
                     if (/^[ABCDF].*/.test(scoreCell.textContent)) {
                         scoreCell.textContent = scoreCell.textContent.replace(/^A.*$/g, "A");
                         scoreCell.textContent = scoreCell.textContent.replace(/^B.+$/g, "B+");
@@ -1601,6 +1637,8 @@
 
         runOnUrl(fastSurvey, /\/survey\//);
 
+        runOnUrl(captchaHelperRegister, "/register");
+
         runOnUrl(customizeHomePage, "/home");
 
         runOnUrl(sortExamSchedule, "/student/schedulefees/transactionmodules");
@@ -1669,6 +1707,7 @@
         })
         .catch((err) => {
             console.error("Lỗi:", err);
+			captchaHelperSignIn();
         });
     // ================================================================
 })();
