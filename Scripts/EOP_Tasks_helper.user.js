@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Task helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      1.1.7
+// @version      1.2.0
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/study/task/*
@@ -90,7 +90,7 @@
     async function clickDone(seconds) {
         await new Promise((resolve) => setTimeout(resolve, seconds * 1000));
         const mfooter = document.querySelector("div#mfooter");
-        await waitForSelector('button.btn.btn-info.dnut[type="button"]', 1000, 100, mfooter);
+        await waitForSelector('button.btn.btn-info.dnut[type="button"]', 10000, 100, mfooter);
         const btnDone = mfooter.querySelector('button.btn.btn-info.dnut[type="button"]');
         if (/submit/.test(btnDone.id)) {
             btnDone.click();
@@ -126,9 +126,42 @@
         });
     }
 
+    function normalizeOcrText(text) {
+        const numMap = {};
+
+        const wordMap = {
+            0: "o",
+            1: "i",
+            5: "s",
+            Cc: "C",
+            intermet: "internet",
+            Intemet: "Intenet",
+        };
+
+        text = text.replace("|", "i");
+
+        return text
+            .match(/\w+|\W+/g)
+            .map((token) => {
+                if (/^\d+$/.test(token)) {
+                    return token;
+                } else if (/^\w+$/.test(token)) {
+                    for (const [wrong, correct] of Object.entries(wordMap)) {
+                        token = token.replace(wrong, correct);
+                    }
+                    return token;
+                } else if (token == "\n") return "";
+                else {
+                    return token;
+                }
+            })
+            .join("");
+    }
+
     async function autoFillAnswer() {
         await waitForSelector("input.danw.dinline[type='text']");
         const ditem = document.querySelector("div.ditem");
+        const mfooter = document.getElementById("mfooter");
         const inputs = ditem.querySelectorAll("input.danw.dinline[type='text']");
         await forEachList(inputs, async (i, input, lenght) => {
             await delay(32 / lenght);
@@ -137,8 +170,8 @@
 
         clickDone(2);
 
-        await delay(30);
-        const mfooter = document.getElementById("mfooter");
+        await delay(2);
+        await waitForSelector('button.btn.btn-danger.dnut[type="button"]');
         const btnPreview = mfooter.querySelector('button.btn.btn-danger.dnut[type="button"]');
         if (/answer/.test(btnPreview.id)) {
             btnPreview.click();
@@ -163,17 +196,29 @@
 
         const worker = await Tesseract.createWorker("eng");
 
+        await worker.setParameters({
+            tessedit_char_whitelist:
+                "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,!?;:'\"()- ",
+            tessedit_char_blacklist: "%^&|",
+        });
+
         for (const img of listImg64) {
             let {
                 data: { text },
             } = await worker.recognize(img);
 
-            text = text.replace("|", "i").replace("Cc", "c").replace("\n", "");
+            console.log("⬇ ", text);
+            text = normalizeOcrText(text);
+            console.log("➡️", text);
+
             listText.push(text);
-            console.log(text);
         }
         await worker.terminate();
 
+        console.log(listText);
+
+        await delay(1);
+        await waitForSelector('button.btn.btn-primary.dnut[type="button"]');
         const btnRedo = mfooter.querySelector('button.btn.btn-primary.dnut[type="button"]');
         if (/answer/.test(btnRedo.id)) {
             btnRedo.click();
