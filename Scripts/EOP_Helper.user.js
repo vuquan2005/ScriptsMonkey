@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.4.3
+// @version      2.4.4
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -101,17 +101,30 @@
             captchaInput.setAttribute("lang", "en");
             captchaInput.setAttribute("placeholder", "");
             captchaInput.style.textTransform = "uppercase";
-            const btnCheck = $("button.btn.btn-info[title='Xem kết quả học tập']");
+            const captchaSubmit = $("button.btn.btn-info[title='Xem kết quả học tập']");
 
-            captchaInput.addEventListener("change", function () {
-                this.value = this.value.toUpperCase();
-                if (this.value.length == 4) {
-                    intervalCheckDiemht0.start(50, false);
-                    btnCheck.click();
+            captchaInput.addEventListener("keydown", (e) => {
+                if (e.key === "Enter") {
+                    e.preventDefault();
+                    captchaInput.blur();
                 }
             });
+
+            captchaInput.addEventListener("blur", (e) => {
+                captchaInput.value = captchaInput.value.trim().toUpperCase();
+                captchaInput.value = captchaInput.value
+                    .normalize("NFD")
+                    .replace(/[\u0300-\u036f]/g, "")
+                    .replace(/Đ/g, "D");
+
+                if (captchaInput.value.length == 4) {
+                    intervalCheckDiemht0.start(50, false);
+                    captchaSubmit.click();
+                }
+            });
+
             // khi click vào nút xem kết quả học tập
-            btnCheck.addEventListener("click", function () {
+            captchaSubmit.addEventListener("click", function () {
                 intervalCheckDiemht0.start(200, false);
             });
 
