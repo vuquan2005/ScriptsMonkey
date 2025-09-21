@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Task helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.0.2
+// @version      2.0.3
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/study/task/*
@@ -442,8 +442,8 @@
             autoFillAnswer,
             "dquestion",
             "fill-grammar-word-blank",
-            "fill-reading-choose-answer",
-            "fill-listening-choose-answer"
+            "fill-reading-word-blank",
+            "fill-listening-write-answer"
         );
     }
     var dtasktitle = "";
