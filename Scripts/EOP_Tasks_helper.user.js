@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Task helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.0.3
+// @version      2.0.4
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/study/task/*
@@ -216,25 +216,29 @@
         const wordMap = {
             intermet: "internet",
         };
+
+        let text = "intermet access 0 Cc";
         text = text.trim();
         let output = "";
 
         for (let token of text.match(/\w+|\W+/g)) {
             if (/^\d+$/.test(token)) {
-            } else if (/^\w+$/.test(token)) {
+                output += token;
+                continue;
+            }
+            if (/^\w+$/.test(token)) {
                 for (const [wrong, correct] of Object.entries(wordMap)) {
-                    const regex = new RegExp(`\\b${wrong}\\b`, "g");
+                    const regex = new RegExp(wrong, "gi");
                     token = token.replace(regex, correct);
                 }
                 for (const [wrong, correct] of Object.entries(charMap)) {
-                    const regex = new RegExp(`\\b${wrong}\\b`, "g");
+                    const regex = new RegExp(wrong, "g");
                     token = token.replace(regex, correct);
                 }
             }
             output += token;
         }
-
-        console.log("Normalized text: ", output);
+        console.log(output);
 
         return output;
     }
