@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Task helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.0.5
+// @version      2.0.6
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/study/task/*
@@ -213,13 +213,14 @@
 
         const wordMap = {
             intemet: "internet",
+			inthe: "in the",
         };
 
         text = text.trim();
         let output = "";
 
         for (let token of text.match(/\w+|\W+/g)) {
-            if (/^\d+$/.test(token)) {
+            if (/^\d+.*$/.test(token)) {
                 output += token;
                 continue;
             }
@@ -258,6 +259,7 @@
                         data: { text },
                     } = await worker.recognize(img);
 
+					// console.log("✏️ ", text);
                     text = normalizeOcrText(text);
 
                     listText.push(text);
@@ -360,7 +362,7 @@
         console.log("View content...");
         const timeDo = TimeDoTask();
         console.log("Đợi thêm: ", timeDo, "s");
-		await delay(timeDo);
+        await delay(timeDo);
         clickDone();
     }
 
@@ -455,62 +457,6 @@
             characterData: true,
             subtree: true,
         });
-        setTimeout(() => {
-            const iframe = document.createElement("iframe");
-            iframe.id = "shadow";
-            document.body.appendChild(iframe);
-            GM_addStyle(`
-				#shadow {
-					position: fixed;
-					top: 10px;
-					left: 3px;
-					width: 70px;
-					height: 100px;
-					z-index: 999999;
-				}
-			`);
-            const doc = iframe.contentDocument;
-            doc.body.style.overflow = "hidden";
-            doc.body.style.margin = "0";
-            const shadow = doc.body.attachShadow({ mode: "closed" });
-            const shadowStyle = document.createElement("style");
-            shadowStyle.textContent = `
-				#shadow-container {
-					margin: 2px;
-					padding: 5px;
-					width: 100%;
-					height: 100%;
-					background-color: #ffffffff;
-					cursor: nw-resize;
-				}
-			`;
-            shadow.appendChild(shadowStyle);
-            const container = document.createElement("div");
-            container.id = "shadow-container";
-            shadow.appendChild(container);
-
-            const btnShadow = document.createElement("button");
-            btnShadow.textContent = "👾";
-            container.appendChild(btnShadow);
-
-            container.addEventListener("mousedown", initResize, { once: true });
-
-            function initResize(e) {
-                e.preventDefault();
-                window.addEventListener("mousemove", resize, { once: true });
-                window.addEventListener("mouseup", stopResize);
-            }
-
-            function resize(e) {
-                iframe.style.width = e.clientX + "px";
-                iframe.style.height = e.clientY + "px";
-            }
-
-            function stopResize() {
-                window.removeEventListener("mousemove", resize);
-                window.removeEventListener("mouseup", stopResize);
-            }
-        }, 100);
     });
     //===============================================================
 })();
