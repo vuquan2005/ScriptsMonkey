@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Task helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.0.4
+// @version      2.0.5
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/study/task/*
@@ -99,7 +99,7 @@
                 }
             }
         }
-        console.log(`❌ ${callback.name || "'Callback'"} :`, type1, " / ", type2);
+        // console.log(`❌ ${callback.name || "'Callback'"} :`, type1, " / ", type2);
     }
 
     function delay(s) {
@@ -125,7 +125,6 @@
 
     function TimeDoTask() {
         const contentElement = document.querySelector("div.ditem");
-        const randomNumber = Math.floor(Math.random() * 15);
 
         const listeningTime = document.querySelector(".vjs-remaining-time-display");
         if (listeningTime)
@@ -140,7 +139,6 @@
             const words = text.matchAll(wordMatchRegExp);
             const wordCount = [...words].length;
             let readingTime = (wordCount / 320) * 60;
-            readingTime += randomNumber;
             return readingTime;
         }
     }
@@ -214,10 +212,9 @@
         };
 
         const wordMap = {
-            intermet: "internet",
+            intemet: "internet",
         };
 
-        let text = "intermet access 0 Cc";
         text = text.trim();
         let output = "";
 
@@ -227,10 +224,6 @@
                 continue;
             }
             if (/^\w+$/.test(token)) {
-                for (const [wrong, correct] of Object.entries(wordMap)) {
-                    const regex = new RegExp(wrong, "gi");
-                    token = token.replace(regex, correct);
-                }
                 for (const [wrong, correct] of Object.entries(charMap)) {
                     const regex = new RegExp(wrong, "g");
                     token = token.replace(regex, correct);
@@ -238,7 +231,11 @@
             }
             output += token;
         }
-        console.log(output);
+
+        for (const [wrong, correct] of Object.entries(wordMap)) {
+            const regex = new RegExp(wrong, "gi");
+            output = output.replace(regex, correct);
+        }
 
         return output;
     }
@@ -261,9 +258,7 @@
                         data: { text },
                     } = await worker.recognize(img);
 
-                    console.log("⬇ ", text);
                     text = normalizeOcrText(text);
-                    console.log("➡️", text);
 
                     listText.push(text);
                 }
@@ -321,7 +316,7 @@
         await clickUndo();
 
         await forEachList(inputs, async (i, input) => {
-            await delay(1);
+            await delay(0.2);
             input.value = listText[i];
         });
 
@@ -361,11 +356,12 @@
         });
     }
 
-    function doContent() {
+    async function doContent() {
         console.log("View content...");
         const timeDo = TimeDoTask();
         console.log("Đợi thêm: ", timeDo, "s");
-        clickDone(timeDo);
+		await delay(timeDo);
+        clickDone();
     }
 
     async function uploadContent() {
