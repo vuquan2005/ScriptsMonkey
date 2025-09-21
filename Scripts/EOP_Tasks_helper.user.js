@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Task helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.0.1
+// @version      2.0.2
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/study/task/*
@@ -134,7 +134,7 @@
                 .split(":")
                 .reduce((acc, time) => 60 * acc + +time, 0);
 
-        if (ctimeListeningontentElement) {
+        if (contentElement) {
             const text = contentElement.textContent;
             const wordMatchRegExp = /[^\s]+/g;
             const words = text.matchAll(wordMatchRegExp);
@@ -206,13 +206,38 @@
     function normalizeOcrText(text) {
         const numMap = {};
 
-        const wordMap = {
+        const charMap = {
             0: "o",
             1: "i",
             5: "s",
             Cc: "C",
+        };
+
+        const wordMap = {
             intermet: "internet",
         };
+        text = text.trim();
+        let output = "";
+
+        for (let token of text.match(/\w+|\W+/g)) {
+            if (/^\d+$/.test(token)) {
+            } else if (/^\w+$/.test(token)) {
+                for (const [wrong, correct] of Object.entries(wordMap)) {
+                    const regex = new RegExp(`\\b${wrong}\\b`, "g");
+                    token = token.replace(regex, correct);
+                }
+                for (const [wrong, correct] of Object.entries(charMap)) {
+                    const regex = new RegExp(`\\b${wrong}\\b`, "g");
+                    token = token.replace(regex, correct);
+                }
+            }
+            output += token;
+        }
+
+        console.log("Normalized text: ", output);
+
+        return output;
+    }
 
     async function recognizeTextFromListImage(imgList) {
         return new Promise(async (resolve, reject) => {
@@ -240,7 +265,7 @@
                 }
                 await worker.terminate();
 
-                resolve(normalizeOcrText(listText));
+                resolve(listText);
             } catch (error) {
                 reject(error);
             }
@@ -291,12 +316,12 @@
 
         await clickUndo();
 
-        forEachList(inputs, async (i, input) => {
+        await forEachList(inputs, async (i, input) => {
             await delay(1);
             input.value = listText[i];
         });
 
-        const timeDo = TimeDoTask() - 30;
+        const timeDo = TimeDoTask();
         console.log("Đợi thêm: ", timeDo, "s");
         clickDone(timeDo);
     }
