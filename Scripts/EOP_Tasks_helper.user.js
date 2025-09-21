@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Task helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.0.0
+// @version      2.0.1
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/study/task/*
@@ -87,19 +87,19 @@
         if (type2 === null) {
             if (taskType1 === type1) {
                 console.log(`✅ ${callbackName} :`, type1);
-                callback();
+                return callback();
             }
         } else {
             if (taskType1 === type1) {
                 for (const t2 of type2) {
                     if (taskType2 === t2) {
                         console.log(`✅ ${callbackName} :`, type1, " / ", t2);
-                        callback();
+                        return callback();
                     }
                 }
             }
         }
-        // console.log(`❌ ${callback.name || "'Callback'"} :`, type1, " / ", type2);
+        console.log(`❌ ${callback.name || "'Callback'"} :`, type1, " / ", type2);
     }
 
     function delay(s) {
@@ -125,7 +125,6 @@
 
     function TimeDoTask() {
         const contentElement = document.querySelector("div.ditem");
-        const listenQuestion = document.querySelector("div.dta-main");
         const randomNumber = Math.floor(Math.random() * 15);
 
         const listeningTime = document.querySelector(".vjs-remaining-time-display");
@@ -146,7 +145,7 @@
         }
     }
 
-    async function clickDone(seconds = 200) {
+    async function clickDone(seconds = 0.2) {
         const mfooter = document.querySelector("div#mfooter");
         const btn = mfooter.querySelector('button.btn.btn-info.dnut[type="button"]');
         await waitForVisible(btn, 10000, seconds * 1000);
@@ -156,7 +155,7 @@
         } else console.error("❌ Wrong button done selected");
     }
 
-    async function clickShowAnswer(seconds = 200) {
+    async function clickShowAnswer(seconds = 0.2) {
         const mfooter = document.querySelector("div#mfooter");
         const btn = mfooter.querySelector('button.btn.btn-danger.dnut[type="button"]');
         await waitForVisible(btn, 10000, seconds * 1000);
@@ -166,9 +165,9 @@
         } else console.error("❌ Wrong button answer selected");
     }
 
-    async function clickUndo(seconds = 200) {
+    async function clickUndo(seconds = 0.2) {
         const mfooter = document.querySelector("div#mfooter");
-        const btn = mfooter.querySelector('button.btn.btn-primar.dnut[type="button"]');
+        const btn = mfooter.querySelector('button.btn.btn-primary.dnut[type="button"]');
         await waitForVisible(btn, 10000, seconds * 1000);
         if (btn.children[0].className === "fa fa-undo") {
             btn.click();
@@ -213,27 +212,39 @@
             5: "s",
             Cc: "C",
             intermet: "internet",
-            Intemet: "Internet",
         };
 
-        text = text.replace("|", "i");
+    async function recognizeTextFromListImage(imgList) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const worker = await Tesseract.createWorker("eng");
 
-        return text
-            .match(/\w+|\W+/g)
-            .map((token) => {
-                if (/^\d+$/.test(token)) {
-                    return token;
-                } else if (/^\w+$/.test(token)) {
-                    for (const [wrong, correct] of Object.entries(wordMap)) {
-                        token = token.replace(wrong, correct);
-                    }
-                    return token;
-                } else if (token == "\n") return "";
-                else {
-                    return token;
+                await worker.setParameters({
+                    tessedit_char_whitelist:
+                        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,!?;:'\"()- ",
+                    tessedit_char_blacklist: "%^&|",
+                });
+
+                let listText = [];
+
+                for (const img of imgList) {
+                    let {
+                        data: { text },
+                    } = await worker.recognize(img);
+
+                    console.log("⬇ ", text);
+                    text = normalizeOcrText(text);
+                    console.log("➡️", text);
+
+                    listText.push(text);
                 }
-            })
-            .join("");
+                await worker.terminate();
+
+                resolve(normalizeOcrText(listText));
+            } catch (error) {
+                reject(error);
+            }
+        });
     }
 
     async function autoFillAnswer() {
@@ -257,7 +268,6 @@
         );
 
         let listImg64 = [];
-        let listText = [];
 
         await forEachList(inputsImg, async (i, input) => {
             const base64Match = input.style.backgroundImage.match(/url\(["']?(.*?)["']?\)/);
@@ -265,26 +275,15 @@
             if (img64) listImg64.push(img64);
         });
 
-        const worker = await Tesseract.createWorker("eng");
+        let listText = [];
 
-        await worker.setParameters({
-            tessedit_char_whitelist:
-                "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,!?;:'\"()- ",
-            tessedit_char_blacklist: "%^&|",
-        });
-
-        for (const img of listImg64) {
-            let {
-                data: { text },
-            } = await worker.recognize(img);
-
-            console.log("⬇ ", text);
-            text = normalizeOcrText(text);
-            console.log("➡️", text);
-
-            listText.push(text);
-        }
-        await worker.terminate();
+        await recognizeTextFromListImage(listImg64)
+            .then((result) => {
+                listText = result;
+            })
+            .catch((error) => {
+                console.error("Error recognizing text from images:", error);
+            });
 
         console.log(listText);
 
@@ -297,13 +296,11 @@
             input.value = listText[i];
         });
 
-        const timeDo = TimeDoTask();
+        const timeDo = TimeDoTask() - 30;
         console.log("Đợi thêm: ", timeDo, "s");
         clickDone(timeDo);
     }
 
-    //===============================================================
-    // Do task
     async function doVocabularyDefault() {
         console.log("Do vocabulary default...");
         await waitForSelector("i.fa.daudio.fa-play-circle");
@@ -373,9 +370,7 @@
                 document.querySelector("#dupload > div > textarea").value
             );
         }
-        const timeDo = TimeDoTask() - 30;
-        console.log("Đợi thêm: ", timeDo, "s");
-        clickDone(timeDo);
+        clickDone(7);
     }
 
     //===============================================================
@@ -384,7 +379,7 @@
         await waitForSelector("div#mbody");
         console.log("▶️▶️▶️", document.querySelector("div#mbody").children[0].className, "◀️◀️◀️");
 
-        if (!document.querySelector("span#dtasktitle")) {
+        if (document.querySelector("span#dtasktitle")) {
             // Tránh lặp lại
             if (dtasktitle != document.querySelector("span#dtasktitle").textContent.trim())
                 dtasktitle = document.querySelector("span#dtasktitle").textContent.trim();
