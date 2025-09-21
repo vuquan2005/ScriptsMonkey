@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Task helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      1.2.1
+// @version      1.3.0
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/study/task/*
@@ -263,6 +263,15 @@
         console.log("Can't do MCQ");
     }
 
+    function enhanceMCQ() {
+		const mbody = document.querySelector("div#mbody");
+        mbody.querySelectorAll(".dans").forEach((div) => {
+            div.addEventListener("click", () => {
+                div.querySelector("a").click();
+            });
+        });
+    }
+
     function doContent() {
         console.log("View content...");
         const timeDo = TimeDoTask();
@@ -363,6 +372,14 @@
         // MCQ
         if (taskType[0] === "dmcq") {
             doMCQ();
+        }
+        if (
+            taskType[0] === "dmcq" &&
+            (taskType[1] === "word-choose-meaning" ||
+                taskType[1] === "audio-choose-word" ||
+                taskType[1] === "image-choose-word")
+        ) {
+            enhanceMCQ();
         }
         // Content
         if (taskType[0] === "dcontent" && taskType[1] === "view-content") {
