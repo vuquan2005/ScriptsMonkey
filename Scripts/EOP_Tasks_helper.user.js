@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Task helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      1.3.0
+// @version      2.0.0
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/study/task/*
@@ -30,7 +30,9 @@
             if (timeout > 0) {
                 timeoutId = setTimeout(() => {
                     observer.disconnect();
-                    reject(new Error(`Timeout: Không tìm thấy "${selector}" trong ${timeout}ms.`));
+                    reject(
+                        new Error(`⏱️ Timeout: Không tìm thấy "${selector}" trong ${timeout}ms.`)
+                    );
                 }, timeout);
             }
 
@@ -48,6 +50,56 @@
                 subtree: true,
             });
         });
+    }
+
+    function waitForVisible(element, timeout = 10000, delay = 200) {
+        return new Promise((resolve, reject) => {
+            const end = Date.now() + timeout;
+            function check() {
+                if (!document.body.contains(element)) {
+                    return reject(new Error("❌ Element was removed from DOM"));
+                }
+
+                if (getComputedStyle(element).display !== "none") {
+                    // console.log(element, ": is visible");
+                    return setTimeout(() => resolve(element), delay);
+                }
+
+                if (Date.now() > end) {
+                    return reject(new Error("⏱️ Timeout: element not visible"));
+                }
+
+                requestAnimationFrame(check);
+            }
+
+            requestAnimationFrame(check);
+        });
+    }
+
+    function runOnTaskType(callback, type1 = null, ...type2) {
+        const mbody = document.querySelector("div#mbody");
+        const firstChild = mbody.children[0];
+        let taskType1 = firstChild.classList[0];
+        let taskType2 = firstChild.classList[1];
+
+        const callbackName = callback.name || new Error().stack.replace("Error", "Callback: ");
+
+        if (type2 === null) {
+            if (taskType1 === type1) {
+                console.log(`✅ ${callbackName} :`, type1);
+                callback();
+            }
+        } else {
+            if (taskType1 === type1) {
+                for (const t2 of type2) {
+                    if (taskType2 === t2) {
+                        console.log(`✅ ${callbackName} :`, type1, " / ", t2);
+                        callback();
+                    }
+                }
+            }
+        }
+        // console.log(`❌ ${callback.name || "'Callback'"} :`, type1, " / ", type2);
     }
 
     function delay(s) {
@@ -75,27 +127,53 @@
         const contentElement = document.querySelector("div.ditem");
         const listenQuestion = document.querySelector("div.dta-main");
         const randomNumber = Math.floor(Math.random() * 15);
-        if (contentElement) {
+
+        const listeningTime = document.querySelector(".vjs-remaining-time-display");
+        if (listeningTime)
+            return listeningTime.textContent
+                .replace(" -", "")
+                .split(":")
+                .reduce((acc, time) => 60 * acc + +time, 0);
+
+        if (ctimeListeningontentElement) {
             const text = contentElement.textContent;
             const wordMatchRegExp = /[^\s]+/g;
             const words = text.matchAll(wordMatchRegExp);
             const wordCount = [...words].length;
             let readingTime = (wordCount / 320) * 60;
             readingTime += randomNumber;
-            if (listenQuestion) readingTime += 30;
             return readingTime;
         }
     }
 
-    async function clickDone(seconds) {
-        await new Promise((resolve) => setTimeout(resolve, seconds * 1000));
+    async function clickDone(seconds = 200) {
         const mfooter = document.querySelector("div#mfooter");
-        await waitForSelector('button.btn.btn-info.dnut[type="button"]', 10000, 100, mfooter);
-        const btnDone = mfooter.querySelector('button.btn.btn-info.dnut[type="button"]');
-        if (/submit/.test(btnDone.id)) {
-            btnDone.click();
-            console.log("Button done clicked!");
-        }
+        const btn = mfooter.querySelector('button.btn.btn-info.dnut[type="button"]');
+        await waitForVisible(btn, 10000, seconds * 1000);
+        if (btn.children[0].className === "fa fa-check") {
+            btn.click();
+            console.log("✅ Button done clicked!");
+        } else console.error("❌ Wrong button done selected");
+    }
+
+    async function clickShowAnswer(seconds = 200) {
+        const mfooter = document.querySelector("div#mfooter");
+        const btn = mfooter.querySelector('button.btn.btn-danger.dnut[type="button"]');
+        await waitForVisible(btn, 10000, seconds * 1000);
+        if (btn.children[0].className === "fa fa-eye") {
+            btn.click();
+            console.log("✅ Button answer clicked!");
+        } else console.error("❌ Wrong button answer selected");
+    }
+
+    async function clickUndo(seconds = 200) {
+        const mfooter = document.querySelector("div#mfooter");
+        const btn = mfooter.querySelector('button.btn.btn-primar.dnut[type="button"]');
+        await waitForVisible(btn, 10000, seconds * 1000);
+        if (btn.children[0].className === "fa fa-undo") {
+            btn.click();
+            console.log("✅ Button undo clicked!");
+        } else console.error("❌ Wrong button undo selected");
     }
 
     async function autoChooseAnswer() {
@@ -161,22 +239,15 @@
     async function autoFillAnswer() {
         await waitForSelector("input.danw.dinline[type='text']");
         const ditem = document.querySelector("div.ditem");
-        const mfooter = document.getElementById("mfooter");
         const inputs = ditem.querySelectorAll("input.danw.dinline[type='text']");
         await forEachList(inputs, async (i, input, lenght) => {
             await delay(32 / lenght);
             input.value = "a";
         });
 
-        clickDone(2);
-
+        await clickDone();
         await delay(2);
-        await waitForSelector('button.btn.btn-danger.dnut[type="button"]');
-        const btnPreview = mfooter.querySelector('button.btn.btn-danger.dnut[type="button"]');
-        if (/answer/.test(btnPreview.id)) {
-            btnPreview.click();
-            console.log("Button preview clicked!");
-        }
+        await clickShowAnswer();
 
         await waitForSelector(
             `input.danw.dinline[type='text'][disabled="disabled"][style*="background-image"]`
@@ -218,12 +289,8 @@
         console.log(listText);
 
         await delay(1);
-        await waitForSelector('button.btn.btn-primary.dnut[type="button"]');
-        const btnRedo = mfooter.querySelector('button.btn.btn-primary.dnut[type="button"]');
-        if (/answer/.test(btnRedo.id)) {
-            btnRedo.click();
-            console.log("Button redo clicked!");
-        }
+
+        await clickUndo();
 
         forEachList(inputs, async (i, input) => {
             await delay(1);
@@ -259,12 +326,8 @@
         );
     }
 
-    function doMCQ() {
-        console.log("Can't do MCQ");
-    }
-
     function enhanceMCQ() {
-		const mbody = document.querySelector("div#mbody");
+        const mbody = document.querySelector("div#mbody");
         mbody.querySelectorAll(".dans").forEach((div) => {
             div.addEventListener("click", () => {
                 div.querySelector("a").click();
@@ -279,7 +342,7 @@
         clickDone(timeDo);
     }
 
-    async function doUploadContent() {
+    async function uploadContent() {
         console.log("Upload content...");
         const notyf = new Notyf();
         const oDienLink = document.querySelector("#dupload > div > textarea").value;
@@ -310,106 +373,58 @@
                 document.querySelector("#dupload > div > textarea").value
             );
         }
-        const timeDo = TimeDoTask();
+        const timeDo = TimeDoTask() - 30;
         console.log("Đợi thêm: ", timeDo, "s");
         clickDone(timeDo);
     }
 
-    function doQuestionChooseReading() {
-        console.log("Do choose reading question...");
-        autoChooseAnswer();
-    }
-
-    function doQuestionChooseListening() {
-        console.log("Do choose listening question");
-        autoChooseAnswer();
-    }
-
-    function doQuestionFillGrammar() {
-        console.log("Do question fill grammar...");
-        autoFillAnswer();
-    }
-
-    function doQuestionFillReading() {
-        console.log("Do question fill reading...");
-        autoFillAnswer();
-    }
-
-    function doQuestionFillListening() {
-        console.log("Do question fill listening...");
-        autoFillAnswer();
-    }
     //===============================================================
 
     async function run() {
         await waitForSelector("div#mbody");
-        console.log("----------------------------------");
-        const mbody = document.querySelector("div#mbody");
-        const classList = mbody.children[0].className;
-        const classListArray = classList.split(" ");
-        let taskType = classListArray;
+        console.log("▶️▶️▶️", document.querySelector("div#mbody").children[0].className, "◀️◀️◀️");
 
-        if (dtasktitle != document.querySelector("span#dtasktitle").textContent.trim())
-            dtasktitle = document.querySelector("span#dtasktitle").textContent.trim();
-        else return;
+        if (!document.querySelector("span#dtasktitle")) {
+            // Tránh lặp lại
+            if (dtasktitle != document.querySelector("span#dtasktitle").textContent.trim())
+                dtasktitle = document.querySelector("span#dtasktitle").textContent.trim();
+            else return;
+        } else return;
 
+        // Unit test
         const timerUnitTest = document.querySelector("div#countdown.timeTo.timeTo-white");
         if (timerUnitTest) {
             console.log("!!! Đây là bài kiểm tra !!!");
             return;
         }
-        const taskTitleElement = document.querySelector("span#dtasktitle");
-        if (!taskTitleElement) {
-            console.error("It's not a task");
-            return;
-        }
 
-        console.log("Task type: " + taskType[0] + " - " + taskType[1]);
-        // Vocabulary
-        if (taskType[0] === "dvocabulary" && taskType[1] === "default") {
-            doVocabularyDefault();
-        }
-        // MCQ
-        if (taskType[0] === "dmcq") {
-            doMCQ();
-        }
-        if (
-            taskType[0] === "dmcq" &&
-            (taskType[1] === "word-choose-meaning" ||
-                taskType[1] === "audio-choose-word" ||
-                taskType[1] === "image-choose-word")
-        ) {
-            enhanceMCQ();
-        }
-        // Content
-        if (taskType[0] === "dcontent" && taskType[1] === "view-content") {
-            doContent();
-        }
-        // Upload content
-        if (taskType[0] === "dcontent" && taskType[1] === "upload-content") {
-            doUploadContent();
-        }
-        // Question
-        // Reading choose answer
-        if (taskType[0] === "dquestion" && taskType[1] === "choose-reading-choose-answer") {
-            doQuestionChooseReading();
-        }
-        // Listening choose answer
-        if (taskType[0] === "dquestion" && taskType[1] === "choose-listening-choose-answer") {
-            doQuestionChooseListening();
-        }
-        // Fill word blank
-        if (taskType[0] === "dquestion" && taskType[1] === "fill-grammar-word-blank") {
-            doQuestionFillGrammar();
-        }
-        // Fill word blank
-        if (taskType[0] === "dquestion" && taskType[1] === "fill-reading-word-blank") {
-            doQuestionFillReading();
-        }
-        // Fill word blank in Listening
-        if (taskType[0] === "dquestion" && taskType[1] === "fill-listening-write-answer") {
-            doQuestionFillListening();
-        }
+        runOnTaskType(doVocabularyDefault, "dvocabulary", "default");
+
+        runOnTaskType(
+            enhanceMCQ,
+            "dmcq",
+            "word-choose-meaning",
+            "audio-choose-word",
+            "image-choose-word"
+        );
+
+        runOnTaskType(doContent, "dcontent", "view-content");
+        runOnTaskType(uploadContent, "dcontent", "upload-content");
+
+        runOnTaskType(
+            autoChooseAnswer,
+            "dquestion",
+            "choose-reading-choose-answer",
+            "choose-listening-choose-answer"
+        );
+
+        runOnTaskType(
+            autoFillAnswer,
+            "dquestion",
+            "fill-grammar-word-blank",
+            "fill-reading-choose-answer",
+            "fill-listening-choose-answer"
+        );
     }
     var dtasktitle = "";
     waitForSelector("div#mbody", 10000, 500).then(() => {
