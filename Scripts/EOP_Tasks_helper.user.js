@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Task helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.0.6
+// @version      2.0.7
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/study/task/*
@@ -52,29 +52,31 @@
         });
     }
 
-    function waitForVisible(element, timeout = 10000, delay = 200) {
-        return new Promise((resolve, reject) => {
-            const end = Date.now() + timeout;
-            function check() {
-                if (!document.body.contains(element)) {
-                    return reject(new Error("❌ Element was removed from DOM"));
-                }
+    // function waitForVisible(element, timeout = 10000, delay = 200) {
+    //     return new Promise((resolve, reject) => {
+    //         const start = Date.now();
+    //         function check() {
+    //             const elapsed = Date.now() - start;
+    //             if (!document.body.contains(element)) {
+    //                 return reject(new Error("❌ Element was removed from DOM"));
+    //             }
 
-                if (getComputedStyle(element).display !== "none") {
-                    // console.log(element, ": is visible");
-                    return setTimeout(() => resolve(element), delay);
-                }
+    //             if (getComputedStyle(element).display !== "none") {
+    //                 // console.log(element, ": is visible");
+    //                 return setTimeout(() => resolve(element), delay - elapsed);
+    //             }
 
-                if (Date.now() > end) {
-                    return reject(new Error("⏱️ Timeout: element not visible"));
-                }
+    //             if (elapsed >= timeout) {
+    //                 console.error("⏱️ Timeout: Element not visible after", timeout, "ms");
+    //                 return resolve(element);
+    //             }
 
-                requestAnimationFrame(check);
-            }
+    //             requestAnimationFrame(check);
+    //         }
 
-            requestAnimationFrame(check);
-        });
-    }
+    //         requestAnimationFrame(check);
+    //     });
+    // }
 
     function runOnTaskType(callback, type1 = null, ...type2) {
         const mbody = document.querySelector("div#mbody");
@@ -102,8 +104,9 @@
         // console.log(`❌ ${callback.name || "'Callback'"} :`, type1, " / ", type2);
     }
 
-    function delay(s) {
-        const factor = 0.8 + Math.random() * 0.6;
+    function delay(s, sRandom = true) {
+        let factor = 1;
+        if (sRandom) factor = 0.8 + Math.random() * 0.4;
         const randomS = s * factor;
         return new Promise((resolve) => setTimeout(resolve, randomS * 1000));
     }
@@ -139,14 +142,15 @@
             const words = text.matchAll(wordMatchRegExp);
             const wordCount = [...words].length;
             let readingTime = (wordCount / 320) * 60;
+			if (readingTime > 30) readingTime = (wordCount / 640) * 60;
             return readingTime;
         }
     }
 
-    async function clickDone(seconds = 0.2) {
+    async function clickDone(seconds = 0.5) {
         const mfooter = document.querySelector("div#mfooter");
         const btn = mfooter.querySelector('button.btn.btn-info.dnut[type="button"]');
-        await waitForVisible(btn, 10000, seconds * 1000);
+        await delay(seconds);
         if (btn.children[0].className === "fa fa-check") {
             btn.click();
             console.log("✅ Button done clicked!");
@@ -156,7 +160,7 @@
     async function clickShowAnswer(seconds = 0.2) {
         const mfooter = document.querySelector("div#mfooter");
         const btn = mfooter.querySelector('button.btn.btn-danger.dnut[type="button"]');
-        await waitForVisible(btn, 10000, seconds * 1000);
+        await delay(seconds);
         if (btn.children[0].className === "fa fa-eye") {
             btn.click();
             console.log("✅ Button answer clicked!");
@@ -166,7 +170,7 @@
     async function clickUndo(seconds = 0.2) {
         const mfooter = document.querySelector("div#mfooter");
         const btn = mfooter.querySelector('button.btn.btn-primary.dnut[type="button"]');
-        await waitForVisible(btn, 10000, seconds * 1000);
+        await delay(seconds);
         if (btn.children[0].className === "fa fa-undo") {
             btn.click();
             console.log("✅ Button undo clicked!");
@@ -183,7 +187,7 @@
             // console.log(i0);
             if (i0 === 0)
                 await forEachList(questions, async (i1, question) => {
-                    await delay(2);
+                    await delay(1.5);
                     question.querySelector(".iCheck-helper").click();
                 });
             else
@@ -213,7 +217,7 @@
 
         const wordMap = {
             intemet: "internet",
-			inthe: "in the",
+            inthe: "in the",
         };
 
         text = text.trim();
@@ -250,6 +254,7 @@
                     tessedit_char_whitelist:
                         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,!?;:'\"()- ",
                     tessedit_char_blacklist: "%^&|",
+                    preserve_interword_spaces: "1",
                 });
 
                 let listText = [];
@@ -259,7 +264,7 @@
                         data: { text },
                     } = await worker.recognize(img);
 
-					// console.log("✏️ ", text);
+                    // console.log("✏️ ", text);
                     text = normalizeOcrText(text);
 
                     listText.push(text);
@@ -278,12 +283,12 @@
         const ditem = document.querySelector("div.ditem");
         const inputs = ditem.querySelectorAll("input.danw.dinline[type='text']");
         await forEachList(inputs, async (i, input, lenght) => {
-            await delay(32 / lenght);
+            await delay(30.5 / lenght, false);
             input.value = "a";
         });
 
         await clickDone();
-        await delay(2);
+        await delay(1);
         await clickShowAnswer();
 
         await waitForSelector(
