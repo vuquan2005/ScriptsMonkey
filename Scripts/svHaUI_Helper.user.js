@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.9.2
+// @version      20.10.0
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -1311,9 +1311,13 @@
         let courseCodeMap = new Map();
 
         for (const course of courses) {
-            const scorse4Cell = course.children[12];
+            const score4Cell = course.children[12];
 
-            if (scorse4Cell.style.backgroundColor != "rgb(252, 239, 195)") continue;
+            if (
+                !score4Cell.classList.contains("is-calculated") &&
+                !score4Cell.classList.contains("is-edited")
+            )
+                continue;
             const code = course.children[1].textContent.trim();
             const credit = Number(course.children[5].textContent.trim());
             const scorse4 = Number(course.children[12].textContent.trim());
@@ -1415,7 +1419,7 @@
             score = score.replace(/^D.+$/g, "D+");
             score = score.replace(/^F.*$/g, "F");
         }
-        console.log("▶️ score: ", score);
+        // console.log("▶️ score: ", score);
 
         return score;
     }
@@ -1426,14 +1430,23 @@
         const kgrid = document.querySelector("div.kGrid");
         const courses = kgrid.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
 
+        GM_addStyle(`
+			.is-edited { background-color: #fcefc3ff !important; }
+			.is-calculated { background-color: #d4eddaff !important; }
+		`);
+
         if (isEnable) {
             var notyf = new Notyf();
             for (const course of courses) {
                 if (nonCreditCourse.some((hp) => course.children[1].textContent.includes(hp)))
                     continue;
                 const scoreCell = course.children[13];
+                const score4Cell = course.children[12];
 
                 const originalScore = scoreCell.textContent.trim();
+
+                scoreCell.title = `📌: ${originalScore}\n✨: A, B+, B, C+, C, D+, D, F, 0, 1, 1.5, 2, 2.5, 3, 3.5, 4`;
+                score4Cell.title = "📌: " + originalScore;
 
                 scoreCell.setAttribute("contenteditable", "true");
 
@@ -1449,12 +1462,11 @@
 
                     if (!["A", "B+", "B", "C+", "C", "D+", "D", "F"].includes(score)) {
                         notyf.error(
-                            "Điểm không hợp lệ! \nVui lòng nhập lại (A, B+, B, C+, C, D+, D, F)"
+                            "Điểm không hợp lệ! <br>Vui lòng nhập lại (A, B+, B, C+, C, D+, D, F | 0, 1, 1.5, 2, 2.5, 3, 3.5, 4)"
                         );
                         score = originalScore;
                     }
 
-                    const score4Cell = course.children[12];
                     score4Cell.textContent = {
                         A: "4.0",
                         "B+": "3.5",
@@ -1468,8 +1480,24 @@
 
                     scoreCell.textContent = score;
 
-                    if (score !== originalScore) score4Cell.style.backgroundColor = "#fcefc3ff";
-                    else score4Cell.style.backgroundColor = "#ffffff";
+                    if (score !== originalScore) {
+                        score4Cell.classList.add("is-edited");
+                        score4Cell.classList.remove("is-calculated");
+                    } else score4Cell.classList.remove("is-edited");
+
+                    onScoreCellUpdated(scoreCell);
+                });
+
+                score4Cell.addEventListener("click", (e) => {
+                    if (
+                        !score4Cell.classList.contains("is-calculated") &&
+                        !score4Cell.classList.contains("is-edited") &&
+                        scoreCell.textContent.trim() != ""
+                    ) {
+                        score4Cell.classList.add("is-calculated");
+                    } else {
+                        score4Cell.classList.remove("is-calculated");
+                    }
 
                     onScoreCellUpdated(scoreCell);
                 });
