@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.9.1
+// @version      20.9.2
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -1385,6 +1385,41 @@
         container.appendChild(toggleBtn);
     }
 
+    //
+    function normalizeScore(score) {
+        score = score
+            .trim()
+            .toUpperCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/Đ/g, "D");
+        score = score.replace(/.+(?=[ABCDF].*)/, "");
+        if (/\d\.*\d*/.test(score)) {
+            score = Math.ceil(score.match(/\d\.*\d*/)[0] * 2) / 2;
+            if (score > 0 || score <= 4.0) {
+                score = {
+                    4.0: "A",
+                    3.5: "B+",
+                    3.0: "B",
+                    2.5: "C+",
+                    2.0: "C",
+                    1.5: "D+",
+                    1.0: "D",
+                    0.0: "F",
+                }[score];
+            }
+        } else if (/^[ABCDF].*/.test(score)) {
+            score = score.replace(/^A.*$/g, "A");
+            score = score.replace(/^B.+$/g, "B+");
+            score = score.replace(/^C.+$/g, "C+");
+            score = score.replace(/^D.+$/g, "D+");
+            score = score.replace(/^F.*$/g, "F");
+        }
+        console.log("▶️ score: ", score);
+
+        return score;
+    }
+
     // Xử lý chỉnh sửa điểm
     function onEditScore(isEnable) {
         console.log("onEditScore", isEnable);
@@ -1393,7 +1428,6 @@
 
         if (isEnable) {
             var notyf = new Notyf();
-
             for (const course of courses) {
                 if (nonCreditCourse.some((hp) => course.children[1].textContent.includes(hp)))
                     continue;
@@ -1411,45 +1445,15 @@
                 });
 
                 scoreCell.addEventListener("blur", (e) => {
-                    // Upcase
-                    scoreCell.textContent = scoreCell.textContent.trim().toUpperCase();
-                    scoreCell.textContent = scoreCell.textContent
-                        .normalize("NFD")
-                        .replace(/[\u0300-\u036f]/g, "")
-                        .replace(/Đ/g, "D");
-                    scoreCell.textContent = scoreCell.textContent.replace(/.+(?=[ABCDF].*)/, "");
-                    if (/^[ABCDF].*/.test(scoreCell.textContent)) {
-                        scoreCell.textContent = scoreCell.textContent.replace(/^A.*$/g, "A");
-                        scoreCell.textContent = scoreCell.textContent.replace(/^B.+$/g, "B+");
-                        scoreCell.textContent = scoreCell.textContent.replace(/^C.+$/g, "C+");
-                        scoreCell.textContent = scoreCell.textContent.replace(/^D.+$/g, "D+");
-                        scoreCell.textContent = scoreCell.textContent.replace(/^F.*$/g, "F");
-                    } else if (/\d\.*\d*/.test(scoreCell.textContent)) {
-                        scoreCell.textContent =
-                            Math.ceil(scoreCell.textContent.match(/\d\.*\d*/)[0] * 2) / 2;
-                        if (scoreCell.textContent > 0 || scoreCell.textContent <= 4.0) {
-                            scoreCell.textContent = {
-                                4.0: "A",
-                                3.5: "B+",
-                                3.0: "B",
-                                2.5: "C+",
-                                2.0: "C",
-                                1.5: "D+",
-                                1.0: "D",
-                                0.0: "F",
-                            }[scoreCell.textContent];
-                        }
-                    }
-                    if (scoreCell.textContent == originalScore && originalScore != "") return;
+                    let score = normalizeScore(scoreCell.textContent, originalScore);
 
-                    if (
-                        !["A", "B+", "B", "C+", "C", "D+", "D", "F"].includes(scoreCell.textContent)
-                    ) {
+                    if (!["A", "B+", "B", "C+", "C", "D+", "D", "F"].includes(score)) {
                         notyf.error(
                             "Điểm không hợp lệ! \nVui lòng nhập lại (A, B+, B, C+, C, D+, D, F)"
                         );
-                        scoreCell.textContent = originalScore;
+                        score = originalScore;
                     }
+
                     const score4Cell = course.children[12];
                     score4Cell.textContent = {
                         A: "4.0",
@@ -1460,10 +1464,11 @@
                         "D+": "1.5",
                         D: "1.0",
                         F: "0.0",
-                    }[scoreCell.textContent];
+                    }[score];
 
-                    if (scoreCell.textContent !== originalScore)
-                        score4Cell.style.backgroundColor = "#fcefc3ff";
+                    scoreCell.textContent = score;
+
+                    if (score !== originalScore) score4Cell.style.backgroundColor = "#fcefc3ff";
                     else score4Cell.style.backgroundColor = "#ffffff";
 
                     onScoreCellUpdated(scoreCell);
