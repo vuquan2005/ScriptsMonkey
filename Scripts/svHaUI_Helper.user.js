@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.10.0
+// @version      20.10.1
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -328,7 +328,7 @@
 					<ul class="shortcut-list">
 						<li>
 							<a href="/sso/blearning">
-								<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="40px" version="1.1" viewBox="144 144 512 512">
+								<svg xmlns="http://www.w3.org/2000/svg" class="shortcut-icon" version="1.1" viewBox="144 144 512 512">
 									<defs>
 										<clipPath id="a">
 											<path d="m148.09 148.09h503.81v503.81h-503.81z"/>
@@ -344,7 +344,7 @@
 						</li>
 						<li>
 							<a href="/training/viewcourseindustry">
-								<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="40px" viewBox="0 0 24 24" fill="none">
+								<svg xmlns="http://www.w3.org/2000/svg" class="shortcut-icon" viewBox="0 0 24 24" fill="none">
 									<path d="M10 22C7.17157 22 5.75736 22 4.87868 21.1213C4 20.2426 4 18.8284 4 16V8C4 5.17157 4 3.75736 4.87868 2.87868C5.75736 2 7.17157 2 10 2H14C16.8284 2 18.2426 2 19.1213 2.87868C20 3.75736 20 5.17157 20 8M14 22C16.8284 22 18.2426 22 19.1213 21.1213C20 20.2426 20 18.8284 20 16V12" stroke="#1C274D" stroke-width="1.5" stroke-linecap="round"/>
 									<path d="M19.8978 16H7.89778C6.96781 16 6.50282 16 6.12132 16.1022C5.08604 16.3796 4.2774 17.1883 4 18.2235" stroke="#1C274D" stroke-width="1.5"/>
 									<path d="M7 16V9M7 2.5V5" stroke="#1C274D" stroke-width="1.5" stroke-linecap="round"/>
@@ -355,7 +355,7 @@
 						</li>
 						<li>
 							<a href="/training/programmodulessemester">
-								<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="40px" viewBox="0 0 24 24" fill="none">
+								<svg xmlns="http://www.w3.org/2000/svg" class="shortcut-icon" viewBox="0 0 24 24" fill="none">
 									<path d="M19.8978 16H7.89778C6.96781 16 6.50282 16 6.12132 16.1022C5.08604 16.3796 4.2774 17.1883 4 18.2235" stroke="#1C274D" stroke-width="1.5"/>
 									<path d="M8 7H16" stroke="#1C274D" stroke-width="1.5" stroke-linecap="round"/>
 									<path d="M8 10.5H13" stroke="#1C274D" stroke-width="1.5" stroke-linecap="round"/>
@@ -367,7 +367,7 @@
 						</li>
 						<li>
 							<a href="/register/dangkyhocphan">
-								<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="40px" viewBox="0 0 25 25">
+								<svg xmlns="http://www.w3.org/2000/svg" class="shortcut-icon" viewBox="0 0 25 25">
 									<defs>
 										<style>.cls-1{fill:#ff7900;}</style>
 									</defs>
@@ -381,7 +381,7 @@
 						</li>
 						<li>
 							<a href="/register/">
-								<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="40px" viewBox="0 0 25 25">
+								<svg xmlns="http://www.w3.org/2000/svg" class="shortcut-icon" viewBox="0 0 25 25">
 									<defs>
 										<style>.cls-1{fill:#ff7900;}</style>
 									</defs>
@@ -395,7 +395,7 @@
 						</li>
 						<li>
 							<a href="/student/result/studyresults">
-								<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="40px" viewBox="0 0 24 24" fill="none">
+								<svg xmlns="http://www.w3.org/2000/svg" class="shortcut-icon" viewBox="0 0 24 24" fill="none">
 									<path d="M19.7781 1.39348C20.1686 1.00295 20.8018 1.00295 21.1923 1.39348L22.6066 2.80769C22.9971 3.19822 22.9971 3.83138 22.6066 4.22191C22.216 4.61243 21.5829 4.61243 21.1923 4.22191L19.7781 2.80769C19.3876 2.41717 19.3876 1.784 19.7781 1.39348Z" fill="#0F0F0F"/>
 									<path d="M16.2425 2.10051C16.633 1.70999 17.2662 1.70999 17.6567 2.10051L21.8993 6.34315C22.2899 6.73368 22.2899 7.36684 21.8993 7.75736C21.5088 8.14789 20.8756 8.14789 20.4851 7.75736L16.2425 3.51472C15.852 3.1242 15.852 2.49103 16.2425 2.10051Z" fill="#0F0F0F"/>
 									<path d="M16.9497 8.46463L8.46451 16.9498L10.5858 19.0711C10.9763 19.4616 10.9763 20.0948 10.5858 20.4853C10.1952 20.8758 9.56207 20.8758 9.17155 20.4853L3.5147 14.8284C3.12417 14.4379 3.12417 13.8048 3.51469 13.4142C3.90522 13.0237 4.53838 13.0237 4.92891 13.4142L7.05029 15.5356L15.5355 7.05041L13.4141 4.92903C13.0236 4.53851 13.0236 3.90534 13.4141 3.51482C13.8046 3.12429 14.4378 3.12429 14.8283 3.51482L20.4852 9.17167C20.8757 9.56219 20.8757 10.1954 20.4852 10.5859C20.0947 10.9764 19.4615 10.9764 19.071 10.5859L16.9497 8.46463Z" fill="#0F0F0F"/>
@@ -407,7 +407,7 @@
 						</li>
 						<li>
 							<a href="/student/result/examresult">
-								<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="40px" viewBox="0 0 24 24" fill="none">
+								<svg xmlns="http://www.w3.org/2000/svg" class="shortcut-icon" viewBox="0 0 24 24" fill="none">
 									<path fill-rule="evenodd" clip-rule="evenodd" d="M5 4C5 2.34315 6.34315 1 8 1H15.9999C17.6568 1 19 2.34314 19 4H20C21.6569 4 23 5.34315 23 7V7.64593C23 8.87265 22.2531 9.97577 21.1142 10.4314L18.031 11.6646C17.5965 12.464 16.958 13.2715 16.0234 13.8946C15.211 14.4361 14.2124 14.8132 13 14.9467V17H15C16.6569 17 18 18.3431 18 20V21C18 22.1046 17.1046 23 16 23H8C6.89543 23 6 22.1046 6 21V20C6 18.3431 7.34315 17 9 17H11V14.9467C9.78757 14.8133 8.7889 14.4361 7.97651 13.8945C7.04188 13.2715 6.40335 12.464 5.9689 11.6646L2.88583 10.4314C1.74685 9.97577 1 8.87265 1 7.64593V7C1 5.34315 2.34315 4 4 4H5ZM5 6H4C3.44772 6 3 6.44772 3 7V7.64593C3 8.05484 3.24895 8.42255 3.62861 8.57441L5.11907 9.1706C5.05194 8.78628 5.00063 8.39214 5 8.00104L5 6ZM19 8V6H20C20.5523 6 21 6.44772 21 7V7.64593C21 8.05484 20.751 8.42255 20.3714 8.57441L18.8809 9.17062C18.9469 8.78361 19 8.39286 19 8ZM8 3C7.44772 3 7 3.44772 7 4V7.99707L7 7.99832C7 7.99996 7 8.00078 7 7.99832C7.00508 8.25761 7.03756 8.51764 7.08014 8.77311C7.16297 9.27012 7.32677 9.91751 7.6444 10.5528C7.96008 11.1842 8.4179 11.7851 9.08591 12.2305C9.74766 12.6716 10.6749 13 12 13C13.325 13 14.2522 12.6716 14.914 12.2304C15.582 11.7851 16.0398 11.1842 16.3555 10.5528C16.6732 9.9175 16.837 9.27011 16.9198 8.7731C16.9624 8.51735 16.993 8.25848 17 7.99909V4C17 3.44772 16.5522 3 15.9999 3H8ZM9 19C8.44772 19 8 19.4477 8 20V21H16V20C16 19.4477 15.5523 19 15 19H9Z" fill="#0F0F0F"/>
 								</svg>
 								<span>Kết quả thi</span>
@@ -420,7 +420,7 @@
 				<div id="exam-plan-panel">
 					<div class="panel-heading">
 						<h3 class="panel-title">
-							<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="40px" viewBox="0 0 25 25">
+							<svg xmlns="http://www.w3.org/2000/svg" id="exam-plan-icon" class="shortcut-icon" viewBox="0 0 25 25">
 								<defs>
 									<style>.cls-1{fill:#000000;}</style>
 								</defs>
@@ -459,7 +459,7 @@
 				<div id="exam-schedule-panel">
 					<div class="panel-heading">
 						<h3 class="panel-title">
-							<svg xmlns="http://www.w3.org/2000/svg" width="40px" height="40px" viewBox="0 0 25 25">
+							<svg xmlns="http://www.w3.org/2000/svg" id="exam-schedule-icon" class="shortcut-icon" viewBox="0 0 25 25">
 								<defs>
 									<style>.cls-1{fill:#000000;}</style>
 								</defs>
@@ -573,14 +573,6 @@
 					transform: translateY(-2px);
 				}
 
-				.shortcut-list .icon {
-					width: 24px;
-					height: 24px;
-					margin-bottom: 8px;
-					stroke: #007bff;
-					transition: stroke 0.3s;
-				}
-
 				.shortcut-list a:hover .icon {
 					stroke: #0056b3;
 				}
@@ -588,6 +580,17 @@
 				.shortcut-list span {
 					font-weight: 400;
 					line-height: 1.4;
+				}
+
+				.shortcut-icon {
+					width: 40px;
+					height: 40px;
+					margin-bottom: 5px;
+					transition: transform 0.2s;
+				}
+
+				.shortcut-icon:hover {
+					transform: translateY(-2px);
 				}
 
 				.table {
@@ -642,8 +645,22 @@
             `);
         }
 
-        showExamPlanInHomePage();
-        showExamScheduleInHomePage();
+		const autoCheckExamPlan = GM_getValue("autoCheckExamPlan");
+		console.log("Auto check exam plan, exam schedule: ", autoCheckExamPlan);
+        if (autoCheckExamPlan == undefined)
+            GM_setValue("autoCheckExamPlan", confirm("Bạn có muốn tự động kiểm tra lịch thi?"));
+        if (GM_getValue("autoCheckExamPlan") === true) {
+            showExamPlanInHomePage();
+            showExamScheduleInHomePage();
+        }
+
+		document.querySelector("#exam-schedule-icon").addEventListener("click", () => {
+			showExamScheduleInHomePage();
+		});
+
+		document.querySelector("#exam-plan-icon").addEventListener("click", () => {
+			showExamPlanInHomePage();
+		});
     }
 
     // Hiển thị kế hoạch thi trên trang kế hoạch thi
@@ -1355,6 +1372,12 @@
         toggleBtn.id = "toggle-edit-score-btn";
         toggleBtn.textContent = "✏️";
         toggleBtn.title = "Bật/Tắt chỉnh sửa điểm";
+        const defaultEditScore = GM_getValue("defaultEditScore");
+        if (defaultEditScore == undefined)
+            GM_setValue(
+                "defaultEditScore",
+                confirm("Bạn có muốn mặc định bật chế độ chỉnh sửa điểm không?")
+            );
 
         GM_addStyle(`
 			#toggle-edit-score-btn {
@@ -1370,6 +1393,7 @@
 		`);
 
         const notyf = new Notyf();
+        if (defaultEditScore == true) setTimeout(() => toggleBtn.click(), 1000);
 
         toggleBtn.addEventListener("click", (e) => {
             e.stopPropagation();
