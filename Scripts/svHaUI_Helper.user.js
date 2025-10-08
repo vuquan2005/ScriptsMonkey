@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.11.0
+// @version      20.11.1
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -1677,13 +1677,14 @@
             "PE60", // Giáo dục thể chất
             "DC600", // Giáo dục quốc phòng
             "IC6005", // Công nghệ thông tin cơ bản
-            "IC6006", // Công nghệ thông tin nâng cao
-            "IC6007", // Công nghệ thông tin nâng cao
+            "IC6006", // Công nghệ thông tin nâng cao khối KTXH
+            "IC6007", // Công nghệ thông tin nâng cao khối Kỹ thuật
             "FL60", // Ngôn ngữ cơ bản
             "FL61",
             "FL62",
             // "FL63" // Ngôn ngữ chuyên ngành
-            "/FLd+OT/", // Ôn tập ngôn ngữ
+			"/FL65(?!82|83)\\d{2}/", // Ngôn ngữ cơ bản từ K20, loại trừ FL682, FL683 tiếng Đức
+            "/FL\\d+OT/", // Ôn tập ngôn ngữ
         ];
 
         let nCodes = GM_getValue("nonCreditCourse", []);
