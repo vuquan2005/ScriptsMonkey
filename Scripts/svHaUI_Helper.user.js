@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.11.1
+// @version      20.11.2
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -52,7 +52,7 @@
     function runOnUrl(callback, ...validLinks) {
         const href = window.location.href;
         const pathname = window.location.pathname.replace(/\/+$/, "") || "/";
-        const callbackName = callback.name || new Error().stack.replace("Error", "Callback: ");
+        const callbackName = callback.name; // || new Error().stack.replace("Error", "Callback: ");
 
         for (const link of validLinks) {
             if (typeof link === "string") {
@@ -1532,16 +1532,32 @@
     // Hiển thị thêm thông tin trong trang kết quả thi
     function showMoreInfoInExamResult() {
         let isSameTotalCredits = true;
+        const notyf = new Notyf();
+        if (window.location.pathname === "/student/result/examresult") {
+            const yourClassCode = GM_getValue("classCode");
+            if (yourClassCode.includes("DHNN")) {
+                notyf.error("Ngành ngôn ngữ không hỗ trợ tính GPA");
+                console.error("Ngành ngôn ngữ không hỗ trợ tính GPA");
+                return;
+            }
+        }
         if (window.location.pathname.includes("/student/result/viewexamresult")) {
             const yourClassCode = GM_getValue("classCode");
-            let classCode = document
+            const classCode = document
                 .querySelector(
                     "div.kGrid > div > div > div > table > tbody > tr:nth-child(3) > td:nth-child(2) > strong"
                 )
                 .textContent.trim();
-            classCode = classCode.match(/\d{4}\D+/);
-            isSameTotalCredits = yourClassCode.includes(classCode);
-            console.log("isSameTotalCredits: ", isSameTotalCredits);
+            const major = classCode.match(/\d{4}\D+/)[0];
+            isSameTotalCredits = yourClassCode.includes(major);
+            console.log("isSameTotalCredits: ", isSameTotalCredits, yourClassCode, major);
+
+            // Check ngành ngôn ngữ
+            if (classCode.includes("DHNN")) {
+                notyf.error("Ngành ngôn ngữ không hỗ trợ tính GPA");
+                console.error("Ngành ngôn ngữ không hỗ trợ tính GPA");
+                return;
+            }
         }
         // Selector
         const kgrid = document.querySelector("div.kGrid");
@@ -1683,7 +1699,7 @@
             "FL61",
             "FL62",
             // "FL63" // Ngôn ngữ chuyên ngành
-			"/FL65(?!82|83)\\d{2}/", // Ngôn ngữ cơ bản từ K20, loại trừ FL682, FL683 tiếng Đức
+            "/FL65(?!82|83)\\d{2}/", // Ngôn ngữ cơ bản từ K20, loại trừ FL682, FL683 tiếng Đức
             "/FL\\d+OT/", // Ôn tập ngôn ngữ
         ];
 
