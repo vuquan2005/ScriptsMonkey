@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.10.1
+// @version      20.11.0
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -590,7 +590,7 @@
 				}
 
 				.shortcut-icon:hover {
-					transform: translateY(-2px);
+					transform: translateY(-3px);
 				}
 
 				.table {
@@ -645,8 +645,8 @@
             `);
         }
 
-		const autoCheckExamPlan = GM_getValue("autoCheckExamPlan");
-		console.log("Auto check exam plan, exam schedule: ", autoCheckExamPlan);
+        const autoCheckExamPlan = GM_getValue("autoCheckExamPlan");
+        console.log("Auto check exam plan, exam schedule: ", autoCheckExamPlan);
         if (autoCheckExamPlan == undefined)
             GM_setValue("autoCheckExamPlan", confirm("Bạn có muốn tự động kiểm tra lịch thi?"));
         if (GM_getValue("autoCheckExamPlan") === true) {
@@ -654,13 +654,13 @@
             showExamScheduleInHomePage();
         }
 
-		document.querySelector("#exam-schedule-icon").addEventListener("click", () => {
-			showExamScheduleInHomePage();
-		});
+        document.querySelector("#exam-schedule-icon").addEventListener("click", () => {
+            showExamScheduleInHomePage();
+        });
 
-		document.querySelector("#exam-plan-icon").addEventListener("click", () => {
-			showExamPlanInHomePage();
-		});
+        document.querySelector("#exam-plan-icon").addEventListener("click", () => {
+            showExamPlanInHomePage();
+        });
     }
 
     // Hiển thị kế hoạch thi trên trang kế hoạch thi
@@ -886,10 +886,8 @@
 
         for (const row of hocPhan) {
             // Bỏ qua nonCreditCourse
-            if (
-                nonCreditCourse.some((hp) => row.children[courseCodeIndex].textContent.includes(hp))
-            )
-                continue;
+            const code = row.children[courseCodeIndex].textContent.trim();
+            if (checkNonCreditCourse(code)) continue;
             // Tô màu tín chỉ
             row.children[creditIndex].style.backgroundColor =
                 creditsBoxColor[row.children[creditIndex].textContent.trim()];
@@ -1046,10 +1044,7 @@
         elementContainer.style.fontSize = "14px";
         // Lấy hệ số điểm
         let saveScoreWeight = {};
-        const isnonCreditCourse = nonCreditCourse.some((hp) => courseCode.includes(hp));
-        if (!isnonCreditCourse) {
-            saveScoreWeight = GM_getValue("scoreWeight", {});
-        }
+        saveScoreWeight = GM_getValue("scoreWeight", {});
         // reset hp hiện tại
         saveScoreWeight[courseCode] = "";
         let elementHtml = "";
@@ -1289,7 +1284,7 @@
             const credit = Number(course.children[5].textContent.trim());
             const scorse4 = Number(course.children[12].textContent.trim());
 
-            if (nonCreditCourse.some((hp) => code.includes(hp))) continue;
+            if (checkNonCreditCourse(code)) continue;
             if (Number.isNaN(credit)) continue;
             if (Number.isNaN(scorse4)) continue;
             if (scorse4 == "") continue;
@@ -1339,7 +1334,7 @@
             const credit = Number(course.children[5].textContent.trim());
             const scorse4 = Number(course.children[12].textContent.trim());
 
-            if (nonCreditCourse.some((hp) => code.includes(hp))) continue;
+            if (checkNonCreditCourse(code)) continue;
             if (Number.isNaN(credit)) continue;
             if (Number.isNaN(scorse4)) continue;
             if (scorse4 == "") continue;
@@ -1462,8 +1457,9 @@
         if (isEnable) {
             var notyf = new Notyf();
             for (const course of courses) {
-                if (nonCreditCourse.some((hp) => course.children[1].textContent.includes(hp)))
-                    continue;
+                const code = course.children[1].textContent.trim();
+                if (checkNonCreditCourse(code)) continue;
+
                 const scoreCell = course.children[13];
                 const score4Cell = course.children[12];
 
@@ -1674,13 +1670,50 @@
 
     //===============================================================
 
-    const nonCreditCourse = [
-        "FL609", // Tiếng Anh cơ bản FL609x
-        "PE60", // Giáo dục thể chất PE60xx
-        "DC600", // Giáo dục quốc phòng DC600x
-        "IC6005", // Công nghệ thông tin cơ bản
-        "IC6007", // Công nghệ thông tin nâng cao
-    ];
+    function checkNonCreditCourse(courseCode) {
+        courseCode = courseCode.trim().toUpperCase();
+
+        const nonCreditCourse = [
+            "PE60", // Giáo dục thể chất
+            "DC600", // Giáo dục quốc phòng
+            "IC6005", // Công nghệ thông tin cơ bản
+            "IC6006", // Công nghệ thông tin nâng cao
+            "IC6007", // Công nghệ thông tin nâng cao
+            "FL60", // Ngôn ngữ cơ bản
+            "FL61",
+            "FL62",
+            // "FL63" // Ngôn ngữ chuyên ngành
+            "/FLd+OT/", // Ôn tập ngôn ngữ
+        ];
+
+        let nCodes = GM_getValue("nonCreditCourse", []);
+
+        if (nCodes.length == 0) {
+            GM_setValue("nonCreditCourse", Array.from(new Set([...nonCreditCourse, ...nCodes])));
+            console.log("Set nonCreditCourse", nCodes);
+        }
+
+        nCodes = nCodes.map((code) => {
+            if (typeof code === "string" && code.startsWith("/") && code.endsWith("/")) {
+                const pattern = code.slice(1, -1);
+                return new RegExp(pattern);
+            }
+            return code;
+        });
+
+        for (const nCode of nCodes) {
+            if (typeof nCode === "string") {
+                if (courseCode.startsWith(nCode)) {
+                    return true;
+                }
+            } else if (nCode instanceof RegExp) {
+                if (nCode.test(courseCode)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     //===============================================================
 
