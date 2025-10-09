@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.12.1
+// @version      20.12.2
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -930,18 +930,28 @@
             courseCredit.addEventListener("click", () => {
                 const isNonCreditCourse = courseCredit.getAttribute("nonCreditCourse") === "false";
                 courseCredit.setAttribute("nonCreditCourse", isNonCreditCourse ? "true" : "false");
+
+                console.log("isNonCreditCourse", isNonCreditCourse);
+
                 if (isNonCreditCourse) {
+                    const originalScore = scoreCell.getAttribute("originalScore");
+                    scoreCell.textContent = originalScore ? originalScore : scoreCell.textContent;
+
+                    scoreCell.focus();
+                    scoreCell.blur();
+
                     courseCredit.style.backgroundColor = "";
                     courseCredit.style.color = "";
                     scoreCell.setAttribute("contenteditable", "false");
-                    scoreCell.textContent = scoreCell.getAttribute("originalScore");
                 } else {
                     courseCredit.style.backgroundColor =
                         creditsBoxColor[courseCredit.textContent.trim()];
                     courseCredit.style.color = "#FFFFFF";
                     scoreCell.setAttribute("contenteditable", "true");
+
+                    scoreCell.focus();
+                    scoreCell.blur();
                 }
-                onScoreCellUpdated();
             });
 
             if (checkDefaultNonCreditCourse(courseCode)) {
@@ -1557,6 +1567,7 @@
 
                 scoreCell.addEventListener("blur", (e) => {
                     let score = normalizeScore(scoreCell.textContent, originalScore);
+                    console.log(score);
 
                     if (!["A", "B+", "B", "C+", "C", "D+", "D", "F"].includes(score)) {
                         notyf.error(
@@ -1566,14 +1577,14 @@
                     }
 
                     score4Cell.textContent = {
-                        A: "4.0",
+                        A: "4",
                         "B+": "3.5",
-                        B: "3.0",
+                        B: "3",
                         "C+": "2.5",
-                        C: "2.0",
+                        C: "2",
                         "D+": "1.5",
-                        D: "1.0",
-                        F: "0.0",
+                        D: "1",
+                        F: "0",
                     }[score];
 
                     scoreCell.textContent = score;
