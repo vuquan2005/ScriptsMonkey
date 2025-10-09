@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.11.2
+// @version      20.12.0
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -142,6 +142,8 @@
       @import url("https://cdn.jsdelivr.net/npm/notyf/notyf.min.css");
     `);
 
+    let notyf;
+
     //===============================================================
     // Sửa tiêu đề trang
     function changeTitle() {
@@ -261,8 +263,6 @@
                     inputSelectScore.name = "select_score";
                     inputSelectScore.value = scoreId;
                     score.prepend(inputSelectScore);
-
-                    const notyf = new Notyf();
 
                     inputSelectScore.addEventListener("change", function () {
                         const scoreElements = element.querySelectorAll(
@@ -704,7 +704,6 @@
             }
             await delay(10);
         }
-        var notyf = new Notyf();
 
         if (i === 0) notyf.error("Không có kế hoạch thi");
         else notyf.success("Đã lấy thành công kế hoạch thi");
@@ -747,7 +746,6 @@
                 examScheduleContainer.appendChild(examScheduleElement);
             }
         }
-        var notyf = new Notyf();
 
         if (i === 0) notyf.error("Không có lịch thi");
         else notyf.success("Đã lấy thành công lịch thi");
@@ -808,7 +806,6 @@
             return dom.querySelector("#ctl02_ctl00_viewResult > div > div > table > tbody > tr");
         } catch (err) {
             console.error(`❌ Lỗi khi lấy lịch thi cho ${getHPCode}: `, err);
-            var notyf = new Notyf();
             notyf.error(`Lỗi khi lấy lịch thi cho ${getHPCode}: `, err);
         }
     }
@@ -857,6 +854,107 @@
         }
     }
 
+    // Kiểm tra học phần không tính tín chỉ theo mặc định
+    function checkDefaultNonCreditCourse(courseCode) {
+        courseCode = courseCode.trim().toUpperCase();
+
+        const nonCreditCourse = [
+            "PE60", // Giáo dục thể chất
+            "DC600", // Giáo dục quốc phòng
+            "IC6005", // Công nghệ thông tin cơ bản
+            "IC6006", // Công nghệ thông tin nâng cao khối KTXH
+            "IC6007", // Công nghệ thông tin nâng cao khối Kỹ thuật
+            "FL60", // Ngôn ngữ cơ bản
+            "FL61",
+            "FL62",
+            // "FL63" // Ngôn ngữ chuyên ngành
+            "/FL65(?!82|83)\\d{2}/", // Ngôn ngữ cơ bản từ K20, loại trừ FL682, FL683 tiếng Đức
+            "/FL\\d+OT/", // Ôn tập ngôn ngữ
+        ];
+
+        let nCodes = GM_getValue("nonCreditCourse", []);
+
+        if (nCodes.length == 0) {
+            GM_setValue("nonCreditCourse", Array.from(new Set([...nonCreditCourse, ...nCodes])));
+            nCodes = GM_getValue("nonCreditCourse");
+            console.log("Set nonCreditCourse", nCodes);
+        }
+
+        nCodes = nCodes.map((code) => {
+            if (typeof code === "string" && code.startsWith("/") && code.endsWith("/")) {
+                const pattern = code.slice(1, -1);
+                return new RegExp(pattern);
+            }
+            return code;
+        });
+
+        for (const nCode of nCodes) {
+            if (typeof nCode === "string") {
+                if (courseCode.startsWith(nCode)) {
+                    return true;
+                }
+            } else if (nCode instanceof RegExp) {
+                if (nCode.test(courseCode)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    // Kiểm tra học phần không tính tín chỉ
+    function checkNonCreditCourse(courseCredit) {
+        const isNonCreditCourse = courseCredit.getAttribute("nonCreditCourse") === "true";
+        return isNonCreditCourse;
+    }
+
+    // Tô màu tín chỉ
+    function highlightCreditsCourse() {
+        const creditsBoxColor = {
+            "5.0": "rgb(200, 0, 100)",
+            "4.0": "rgb(255, 0, 0)",
+            "3.0": "rgb(255, 165, 0)",
+            "2.0": "rgb(0, 191, 255)",
+            "1.0": "rgb(46, 204, 64)",
+        };
+        const kgrid = document.querySelector("div.kGrid");
+        const hocPhan = kgrid.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
+
+        for (const row of hocPhan) {
+            const courseCode = row.children[1].textContent.trim();
+            const courseCredit = row.children[5];
+            const scoreCell = row.children[13];
+
+            courseCredit.setAttribute("title", "👆");
+
+            courseCredit.addEventListener("click", () => {
+                const isNonCreditCourse = courseCredit.getAttribute("nonCreditCourse") === "false";
+                courseCredit.setAttribute("nonCreditCourse", isNonCreditCourse ? "true" : "false");
+                if (isNonCreditCourse) {
+                    courseCredit.style.backgroundColor = "";
+                    courseCredit.style.color = "";
+                    scoreCell.setAttribute("contenteditable", "false");
+                    scoreCell.textContent = scoreCell.getAttribute("originalScore");
+                } else {
+                    courseCredit.style.backgroundColor =
+                        creditsBoxColor[courseCredit.textContent.trim()];
+                    courseCredit.style.color = "#FFFFFF";
+                    scoreCell.setAttribute("contenteditable", "true");
+                }
+                onScoreCellUpdated();
+            });
+
+            if (checkDefaultNonCreditCourse(courseCode)) {
+                courseCredit.setAttribute("nonCreditCourse", "true");
+                continue;
+            }
+
+            courseCredit.setAttribute("nonCreditCourse", "false");
+            courseCredit.style.backgroundColor = creditsBoxColor[courseCredit.textContent.trim()];
+            courseCredit.style.color = "#FFFFFF";
+        }
+    }
+
     // Tô màu điểm thi
     function highlightExamScores() {
         const scoresBoxColor = {
@@ -869,44 +967,27 @@
             1.0: "rgb(200, 0, 0)", // D
             0.0: "rgb(157, 0, 255)", // F
         };
-        const creditsBoxColor = {
-            "5.0": "rgb(200, 0, 100)",
-            "4.0": "rgb(255, 0, 0)",
-            "3.0": "rgb(255, 165, 0)",
-            "2.0": "rgb(0, 191, 255)",
-            "1.0": "rgb(46, 204, 64)",
-        };
+
         const kgrid = document.querySelector("div.kGrid");
         const hocPhan = kgrid.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
 
-        const courseCodeIndex = 1,
-            creditIndex = 5,
-            score4Index = 12,
-            scoreLetterIndex = 13;
-
         for (const row of hocPhan) {
             // Bỏ qua nonCreditCourse
-            const code = row.children[courseCodeIndex].textContent.trim();
-            if (checkNonCreditCourse(code)) continue;
-            // Tô màu tín chỉ
-            row.children[creditIndex].style.backgroundColor =
-                creditsBoxColor[row.children[creditIndex].textContent.trim()];
-            row.children[creditIndex].style.color = "#FFFFFF";
+            const courseCredit = row.children[5];
+            const score4Text = row.children[12].textContent.trim();
+            const scoreLetter = row.children[13];
 
-            // Bỏ qua những học phần không có điểm
-            if (
-                row.children[score4Index].textContent.trim() == "" ||
-                row.children[score4Index].textContent.trim() == "**"
-            ) {
-                row.children[scoreLetterIndex].style.backgroundColor = "rgba(0, 0, 0, 0)";
+            if (checkNonCreditCourse(courseCredit) || score4Text == "" || score4Text == "**") {
+                scoreLetter.style.backgroundColor = "";
+                scoreLetter.style.color = "";
                 continue;
             }
 
-            const diemSo = 0.0 + Number(row.children[score4Index].textContent.trim());
+            const diemSo = 0.0 + Number(score4Text);
             // console.log(diemSo);
             // Tô màu điểm
-            row.children[scoreLetterIndex].style.backgroundColor = scoresBoxColor[diemSo];
-            row.children[scoreLetterIndex].style.color = "#FFFFFF";
+            scoreLetter.style.backgroundColor = scoresBoxColor[diemSo];
+            scoreLetter.style.color = "#FFFFFF";
         }
     }
 
@@ -919,7 +1000,6 @@
         const kgrid = document.querySelector("div.kGrid");
         const hocPhan = kgrid.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
 
-        const codeCourseIndex = 2;
         const regex = /FL\d{4}OT\.\d/;
 
         for (const row of hocPhan) {
@@ -1231,7 +1311,6 @@
             document.body.removeChild(link);
             URL.revokeObjectURL(url);
 
-            var notyf = new Notyf();
             notyf.success("Đã xuất lịch học");
         });
     }
@@ -1281,10 +1360,11 @@
 
         for (const course of courses) {
             const code = course.children[1].textContent.trim();
-            const credit = Number(course.children[5].textContent.trim());
+            const courseCredit = course.children[5];
+            const credit = Number(courseCredit.textContent.trim());
             const scorse4 = Number(course.children[12].textContent.trim());
 
-            if (checkNonCreditCourse(code)) continue;
+            if (checkNonCreditCourse(courseCredit)) continue;
             if (Number.isNaN(credit)) continue;
             if (Number.isNaN(scorse4)) continue;
             if (scorse4 == "") continue;
@@ -1295,9 +1375,6 @@
                 if (scorse4 > old.scorse4) {
                     courseCodeMap.delete(code);
                     courseCodeMap.set(code, { scorse4: scorse4, credit: credit });
-
-                    // console.log(course);
-                    // course.children[14].style.backgroundColor = "rgb(252, 239, 195)";
                 }
             } else {
                 courseCodeMap.set(code, { scorse4: scorse4, credit: credit });
@@ -1331,10 +1408,11 @@
             )
                 continue;
             const code = course.children[1].textContent.trim();
-            const credit = Number(course.children[5].textContent.trim());
+            const courseCredit = course.children[5];
+            const credit = Number(courseCredit.textContent.trim());
             const scorse4 = Number(course.children[12].textContent.trim());
 
-            if (checkNonCreditCourse(code)) continue;
+            if (checkNonCreditCourse(courseCredit)) continue;
             if (Number.isNaN(credit)) continue;
             if (Number.isNaN(scorse4)) continue;
             if (scorse4 == "") continue;
@@ -1387,7 +1465,6 @@
 			}
 		`);
 
-        const notyf = new Notyf();
         if (defaultEditScore == true) setTimeout(() => toggleBtn.click(), 1000);
 
         toggleBtn.addEventListener("click", (e) => {
@@ -1455,20 +1532,21 @@
 		`);
 
         if (isEnable) {
-            var notyf = new Notyf();
             for (const course of courses) {
-                const code = course.children[1].textContent.trim();
-                if (checkNonCreditCourse(code)) continue;
-
+                const courseCredit = course.children[5];
                 const scoreCell = course.children[13];
                 const score4Cell = course.children[12];
 
+                scoreCell.setAttribute("originalScore", scoreCell.textContent.trim());
                 const originalScore = scoreCell.textContent.trim();
 
+                if (checkNonCreditCourse(courseCredit)) {
+                    scoreCell.setAttribute("contenteditable", "false");
+                } else {
+                    scoreCell.setAttribute("contenteditable", "true");
+                }
                 scoreCell.title = `📌: ${originalScore}\n✨: A, B+, B, C+, C, D+, D, F, 0, 1, 1.5, 2, 2.5, 3, 3.5, 4`;
                 score4Cell.title = "📌: " + originalScore;
-
-                scoreCell.setAttribute("contenteditable", "true");
 
                 scoreCell.addEventListener("keydown", (e) => {
                     if (e.key === "Enter") {
@@ -1532,12 +1610,10 @@
     // Hiển thị thêm thông tin trong trang kết quả thi
     function showMoreInfoInExamResult() {
         let isSameTotalCredits = true;
-        const notyf = new Notyf();
         if (window.location.pathname === "/student/result/examresult") {
             const yourClassCode = GM_getValue("classCode");
             if (yourClassCode.includes("DHNN")) {
-                notyf.error("Ngành ngôn ngữ không hỗ trợ tính GPA");
-                console.error("Ngành ngôn ngữ không hỗ trợ tính GPA");
+                notyf.error("Ngành ngôn ngữ vui lòng nhấn vào số tín các môn cần tính GPA");
                 return;
             }
         }
@@ -1686,56 +1762,9 @@
 
     //===============================================================
 
-    function checkNonCreditCourse(courseCode) {
-        courseCode = courseCode.trim().toUpperCase();
-
-        const nonCreditCourse = [
-            "PE60", // Giáo dục thể chất
-            "DC600", // Giáo dục quốc phòng
-            "IC6005", // Công nghệ thông tin cơ bản
-            "IC6006", // Công nghệ thông tin nâng cao khối KTXH
-            "IC6007", // Công nghệ thông tin nâng cao khối Kỹ thuật
-            "FL60", // Ngôn ngữ cơ bản
-            "FL61",
-            "FL62",
-            // "FL63" // Ngôn ngữ chuyên ngành
-            "/FL65(?!82|83)\\d{2}/", // Ngôn ngữ cơ bản từ K20, loại trừ FL682, FL683 tiếng Đức
-            "/FL\\d+OT/", // Ôn tập ngôn ngữ
-        ];
-
-        let nCodes = GM_getValue("nonCreditCourse", []);
-
-        if (nCodes.length == 0) {
-            GM_setValue("nonCreditCourse", Array.from(new Set([...nonCreditCourse, ...nCodes])));
-            console.log("Set nonCreditCourse", nCodes);
-        }
-
-        nCodes = nCodes.map((code) => {
-            if (typeof code === "string" && code.startsWith("/") && code.endsWith("/")) {
-                const pattern = code.slice(1, -1);
-                return new RegExp(pattern);
-            }
-            return code;
-        });
-
-        for (const nCode of nCodes) {
-            if (typeof nCode === "string") {
-                if (courseCode.startsWith(nCode)) {
-                    return true;
-                }
-            } else if (nCode instanceof RegExp) {
-                if (nCode.test(courseCode)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    //===============================================================
-
     function run() {
         // console.log("✅ sv.HaUI loaded: " + window.location.href);
+        notyf = new Notyf();
 
         runOnUrl(changeTitle, "");
         runOnUrl(changeHomePagePath, "");
@@ -1752,6 +1781,11 @@
 
         runOnUrl(showExamPlan, "/student/schedulefees/examplant");
 
+        runOnUrl(
+            highlightCreditsCourse,
+            "/student/result/examresult",
+            "/student/result/viewexamresult"
+        );
         runOnUrl(
             highlightExamScores,
             "/student/result/examresult",
