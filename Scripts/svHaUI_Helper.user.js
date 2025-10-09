@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.12.0
+// @version      20.12.1
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -864,7 +864,7 @@
             "IC6005", // Công nghệ thông tin cơ bản
             "IC6006", // Công nghệ thông tin nâng cao khối KTXH
             "IC6007", // Công nghệ thông tin nâng cao khối Kỹ thuật
-            "FL60", // Ngôn ngữ cơ bản
+            "/FL60(91|92|93|94)/", // TA cơ khí cơ bản
             "FL61",
             "FL62",
             // "FL63" // Ngôn ngữ chuyên ngành
@@ -1630,9 +1630,7 @@
 
             // Check ngành ngôn ngữ
             if (classCode.includes("DHNN")) {
-                notyf.error("Ngành ngôn ngữ không hỗ trợ tính GPA");
-                console.error("Ngành ngôn ngữ không hỗ trợ tính GPA");
-                return;
+                notyf.error("Ngành ngôn ngữ vui lòng nhấn vào số tín các môn cần tính GPA");
             }
         }
         // Selector
