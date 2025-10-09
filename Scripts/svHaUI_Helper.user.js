@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.12.2
+// @version      20.12.3
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -142,7 +142,7 @@
       @import url("https://cdn.jsdelivr.net/npm/notyf/notyf.min.css");
     `);
 
-    let notyf;
+    var notyf;
 
     //===============================================================
     // Sửa tiêu đề trang
@@ -1399,7 +1399,7 @@
         }
         const GPA = sumScore / sumCredits;
         // console.log(courseCodeMap);
-        return { currentGPA: GPA, currentCredits: sumCredits };
+        return { calculateGPA: GPA, calculateCredits: sumCredits };
     }
 
     // Chỉ tính học phần đã sửa, tính cả học phần F
@@ -1621,13 +1621,6 @@
     // Hiển thị thêm thông tin trong trang kết quả thi
     function showMoreInfoInExamResult() {
         let isSameTotalCredits = true;
-        if (window.location.pathname === "/student/result/examresult") {
-            const yourClassCode = GM_getValue("classCode");
-            if (yourClassCode.includes("DHNN")) {
-                notyf.error("Ngành ngôn ngữ vui lòng nhấn vào số tín các môn cần tính GPA");
-                return;
-            }
-        }
         if (window.location.pathname.includes("/student/result/viewexamresult")) {
             const yourClassCode = GM_getValue("classCode");
             const classCode = document
@@ -1638,11 +1631,6 @@
             const major = classCode.match(/\d{4}\D+/)[0];
             isSameTotalCredits = yourClassCode.includes(major);
             console.log("isSameTotalCredits: ", isSameTotalCredits, yourClassCode, major);
-
-            // Check ngành ngôn ngữ
-            if (classCode.includes("DHNN")) {
-                notyf.error("Ngành ngôn ngữ vui lòng nhấn vào số tín các môn cần tính GPA");
-            }
         }
         // Selector
         const kgrid = document.querySelector("div.kGrid");
@@ -1673,7 +1661,15 @@
         const currentCreditsContainer = lastTable.querySelector(
             "tbody > tr:last-child > td:first-child"
         );
-        currentCreditsContainer.innerHTML += `<span class="study-info"> / <span id="total-credits">???</span></span>`;
+        const currentCredits = currentCreditsContainer.textContent.trim().match(/\d+/)[0];
+        console.log("currentCredits: ", currentCredits);
+        currentCreditsContainer.innerHTML = `</span><span class="study-info">Tín chỉ đã tích luỹ: <span id="current-credits">${currentCredits} / <span id="total-credits">???</span></span>`;
+        setTimeout(() => {
+            if (document.getElementById("total-credits").textContent.trim() != currentCredits)
+                notyf.error(
+                    "Một số môn có thể chưa được tính vào GPA, nhấp vào số tín chỉ của môn chưa tính GPA để tính lại."
+                );
+        }, 500);
         const totalCredits = GM_getValue("totalCredits", 0);
         if (isSameTotalCredits && totalCredits > 0) {
             document.getElementById("total-credits").textContent = totalCredits;
@@ -1707,7 +1703,7 @@
         requiredScore.innerHTML = `<td colspan="4">
 			<span id="requiredScore" class="study-info">
 				✏️: <span id="edited-gpa">0</span> / <span id="edited-credits">0</span></br>
-				🎯: <span id="current-gpa1">0</span> / <span id="current-credits">0</span></br>
+				🎯: <span id="current-gpa1">0</span> / <span id="calculate-credits">0</span></br>
 				Số tín tích luỹ còn lại: <span id="remaining-credits">0</span></br>
 			</span>
 		</td><td colspan="14">
@@ -1739,30 +1735,33 @@
     function onScoreCellUpdated() {
         highlightExamScores();
 
-        const { currentGPA, currentCredits } = calculateStudyStats();
+        const { calculateGPA, calculateCredits } = calculateStudyStats();
         const { editedGPA, editedCredits } = calculateStudyStatsEdited();
         const totalCredits = Number(document.getElementById("total-credits").textContent.trim());
 
-        document.getElementById("current-gpa").textContent = currentGPA.toFixed(3);
+        document.getElementById("current-gpa").textContent = calculateGPA.toFixed(3);
 
-        if (currentGPA >= 3.6) document.getElementById("edited-study").textContent = "Xuất sắc";
-        else if (currentGPA >= 3.2) document.getElementById("edited-study").textContent = "Giỏi";
-        else if (currentGPA >= 2.5) document.getElementById("edited-study").textContent = "Khá";
-        else if (currentGPA >= 2.0)
+        if (calculateGPA >= 3.6) document.getElementById("edited-study").textContent = "Xuất sắc";
+        else if (calculateGPA >= 3.2) document.getElementById("edited-study").textContent = "Giỏi";
+        else if (calculateGPA >= 2.5) document.getElementById("edited-study").textContent = "Khá";
+        else if (calculateGPA >= 2.0)
             document.getElementById("edited-study").textContent = "Trung bình";
-        else if (currentGPA < 2.0) document.getElementById("edited-study").textContent = "Yếu";
+        else if (calculateGPA < 2.0) document.getElementById("edited-study").textContent = "Yếu";
 
-        const remainingCredits = totalCredits - currentCredits;
-        const scoresToGPA25 = (2.5 * totalCredits - currentGPA * currentCredits) / remainingCredits;
-        const scoresToGPA32 = (3.2 * totalCredits - currentGPA * currentCredits) / remainingCredits;
-        const scoresToGPA36 = (3.6 * totalCredits - currentGPA * currentCredits) / remainingCredits;
+        const remainingCredits = totalCredits - calculateCredits;
+        const scoresToGPA25 =
+            (2.5 * totalCredits - calculateGPA * calculateCredits) / remainingCredits;
+        const scoresToGPA32 =
+            (3.2 * totalCredits - calculateGPA * calculateCredits) / remainingCredits;
+        const scoresToGPA36 =
+            (3.6 * totalCredits - calculateGPA * calculateCredits) / remainingCredits;
 
         document.getElementById("edited-gpa").textContent = isNaN(editedGPA)
             ? "0"
             : editedGPA.toFixed(3);
         document.getElementById("edited-credits").textContent = editedCredits;
-        document.getElementById("current-gpa1").textContent = currentGPA.toFixed(3);
-        document.getElementById("current-credits").textContent = currentCredits;
+        document.getElementById("current-gpa1").textContent = calculateGPA.toFixed(3);
+        document.getElementById("calculate-credits").textContent = calculateCredits;
         document.getElementById("remaining-credits").textContent = remainingCredits;
         document.getElementById("target-2.5").textContent = scoresToGPA25.toFixed(3);
         document.getElementById("target-3.2").textContent = scoresToGPA32.toFixed(3);
@@ -1773,7 +1772,10 @@
 
     function run() {
         // console.log("✅ sv.HaUI loaded: " + window.location.href);
-        notyf = new Notyf();
+        notyf = new Notyf({
+            duration: 3500,
+            dismissible: true,
+        });
 
         runOnUrl(changeTitle, "");
         runOnUrl(changeHomePagePath, "");
