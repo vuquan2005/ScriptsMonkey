@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Task helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.0.7
+// @version      2.0.8
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/study/task/*
@@ -142,7 +142,7 @@
             const words = text.matchAll(wordMatchRegExp);
             const wordCount = [...words].length;
             let readingTime = (wordCount / 320) * 60;
-			if (readingTime > 30) readingTime = (wordCount / 640) * 60;
+            if (readingTime > 30) readingTime = (wordCount / 640) * 60;
             return readingTime;
         }
     }
@@ -206,43 +206,49 @@
     }
 
     function normalizeOcrText(text) {
-        const numMap = {};
+        try {
+            const numMap = {};
 
-        const charMap = {
-            0: "o",
-            1: "i",
-            5: "s",
-            Cc: "C",
-        };
+            const charMap = {
+                0: "o",
+                1: "i",
+                5: "s",
+                Cc: "C",
+            };
 
-        const wordMap = {
-            intemet: "internet",
-            inthe: "in the",
-        };
+            const wordMap = {
+                intemet: "internet",
+                inthe: "in the",
+            };
 
-        text = text.trim();
-        let output = "";
+            text = text.trim();
+            let output = "";
 
-        for (let token of text.match(/\w+|\W+/g)) {
-            if (/^\d+.*$/.test(token)) {
-                output += token;
-                continue;
-            }
-            if (/^\w+$/.test(token)) {
-                for (const [wrong, correct] of Object.entries(charMap)) {
-                    const regex = new RegExp(wrong, "g");
-                    token = token.replace(regex, correct);
+            for (let token of text.match(/\w+|\W+/g)) {
+                // console.log("Token:", token);
+                if (/^\d+.*$/.test(token)) {
+                    output += token;
+                    continue;
                 }
+                if (/^\w+$/.test(token)) {
+                    for (const [wrong, correct] of Object.entries(charMap)) {
+                        const regex = new RegExp(wrong, "g");
+                        token = token.replace(regex, correct);
+                    }
+                }
+                output += token;
             }
-            output += token;
-        }
 
-        for (const [wrong, correct] of Object.entries(wordMap)) {
-            const regex = new RegExp(wrong, "gi");
-            output = output.replace(regex, correct);
-        }
+            for (const [wrong, correct] of Object.entries(wordMap)) {
+                const regex = new RegExp(wrong, "gi");
+                output = output.replace(regex, correct);
+            }
 
-        return output;
+            return output;
+        } catch (error) {
+            console.error("Error in normalizeOcrText:", error);
+            return text;
+        }
     }
 
     async function recognizeTextFromListImage(imgList) {
@@ -253,7 +259,7 @@
                 await worker.setParameters({
                     tessedit_char_whitelist:
                         "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,!?;:'\"()- ",
-                    tessedit_char_blacklist: "%^&|",
+                    tessedit_char_blacklist: "%^&",
                     preserve_interword_spaces: "1",
                 });
 
