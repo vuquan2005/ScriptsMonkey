@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.12.3
+// @version      20.12.4
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -1565,8 +1565,12 @@
                     }
                 });
 
+                scoreCell.addEventListener("focus", () => {
+                    scoreCell.textContent = "";
+                });
+
                 scoreCell.addEventListener("blur", (e) => {
-                    let score = normalizeScore(scoreCell.textContent, originalScore);
+                    let score = normalizeScore(scoreCell.textContent);
                     console.log(score);
 
                     if (!["A", "B+", "B", "C+", "C", "D+", "D", "F"].includes(score)) {
@@ -1663,9 +1667,9 @@
         );
         const currentCredits = currentCreditsContainer.textContent.trim().match(/\d+/)[0];
         console.log("currentCredits: ", currentCredits);
-        currentCreditsContainer.innerHTML = `</span><span class="study-info">Tín chỉ đã tích luỹ: <span id="current-credits">${currentCredits} / <span id="total-credits">???</span></span>`;
+        currentCreditsContainer.innerHTML = `</span><span class="study-info">Tín chỉ đã tích luỹ: <span id="current-credits">${currentCredits}</span> / <span id="total-credits">???</span></span>`;
         setTimeout(() => {
-            if (document.getElementById("total-credits").textContent.trim() != currentCredits)
+            if (document.getElementById("current-credits").textContent.trim() != currentCredits)
                 notyf.error(
                     "Một số môn có thể chưa được tính vào GPA, nhấp vào số tín chỉ của môn chưa tính GPA để tính lại."
                 );
