@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.5.0
+// @version      2.6.0
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -72,26 +72,27 @@
     // =====================================================================================
     // Bỏ chặn một số thứ
     function BoChan() {
-        const events = [
-            "copy",
-            "cut",
-            "paste",
-            "contextmenu",
-            "mousedown",
-            "mouseup",
-            "keydown",
-            "keypress",
-            "keyup",
-        ];
-        events.forEach((evt) => {
+        const events = ["copy", "cut", "paste", "contextmenu"];
+        for (const event of events) {
             window.addEventListener(
-                evt,
+                event,
                 (e) => {
                     e.stopPropagation();
                 },
                 true
             );
-        });
+        }
+        const keyEvents = ["keydown", "keypress", "keyup"];
+        for (const event of keyEvents) {
+            window.addEventListener(
+                event,
+                (e) => {
+                    if (e.ctrlKey || e.key == "F12") e.stopPropagation();
+                    console.log(e.key, "  ", e.keyEvents, "  ", e.ctrlKey);
+                },
+                true
+            );
+        }
     }
     // =====================================================================================
     // Auto viết hoa captcha
