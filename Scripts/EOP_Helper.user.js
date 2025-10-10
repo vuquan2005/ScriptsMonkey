@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.6.0
+// @version      2.6.1
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -86,9 +86,13 @@
         for (const event of keyEvents) {
             window.addEventListener(
                 event,
-                (e) => {
-                    if (e.ctrlKey || e.key == "F12") e.stopPropagation();
-                    console.log(e.key, "  ", e.keyEvents, "  ", e.ctrlKey);
+                (event) => {
+                    if (event.ctrlKey && event.key === "s") {
+                        event.stopPropagation();
+                        event.preventDefault();
+                        console.log("Save as blocked.");
+                    }
+                    if (event.ctrlKey || event.key == "F12") event.stopPropagation();
                 },
                 true
             );
@@ -212,24 +216,13 @@
     // =====================================================================================
     // Hiển thị toàn bộ task trong unit
     function showTasks() {
-        const taskElements = $$("a.dpop.allow");
-        const vocabPanel = $("div#tpvocabulary");
-        const grammarPanel = $("div#tpgrammar");
-        const listeningPanel = $("div#tplistening");
-        const readingPanel = $("div#tpreading");
-        const writingPanel = $("div#tpwriting");
-        const speakingPanel = $("div#tpspeaking");
-        const panels = [
-            vocabPanel,
-            grammarPanel,
-            listeningPanel,
-            readingPanel,
-            writingPanel,
-            speakingPanel,
-        ];
+        $(".content > .row > .col-md-3").remove();
+
+        const container = $("div.tab-content.dgunit");
+        const panels = $$("div.tab-pane", container);
 
         const panelNames = ["Vocabulary", "Grammar", "Listening", "Reading", "Writing", "Speaking"];
-        for (let i = 0; i < panels.length && i < panelNames.length; i++) {
+        for (let i = 0; i < panels.length && i < panels.length; i++) {
             const insertElement = `<p style="font-size: 1.6rem; font-weight: 550; margin: auto; padding: 5px 20px; color: #003500;">${panelNames[i]}</p>`;
             panels[i].insertAdjacentHTML("afterbegin", insertElement);
             if (!panels[i].classList.contains("active")) {
@@ -238,7 +231,7 @@
         }
 
         GM_addStyle(`
-				.tab-content.dgunit {
+			.tab-content.dgunit {
 				display: grid;
 				grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
 				gap: 1rem;
@@ -260,14 +253,20 @@
 				justify-content: center;
 				border-radius: 8px;
 				text-decoration: none;
-				color: #003500;
 				font-weight: 500;
 				transition: all 0.3s ease;
 			}
 
 			.tab-content.dgunit a:hover {
+				color: #000000;
 				background: #e6f3e6;
 				transform: translateY(-2px);
+			}
+
+			.col-md-9 {
+				width: 95% !important;
+				float: none !important;
+				margin: auto !important;
 			}
 		`);
     }
