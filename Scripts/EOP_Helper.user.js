@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.4.4
+// @version      2.5.0
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -209,15 +209,9 @@
         totalScoreElement.appendChild(scoreElement);
     }
     // =====================================================================================
-    // Hiển thị toàn bộ task trong unit hoặc đến task chưa hoàn thành nếu có
+    // Hiển thị toàn bộ task trong unit
     function showTasks() {
-        let areTasksFinished = true;
         const taskElements = $$("a.dpop.allow");
-        taskElements.forEach((taskElement) => {
-            if (!taskElement.classList.contains("dgtaskdone")) {
-                areTasksFinished = false;
-            }
-        });
         const vocabPanel = $("div#tpvocabulary");
         const grammarPanel = $("div#tpgrammar");
         const listeningPanel = $("div#tplistening");
@@ -232,49 +226,60 @@
             writingPanel,
             speakingPanel,
         ];
-        if (!areTasksFinished) {
-            /* Nếu có task chưa done */ // Tìm task chưa hoàn thành đầu tiên
-            const firstUnfinishedTask = Array.from(taskElements).find((taskElement) => {
-                return !taskElement.classList.contains("dgtaskdone");
-            });
-            // Hook phần tử mẹ của firstUnfinishedTask
-            const parentElement = firstUnfinishedTask.closest("div.tab-pane");
-            // Ẩn toàn bộ task
-            panels.forEach((panel) => {
-                panel.classList.remove("active");
-            });
-            // Hiện task chưa hoàn thành đầu tiên
-            parentElement.classList.add("active");
-        } /* Nếu tất cả task đã done */ else {
-            const panelNames = [
-                "Vocabulary",
-                "Grammar",
-                "Listening",
-                "Reading",
-                "Writing",
-                "Speaking",
-            ];
-            for (let i = 0; i < panels.length && i < panelNames.length; i++) {
-                const insertElement = `<a class="dpop" style="color:rgb(32, 161, 32);"><b>${panelNames[i]}</b></br>========================================================================================================================================</a>`;
-                panels[i].insertAdjacentHTML("afterbegin", insertElement);
-                if (!panels[i].classList.contains("active")) {
-                    panels[i].classList.add("active");
-                }
+
+        const panelNames = ["Vocabulary", "Grammar", "Listening", "Reading", "Writing", "Speaking"];
+        for (let i = 0; i < panels.length && i < panelNames.length; i++) {
+            const insertElement = `<p style="font-size: 1.6rem; font-weight: 550; margin: auto; padding: 5px 20px; color: #003500;">${panelNames[i]}</p>`;
+            panels[i].insertAdjacentHTML("afterbegin", insertElement);
+            if (!panels[i].classList.contains("active")) {
+                panels[i].classList.add("active");
             }
         }
+
+        GM_addStyle(`
+				.tab-content.dgunit {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+				gap: 1rem;
+				align-items: start;
+			}
+
+			.tab-pane.active {
+				display: block;
+				grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+				gap: 0.5rem;
+				padding: 1rem;
+				background: #f7f7f7;
+				border-radius: 10px;
+			}
+
+			.tab-content.dgunit a.dpop {
+				display: block;
+				align-items: center;
+				justify-content: center;
+				border-radius: 8px;
+				text-decoration: none;
+				color: #003500;
+				font-weight: 500;
+				transition: all 0.3s ease;
+			}
+
+			.tab-content.dgunit a:hover {
+				background: #e6f3e6;
+				transform: translateY(-2px);
+			}
+		`);
     }
     function showTaskType() {
         const taskElements = $$("a.dpop.allow");
         for (let taskElement of taskElements) {
-            let taskType = $("b", taskElement).title;
-            taskType = taskType.replaceAll("/", " -> ");
+            let taskType = $("b", taskElement).title.match(/(?<=\/).+/)[0];
             taskType = taskType.replaceAll("-", " ");
             $("em", taskElement).textContent = " --- " + taskType;
         }
         GM_addStyle(`
                 em {
-                    color:#dfdfdf;
-                    font-weight: italic;
+                    color: #d8dbd7;
                 }
             `);
     }
