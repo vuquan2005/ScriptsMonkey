@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.12.4
+// @version      20.12.5
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -285,7 +285,7 @@
         captchaInput.addEventListener("keydown", (e) => {
             if (e.key === "Enter") {
                 e.preventDefault();
-                captchaInput.blur();
+                if (captchaInput.value.length == 5) captchaInput.blur();
             }
         });
 
@@ -295,7 +295,6 @@
                 .normalize("NFD")
                 .replace(/[\u0300-\u036f]/g, "")
                 .replace(/đ/g, "d");
-
             if (captchaInput.value.length == 5) captchaSubmit.click();
         });
     }
