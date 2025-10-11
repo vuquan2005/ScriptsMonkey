@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.14.0
+// @version      20.15.0
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -1887,6 +1887,43 @@
                 });
             }
         }
+    }
+
+    function showPlannedCourses() {
+        let plannedCourses = GM_getValue("plannedCourses", []);
+
+        setInterval(() => {
+            // Tô vàng những học phần nằm trong dự định
+            const planningCourses = document.querySelectorAll("#tableorder > tbody > tr");
+            for (const planningCourse of planningCourses) {
+                const courseCodeCell = planningCourse.children[2];
+                if (!courseCodeCell) continue;
+                const courseCode = courseCodeCell.textContent.replace("[Hủy đăng ký]", "").trim();
+                if (/\w{2}\d{4}/.test(courseCode))
+                    if (plannedCourses.includes(courseCode)) {
+                        courseCodeCell.style.backgroundColor = "#fcefc3ff";
+                        plannedCourses = plannedCourses.filter((code) => code !== courseCode);
+                    }
+            }
+
+            // Hiển thị học phần còn lại
+            const note = document.querySelector("#note");
+            if (note.querySelector("p")) note.querySelector("p").remove();
+            const plannedCoursesContainer = document.createElement("p");
+            plannedCoursesContainer.style.fontSize = "18px";
+            plannedCoursesContainer.title =
+                "Học phần bạn đã đánh dấu trong trang 'Trung bình chung tích lũy'";
+            note.appendChild(plannedCoursesContainer);
+
+            plannedCoursesContainer.textContent = "🎯: ";
+            for (const plannedCourse of plannedCourses) {
+                plannedCoursesContainer.textContent += plannedCourse + ", ";
+            }
+            plannedCoursesContainer.textContent = plannedCoursesContainer.textContent.replace(
+                /,\s$/,
+                ""
+            );
+        }, 1000);
     }
 
     //===============================================================
