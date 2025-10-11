@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.15.0
+// @version      20.16.0
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -1851,10 +1851,10 @@
             if (checkDefaultNonCreditCourse(courseCode)) continue;
 
             // Tìm index td.tinchi
-            const tinchiCell = course.querySelector(".tinchi");
-            if (!tinchiCell) continue;
+            const creditCell = course.querySelector(".tinchi");
+            if (!creditCell) continue;
             const tds = Array.from(course.querySelectorAll("td"));
-            const index = tds.indexOf(tinchiCell);
+            const index = tds.indexOf(creditCell);
 
             // Tô màu điểm
             let score4Cell = course.children[index + 6];
@@ -1865,27 +1865,85 @@
             // Tô màu tín đang học
             if (courseCode in yourStudyProcess)
                 if (yourStudyProcess[courseCode] === "") {
-                    tinchiCell.style.backgroundColor =
-                        creditsBoxColor[tinchiCell.textContent.trim()];
-                    tinchiCell.style.color = "#FFFFFF";
+                    creditCell.style.backgroundColor =
+                        creditsBoxColor[creditCell.textContent.trim()];
+                    creditCell.style.color = "#FFFFFF";
                 }
             // Marker plannedCourses
             const courseNameCell = course.children[3];
-            if (score4Cell.textContent.trim() === "") {
-                let flag = false;
-                if (plannedCourses.includes(courseCode)) {
-                    flag = true;
-                    courseNameCell.style.backgroundColor = "#fcefc3ff";
+            let flag = false;
+            if (plannedCourses.includes(courseCode)) {
+                flag = true;
+                courseNameCell.style.backgroundColor = "#fcefc3ff";
+            }
+
+            courseNameCell.addEventListener("click", () => {
+                flag = !flag;
+                courseNameCell.style.backgroundColor = flag ? "#fcefc3ff" : "";
+                if (flag) plannedCourses.push(courseCode);
+                else plannedCourses = plannedCourses.filter((code) => code !== courseCode);
+                GM_setValue("plannedCourses", plannedCourses);
+            });
+        }
+    }
+
+    //
+    function customizeProgramFramework() {
+        const yourStudyProcess = GM_getValue("~~yourStudyProcess", {});
+        const plannedCourses = GM_getValue("plannedCourses", []);
+        const scoresBoxColor = {
+            4: "rgb(64,212,81)", // A
+            3.5: "rgb(49, 163, 255)", // B+
+            3: "rgb(20, 120, 230)", // B
+            2.5: "rgb(255,186,0)", // C+
+            2: "rgb(255,144,0)", // C
+            1.5: "rgb(255, 50, 0)", // D+
+            1: "rgb(200, 0, 0)", // D
+            0: "rgb(157, 0, 255)", // F
+        };
+        const creditsBoxColor = {
+            "5.0": "rgb(200, 0, 100)",
+            "4.0": "rgb(255, 0, 0)",
+            "3.0": "rgb(255, 165, 0)",
+            "2.0": "rgb(0, 191, 255)",
+            "1.0": "rgb(46, 204, 64)",
+        };
+
+        const courses = document.querySelectorAll(".k-table-viewdetail > table.table > tbody  >tr");
+
+        for (const course of courses) {
+            const courseCodeCell = course.children[1];
+            if (!courseCodeCell) continue;
+            const courseCode = courseCodeCell.textContent.trim();
+            if (!/\w{2}\d{4}/.test(courseCode) || checkDefaultNonCreditCourse(courseCode)) continue;
+
+            if (courseCode in yourStudyProcess)
+                if (!yourStudyProcess[courseCode] == "") {
+                    courseCodeCell.style.backgroundColor =
+                        scoresBoxColor[yourStudyProcess[courseCode]];
+                    courseCodeCell.style.color = "#FFFFFF";
+                } else {
+                    const creditCell = course.children[3];
+                    creditCell.style.backgroundColor =
+                        creditsBoxColor[creditCell.textContent.trim()];
+                    creditCell.style.color = "#FFFFFF";
                 }
 
-                courseNameCell.addEventListener("click", () => {
-                    flag = !flag;
-                    courseNameCell.style.backgroundColor = flag ? "#fcefc3ff" : "";
-                    if (flag) plannedCourses.push(courseCode);
-                    else plannedCourses = plannedCourses.filter((code) => code !== courseCode);
-                    GM_setValue("plannedCourses", plannedCourses);
-                });
+            // Marker plannedCourses
+            const courseNameCell = course.children[2];
+            let flag = false;
+            if (plannedCourses.includes(courseCode)) {
+                flag = true;
+                courseNameCell.style.backgroundColor = "#fcefc3ff";
             }
+
+            courseNameCell.addEventListener("click", () => {
+                flag = !flag;
+                courseNameCell.style.backgroundColor = flag ? "#fcefc3ff" : "";
+                if (flag) plannedCourses.push(courseCode);
+                else plannedCourses = plannedCourses.filter((code) => code !== courseCode);
+                GM_setValue("plannedCourses", plannedCourses);
+            });
         }
     }
 
@@ -2015,6 +2073,8 @@
 
         runOnUrl(customizeGPA, "/student/result/viewmodules");
         runOnUrl(showPlannedCourses, "/register/dangkyhocphan");
+
+        runOnUrl(customizeProgramFramework, "/training/viewcourseindustry");
     }
 
     waitForSelector("#frmMain", 5000, 100)
