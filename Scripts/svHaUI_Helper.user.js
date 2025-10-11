@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.13.0
+// @version      20.14.0
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -223,11 +223,11 @@
         container.className = "bar-container";
         container.innerHTML = `
 			<div><a class="bar-data" href="/student/result/examresult">GPA: ${
-                GM_getValue("currentGPA") || "..."
+                GM_getValue("yourInfo").currentGPA || "..."
             }</a></div>
 			<div><a class="bar-data" href="/training/viewcourseindustry">${
-                GM_getValue("currentCredits") || "..."
-            } / ${GM_getValue("totalCredits") || "..."}</a></div>
+                GM_getValue("yourInfo").currentCredits || "..."
+            } / ${GM_getValue("yourInfo").totalCredits || "..."}</a></div>
 		`;
         menuTitle.insertAdjacentElement("afterbegin", container);
 
@@ -1083,7 +1083,7 @@
     function gotoCourseInfoStudy() {
         const courses = document.querySelectorAll("div.kGrid .table tr");
 
-        let courseCode2ID = GM_getValue("courseCode2ID", undefined);
+        let courseCode2ID = GM_getValue("~~~courseCode2ID", undefined);
         if (courseCode2ID == undefined) return;
 
         for (const course of courses) {
@@ -1100,7 +1100,7 @@
     function gotoCourseInfoExam() {
         const courses = document.querySelectorAll("div.kGrid .table tr");
 
-        let courseCode2ID = GM_getValue("courseCode2ID", {});
+        let courseCode2ID = GM_getValue("~~~courseCode2ID", {});
 
         for (const course of courses) {
             const courseID = course.children[2]?.textContent.trim() || "";
@@ -1115,7 +1115,7 @@
         }
 
         if (Object.keys(courseCode2ID).length < courses.length)
-            GM_setValue("courseCode2ID", courseCode2ID);
+            GM_setValue("~~~courseCode2ID", courseCode2ID);
     }
 
     function gotoCourseInfoGPA() {
@@ -1125,16 +1125,16 @@
 
         for (const course of courses) {
             const courseID = course.children[1]?.textContent.trim() || "";
-            const courseCodeElement = course.children[2];
-            const courseCode = courseCodeElement?.textContent.trim() || "";
+            const courseCodeCell = course.children[2];
+            const courseCode = courseCodeCell?.textContent.trim() || "";
 
             if (!/HP\d{4}/.test(courseID)) continue;
 
             courseCode2ID[courseCode] = courseID;
 
-            courseCodeElement.innerHTML = `<a class="di-den-chi-tiet-hp" href="/training/viewmodulescdiosv/xem-chi-tiet-hoc-phan.htm?id=${courseID}&ver=1">${courseCode}</a>`;
+            courseCodeCell.innerHTML = `<a class="di-den-chi-tiet-hp" href="/training/viewmodulescdiosv/xem-chi-tiet-hoc-phan.htm?id=${courseID}&ver=1">${courseCode}</a>`;
         }
-        GM_setValue("courseCode2ID", courseCode2ID);
+        GM_setValue("~~~courseCode2ID", courseCode2ID);
     }
 
     // Hiển thị hệ số điểm trong chi tiết học phần
@@ -1152,7 +1152,7 @@
         elementContainer.style.fontSize = "14px";
         // Lấy hệ số điểm
         let saveScoreWeight = {};
-        saveScoreWeight = GM_getValue("scoreWeight", {});
+        saveScoreWeight = GM_getValue("~scoreWeight", {});
         // reset hp hiện tại
         saveScoreWeight[courseCode] = "";
         let elementHtml = "";
@@ -1171,7 +1171,7 @@
         saveScoreWeight[courseCode].replace(/\s+/g, "");
         console.log("score Weight: ", saveScoreWeight[courseCode]);
         // Lưu lại hệ số điểm
-        GM_setValue("scoreWeight", saveScoreWeight);
+        GM_setValue("~scoreWeight", saveScoreWeight);
     }
 
     // Tính điểm TX dựa trên hệ số điểm
@@ -1183,7 +1183,7 @@
             gk1Index = 9;
         }
 
-        const scoreWeight = GM_getValue("scoreWeight", {});
+        const scoreWeight = GM_getValue("~scoreWeight", {});
         const kgrid = document.querySelector("div.kGrid");
         const courses = kgrid.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
         for (const course of courses) {
@@ -1345,38 +1345,68 @@
 
     // Lấy tổng số tín chỉ
     function getYourTotalCredits() {
-        let totalCredits = document
-            .querySelector("#ctl02_dvList > tbody > tr:nth-child(7) > td.k-table-viewdetail")
-            .textContent.trim();
-        totalCredits = totalCredits.replace("(tín chỉ)", "");
+        let totalCredits = document.querySelector(
+            "#ctl02_dvList > tbody > tr:nth-child(7) > td.k-table-viewdetail"
+        ).textContent;
+        totalCredits = totalCredits.match(/\d+/)[0];
         const totalCreditsNumber = Number(totalCredits);
 
-        GM_setValue("totalCredits", totalCreditsNumber);
-        console.log("totalCredits: ", totalCreditsNumber);
+        let yourInfo = GM_getValue("yourInfo", {});
+        yourInfo.totalCredits = totalCreditsNumber;
+        GM_setValue("yourInfo", yourInfo);
+        console.log("yourInfo: ", yourInfo);
     }
 
     // Lấy Thông tin, tiến trình học
     function getYourLearningProgress() {
-        const classCode = document
-            .querySelector(
-                "#frmMain > div.panel.panel-default.panel-border-color.panel-border-color-primary > div.k-panel-bwrap > div > div > div > div:nth-child(1) > div > table > tbody > tr:nth-child(3) > td:nth-child(2) > strong"
-            )
+        let yourInfo = GM_getValue("yourInfo", {});
+        const infoTable = document.querySelector("#frmMain div.panel-body  > table");
+        yourInfo.name = infoTable
+            .querySelector("tbody > tr:nth-child(1) > td:nth-child(2) > strong")
+            .textContent.replace(/\s+/g, " ");
+        yourInfo.msv = infoTable
+            .querySelector("tbody > tr:nth-child(2) > td:nth-child(2) > strong")
             .textContent.trim();
-        GM_setValue("classCode", classCode);
-        console.log("classCode: ", classCode);
+        yourInfo.classCode = infoTable
+            .querySelector("tbody > tr:nth-child(3) > td:nth-child(2) > strong")
+            .textContent.trim();
 
         const kgrid = document.querySelector("div.kGrid");
         const currentCredits = kgrid.querySelector("tbody > tr:last-child > td:first-child");
         const currentCreditsNumber = Number(
             currentCredits.textContent.trim().match(/(\d+)(?:\.\d+)?/g)[0]
         );
-        GM_setValue("currentCredits", currentCreditsNumber);
-        console.log("currentCredits: ", currentCreditsNumber);
+        yourInfo.currentCredits = currentCreditsNumber;
 
         const currentGPA = kgrid.querySelector("tbody > tr:nth-last-child(2) > td:nth-child(2)");
         const currentGPAValue = Number(currentGPA.textContent.trim().match(/(\d+)(?:\.\d+)?/g)[0]);
-        GM_setValue("currentGPA", currentGPAValue);
-        console.log("currentGPA: ", currentGPAValue);
+        yourInfo.currentGPA = currentGPAValue;
+
+        console.log(yourInfo);
+        GM_setValue("yourInfo", yourInfo);
+
+        // let courseCodeMap = new Map();
+        // const courses = kgrid.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
+        // for (const course of courses) {
+        //     const code = course.children[1].textContent.trim();
+        //     const scorse4 = Number(course.children[12].textContent.trim()) || "";
+
+        //     if (courseCodeMap.has(code)) {
+        //         const old = courseCodeMap.get(code);
+        //         if (scorse4 > old.scorse4) {
+        //             courseCodeMap.delete(code);
+        //             courseCodeMap.set(code, scorse4);
+        //         }
+        //     } else {
+        //         courseCodeMap.set(code, scorse4);
+        //     }
+        // }
+
+        // const yourStudyProcess = Object.fromEntries(
+        //     Array.from(courseCodeMap.entries()).map(([code, scorse4]) => [code, scorse4])
+        // );
+        // GM_setValue("~~yourStudyProcess", yourStudyProcess);
+        // console.log(yourStudyProcess, courseCodeMap);
     }
 
     // Tính toàn bộ
@@ -1642,17 +1672,17 @@
 
     // Hiển thị thêm thông tin trong trang kết quả thi
     function showMoreInfoInExamResult() {
+        let yourInfo = GM_getValue("yourInfo");
         let isSameTotalCredits = true;
         if (window.location.pathname.includes("/student/result/viewexamresult")) {
-            const yourClassCode = GM_getValue("classCode");
             const classCode = document
                 .querySelector(
                     "div.kGrid > div > div > div > table > tbody > tr:nth-child(3) > td:nth-child(2) > strong"
                 )
                 .textContent.trim();
             const major = classCode.match(/\d{4}\D+/)[0];
-            isSameTotalCredits = yourClassCode.includes(major);
-            console.log("isSameTotalCredits: ", isSameTotalCredits, yourClassCode, major);
+            isSameTotalCredits = yourInfo.classCode.includes(major);
+            console.log("isSameTotalCredits: ", isSameTotalCredits, yourInfo.classCode, major);
         }
         // Selector
         const kgrid = document.querySelector("div.kGrid");
@@ -1790,6 +1820,75 @@
         document.getElementById("target-3.6").textContent = scoresToGPA36.toFixed(3);
     }
 
+    //
+    function customizeGPA() {
+        let yourStudyProcess = GM_getValue("~~yourStudyProcess");
+        let plannedCourses = GM_getValue("plannedCourses", []);
+        const creditsBoxColor = {
+            "5.0": "rgb(200, 0, 100)",
+            "4.0": "rgb(255, 0, 0)",
+            "3.0": "rgb(255, 165, 0)",
+            "2.0": "rgb(0, 191, 255)",
+            "1.0": "rgb(46, 204, 64)",
+        };
+        const scoresBoxColor = {
+            4: "rgb(64,212,81)", // A
+            3.5: "rgb(49, 163, 255)", // B+
+            3: "rgb(20, 120, 230)", // B
+            2.5: "rgb(255,186,0)", // C+
+            2: "rgb(255,144,0)", // C
+            1.5: "rgb(255, 50, 0)", // D+
+            1: "rgb(200, 0, 0)", // D
+            0: "rgb(157, 0, 255)", // F
+        };
+
+        const courses = document.querySelectorAll(".table.table-condensed tr");
+
+        for (const course of courses) {
+            const courseCodeCell = course.children[2];
+            const courseCode = courseCodeCell?.textContent.trim() || "";
+            if (!/\w{2}\d{4}/.test(courseCode)) continue;
+            if (checkDefaultNonCreditCourse(courseCode)) continue;
+
+            // Tìm index td.tinchi
+            const tinchiCell = course.querySelector(".tinchi");
+            if (!tinchiCell) continue;
+            const tds = Array.from(course.querySelectorAll("td"));
+            const index = tds.indexOf(tinchiCell);
+
+            // Tô màu điểm
+            let score4Cell = course.children[index + 6];
+            if (score4Cell.textContent.trim() != "") {
+                score4Cell.style.backgroundColor = scoresBoxColor[Number(score4Cell.textContent)];
+                score4Cell.style.color = "#FFFFFF";
+            }
+            // Tô màu tín đang học
+            if (courseCode in yourStudyProcess)
+                if (yourStudyProcess[courseCode] === "") {
+                    tinchiCell.style.backgroundColor =
+                        creditsBoxColor[tinchiCell.textContent.trim()];
+                    tinchiCell.style.color = "#FFFFFF";
+                }
+            // Marker plannedCourses
+            const courseNameCell = course.children[3];
+            if (score4Cell.textContent.trim() === "") {
+                let flag = false;
+                if (plannedCourses.includes(courseCode)) {
+                    flag = true;
+                    courseNameCell.style.backgroundColor = "#fcefc3ff";
+                }
+
+                courseNameCell.addEventListener("click", () => {
+                    flag = !flag;
+                    courseNameCell.style.backgroundColor = flag ? "#fcefc3ff" : "";
+                    if (flag) plannedCourses.push(courseCode);
+                    else plannedCourses = plannedCourses.filter((code) => code !== courseCode);
+                    GM_setValue("plannedCourses", plannedCourses);
+                });
+            }
+        }
+    }
+
     //===============================================================
 
     function run() {
@@ -1846,13 +1945,6 @@
             "/training/viewcourseindustry2/xem-chi-tiet-hoc-phan.htm"
         );
 
-        // runOnUrl(
-        //     gotoCourseInfo,
-        //     "/student/result/examresult",
-        //     "/student/result/viewexamresult",
-        //     "/student/result/studyresults",
-        //     "/student/result/viewstudyresult"
-        // );
         runOnUrl(
             gotoCourseInfoStudy,
             "/student/result/studyresults",
@@ -1883,6 +1975,9 @@
             "/student/result/examresult",
             "/student/result/viewexamresult"
         );
+
+        runOnUrl(customizeGPA, "/student/result/viewmodules");
+        runOnUrl(showPlannedCourses, "/register/dangkyhocphan");
     }
 
     waitForSelector("#frmMain", 5000, 100)
