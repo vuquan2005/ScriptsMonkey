@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.16.0
+// @version      20.16.1
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -1930,16 +1930,16 @@
                 }
 
             // Marker plannedCourses
-            const courseNameCell = course.children[2];
+            const courseNum = course.children[0];
             let flag = false;
             if (plannedCourses.includes(courseCode)) {
                 flag = true;
-                courseNameCell.style.backgroundColor = "#fcefc3ff";
+                courseNum.style.backgroundColor = "#fcefc3ff";
             }
 
-            courseNameCell.addEventListener("click", () => {
+            courseNum.addEventListener("click", () => {
                 flag = !flag;
-                courseNameCell.style.backgroundColor = flag ? "#fcefc3ff" : "";
+                courseNum.style.backgroundColor = flag ? "#fcefc3ff" : "";
                 if (flag) plannedCourses.push(courseCode);
                 else plannedCourses = plannedCourses.filter((code) => code !== courseCode);
                 GM_setValue("plannedCourses", plannedCourses);
