@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.12.5
+// @version      20.13.0
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -1080,42 +1080,61 @@
     }
 
     // Thêm link đến trang chi tiết học phần
-    function gotoCourseInfo() {
-        const kgrid = document.querySelector("div.kGrid");
-        if (window.location.pathname.includes("exam")) {
-            // Trang xem điểm học phần
-            let maHPtoMaIn = {};
-            const hocPhan = kgrid.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
-            for (const row of hocPhan) {
-                const maHP = row.children[1].textContent.trim();
-                const maIN = row.children[2].textContent.match(/\d+/)[0];
-                maHPtoMaIn[maHP] = maIN;
-                row.children[1].innerHTML = `<a class="di-den-chi-tiet-hp" 
-					href="https://sv.haui.edu.vn/training/viewmodulescdiosv/xem-chi-tiet-hoc-phan.htm?id=${maIN}&ver=1">
-						${maHP}
-				</a>`;
-            }
-            GM_setValue("maHPtoMaIn", maHPtoMaIn);
-        } else {
-            // Trang xem điểm TX
-            const maHPtoMaIn = GM_getValue("maHPtoMaIn", undefined);
-            if (maHPtoMaIn == undefined) return;
-            // console.log("maHPtoMaIn: ", maHPtoMaIn);
-            const hocPhan = kgrid.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
-            for (const row of hocPhan) {
-                const maHP = row.children[2].textContent.match(/([A-Z]{2})\d{4}/)[0];
-                row.children[2].innerHTML = `<a class="di-den-chi-tiet-hp" 
-					href="https://sv.haui.edu.vn/training/viewmodulescdiosv/xem-chi-tiet-hoc-phan.htm?id=${
-                        maHPtoMaIn[maHP]
-                    }&ver=2">
-					${row.children[2].textContent.trim()}
-				</a>`;
-            }
+    function gotoCourseInfoStudy() {
+        const courses = document.querySelectorAll("div.kGrid .table tr");
+
+        let courseCode2ID = GM_getValue("courseCode2ID", undefined);
+        if (courseCode2ID == undefined) return;
+
+        for (const course of courses) {
+            const className = course.children[2];
+
+            if (!/\w{2}\d{4}/.test(className.textContent)) continue;
+
+            const courseCode = className.textContent.trim().match(/\w{2}\d{4}/)[0];
+
+            className.innerHTML = `<a class="di-den-chi-tiet-hp" href="/training/viewmodulescdiosv/xem-chi-tiet-hoc-phan.htm?id=${courseCode2ID[courseCode]}&ver=1">${className.textContent}</a>`;
         }
-        GM_addStyle(`
-			.di-den-chi-tiet-hp {
-				color: color:rgb(49, 49, 120);
-		}`);
+    }
+
+    function gotoCourseInfoExam() {
+        const courses = document.querySelectorAll("div.kGrid .table tr");
+
+        let courseCode2ID = GM_getValue("courseCode2ID", {});
+
+        for (const course of courses) {
+            const courseID = course.children[2]?.textContent.trim() || "";
+            const courseCodeElement = course.children[1];
+            const courseCode = courseCodeElement?.textContent.trim() || "";
+
+            if (!/HP\d{4}/.test(courseID)) continue;
+
+            courseCode2ID[courseCode] = courseID;
+
+            courseCodeElement.innerHTML = `<a class="di-den-chi-tiet-hp" href="/training/viewmodulescdiosv/xem-chi-tiet-hoc-phan.htm?id=${courseID}&ver=1">${courseCode}</a>`;
+        }
+
+        if (Object.keys(courseCode2ID).length < courses.length)
+            GM_setValue("courseCode2ID", courseCode2ID);
+    }
+
+    function gotoCourseInfoGPA() {
+        const courses = document.querySelectorAll(".table.table-condensed tr");
+
+        let courseCode2ID = {};
+
+        for (const course of courses) {
+            const courseID = course.children[1]?.textContent.trim() || "";
+            const courseCodeElement = course.children[2];
+            const courseCode = courseCodeElement?.textContent.trim() || "";
+
+            if (!/HP\d{4}/.test(courseID)) continue;
+
+            courseCode2ID[courseCode] = courseID;
+
+            courseCodeElement.innerHTML = `<a class="di-den-chi-tiet-hp" href="/training/viewmodulescdiosv/xem-chi-tiet-hoc-phan.htm?id=${courseID}&ver=1">${courseCode}</a>`;
+        }
+        GM_setValue("courseCode2ID", courseCode2ID);
     }
 
     // Hiển thị hệ số điểm trong chi tiết học phần
@@ -1336,7 +1355,7 @@
         console.log("totalCredits: ", totalCreditsNumber);
     }
 
-    // Lấy tín chỉ hiện tại, GPA hiện tại, mã lớp
+    // Lấy Thông tin, tiến trình học
     function getYourLearningProgress() {
         const classCode = document
             .querySelector(
@@ -1827,13 +1846,24 @@
             "/training/viewcourseindustry2/xem-chi-tiet-hoc-phan.htm"
         );
 
+        // runOnUrl(
+        //     gotoCourseInfo,
+        //     "/student/result/examresult",
+        //     "/student/result/viewexamresult",
+        //     "/student/result/studyresults",
+        //     "/student/result/viewstudyresult"
+        // );
         runOnUrl(
-            gotoCourseInfo,
-            "/student/result/examresult",
-            "/student/result/viewexamresult",
+            gotoCourseInfoStudy,
             "/student/result/studyresults",
             "/student/result/viewstudyresult"
         );
+        runOnUrl(
+            gotoCourseInfoExam,
+            "/student/result/examresult",
+            "/student/result/viewexamresult"
+        );
+        runOnUrl(gotoCourseInfoGPA, "/student/result/viewmodules");
 
         runOnUrl(showScoreWeight, "/training/viewmodulescdiosv/xem-chi-tiet-hoc-phan.htm");
         runOnUrl(
