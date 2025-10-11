@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      3.0.0
+// @version      3.0.1
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -109,7 +109,11 @@
         captchaInput.setAttribute("lang", "en");
         captchaInput.setAttribute("placeholder", "");
         captchaInput.style.textTransform = "uppercase";
-        const captchaSubmit = document.querySelector("button.btn.btn-info[title='Xem kết quả học tập']");
+        const captchaSubmit = document.querySelector(
+            "button.btn.btn-info[title='Xem kết quả học tập']"
+        );
+
+        let isPassCaptcha = true;
 
         captchaInput.addEventListener("keydown", (e) => {
             if (e.key === "Enter") {
@@ -128,22 +132,41 @@
         });
 
         captchaSubmit.addEventListener("click", function () {
+            isPassCaptcha = true;
             waitForSelector("div.modal.fade.dgmodal", 2000, 0).then(() => {
                 waitForSelector("button.btn.btn-secondary", 2000, 0).then((element) => {
                     element.click();
+                    isPassCaptcha = false;
                     notyf.error("Mã xác thực Captcha không đúng.");
+
+                    setTimeout(() => {
+                        window.scrollTo({
+                            top: document.body.scrollHeight,
+                            behavior: "smooth",
+                        });
+                    }, 1000);
                 });
             });
             waitForSelector("div.diemht", 2000, 500).then(() => {
-                highlightAbsence();
-                showCalculateScore();
+                if (isPassCaptcha) {
+                    highlightAbsence();
+                    showCalculateScore();
+                    setTimeout(() => {
+                        window.scrollTo({
+                            top: document.body.scrollHeight,
+                            behavior: "smooth",
+                        });
+                    }, 500);
+                }
             });
         });
     }
     // =====================================================================================
     // Tô màu số tiết nghỉ
     function highlightAbsence() {
-        const absenceElements = document.querySelector("div.diemht > table > tbody > tr > td:nth-child(1)");
+        const absenceElements = document.querySelector(
+            "div.diemht > table > tbody > tr > td:nth-child(1)"
+        );
         if (!absenceElements) return;
         let absenceCount = absenceElements.textContent.trim();
         absenceCount = Number(absenceCount.match(/\d+/)?.[0] || 0);
