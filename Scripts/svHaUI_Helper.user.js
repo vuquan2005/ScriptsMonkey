@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.16.1
+// @version      20.16.2
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -143,6 +143,24 @@
     `);
 
     var notyf;
+
+    const creditsBoxColor = {
+        "5.0": "rgb(200, 0, 100)",
+        "4.0": "rgb(255, 0, 0)",
+        "3.0": "rgb(255, 165, 0)",
+        "2.0": "rgb(0, 191, 255)",
+        "1.0": "rgb(46, 204, 64)",
+    };
+    const scoresBoxColor = {
+        4: "rgb(64,212,81)", // A
+        3.5: "rgb(49, 163, 255)", // B+
+        3: "rgb(20, 120, 230)", // B
+        2.5: "rgb(255,186,0)", // C+
+        2: "rgb(255,144,0)", // C
+        1.5: "rgb(255, 50, 0)", // D+
+        1: "rgb(200, 0, 0)", // D
+        0: "rgb(157, 0, 255)", // F
+    };
 
     //===============================================================
     // Sửa tiêu đề trang
@@ -909,13 +927,6 @@
 
     // Tô màu tín chỉ
     function highlightCreditsCourse() {
-        const creditsBoxColor = {
-            "5.0": "rgb(200, 0, 100)",
-            "4.0": "rgb(255, 0, 0)",
-            "3.0": "rgb(255, 165, 0)",
-            "2.0": "rgb(0, 191, 255)",
-            "1.0": "rgb(46, 204, 64)",
-        };
         const kgrid = document.querySelector("div.kGrid");
         const hocPhan = kgrid.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
 
@@ -966,17 +977,6 @@
 
     // Tô màu điểm thi
     function highlightExamScores() {
-        const scoresBoxColor = {
-            4.0: "rgb(64,212,81)", // A
-            3.5: "rgb(49, 163, 255)", // B+
-            3.0: "rgb(20, 120, 230)", // B
-            2.5: "rgb(255,186,0)", // C+
-            2.0: "rgb(255,144,0)", // C
-            1.5: "rgb(255, 50, 0)", // D+
-            1.0: "rgb(200, 0, 0)", // D
-            0.0: "rgb(157, 0, 255)", // F
-        };
-
         const kgrid = document.querySelector("div.kGrid");
         const hocPhan = kgrid.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
 
@@ -991,11 +991,9 @@
                 scoreLetter.style.color = "";
                 continue;
             }
-
-            const diemSo = 0.0 + Number(score4Text);
             // console.log(diemSo);
             // Tô màu điểm
-            scoreLetter.style.backgroundColor = scoresBoxColor[diemSo];
+            scoreLetter.style.backgroundColor = scoresBoxColor[Number(score4Text)];
             scoreLetter.style.color = "#FFFFFF";
         }
     }
@@ -1824,23 +1822,6 @@
     function customizeGPA() {
         let yourStudyProcess = GM_getValue("~~yourStudyProcess");
         let plannedCourses = GM_getValue("plannedCourses", []);
-        const creditsBoxColor = {
-            "5.0": "rgb(200, 0, 100)",
-            "4.0": "rgb(255, 0, 0)",
-            "3.0": "rgb(255, 165, 0)",
-            "2.0": "rgb(0, 191, 255)",
-            "1.0": "rgb(46, 204, 64)",
-        };
-        const scoresBoxColor = {
-            4: "rgb(64,212,81)", // A
-            3.5: "rgb(49, 163, 255)", // B+
-            3: "rgb(20, 120, 230)", // B
-            2.5: "rgb(255,186,0)", // C+
-            2: "rgb(255,144,0)", // C
-            1.5: "rgb(255, 50, 0)", // D+
-            1: "rgb(200, 0, 0)", // D
-            0: "rgb(157, 0, 255)", // F
-        };
 
         const courses = document.querySelectorAll(".table.table-condensed tr");
 
@@ -1891,25 +1872,10 @@
     function customizeProgramFramework() {
         const yourStudyProcess = GM_getValue("~~yourStudyProcess", {});
         const plannedCourses = GM_getValue("plannedCourses", []);
-        const scoresBoxColor = {
-            4: "rgb(64,212,81)", // A
-            3.5: "rgb(49, 163, 255)", // B+
-            3: "rgb(20, 120, 230)", // B
-            2.5: "rgb(255,186,0)", // C+
-            2: "rgb(255,144,0)", // C
-            1.5: "rgb(255, 50, 0)", // D+
-            1: "rgb(200, 0, 0)", // D
-            0: "rgb(157, 0, 255)", // F
-        };
-        const creditsBoxColor = {
-            "5.0": "rgb(200, 0, 100)",
-            "4.0": "rgb(255, 0, 0)",
-            "3.0": "rgb(255, 165, 0)",
-            "2.0": "rgb(0, 191, 255)",
-            "1.0": "rgb(46, 204, 64)",
-        };
 
-        const courses = document.querySelectorAll(".k-table-viewdetail > table.table > tbody  >tr");
+        const courses = document.querySelectorAll("table.table > tbody  >tr");
+
+        const markerIndex = window.location.pathname == "/training/programmodulessemester" ? 2 : 0;
 
         for (const course of courses) {
             const courseCodeCell = course.children[1];
@@ -1930,21 +1896,36 @@
                 }
 
             // Marker plannedCourses
-            const courseNum = course.children[0];
+            const markerCell = course.children[markerIndex];
             let flag = false;
             if (plannedCourses.includes(courseCode)) {
                 flag = true;
-                courseNum.style.backgroundColor = "#fcefc3ff";
+                markerCell.style.backgroundColor = "#b5eec2ff";
             }
 
-            courseNum.addEventListener("click", () => {
+            markerCell.addEventListener("click", () => {
                 flag = !flag;
-                courseNum.style.backgroundColor = flag ? "#fcefc3ff" : "";
+                markerCell.style.backgroundColor = flag ? "#fcefc3ff" : "";
                 if (flag) plannedCourses.push(courseCode);
                 else plannedCourses = plannedCourses.filter((code) => code !== courseCode);
                 GM_setValue("plannedCourses", plannedCourses);
             });
         }
+
+		GM_addStyle(`
+			.kTableRowBackground {
+				background-color: #f5f5f5 !important;
+			}
+			.kTableRowBackground:nth-of-type(odd) {
+				background-color: inherit !important;
+			}
+			.kTableRowBackground td:nth-child(12) {
+				background-color: yellow !important;
+			}
+			.kTableRowBackground:nth-of-type(odd) td:nth-child(12)  {
+				background-color: inherit !important;
+			}
+		`)
     }
 
     function showPlannedCourses() {
@@ -2074,7 +2055,11 @@
         runOnUrl(customizeGPA, "/student/result/viewmodules");
         runOnUrl(showPlannedCourses, "/register/dangkyhocphan");
 
-        runOnUrl(customizeProgramFramework, "/training/viewcourseindustry");
+        runOnUrl(
+            customizeProgramFramework,
+            "/training/viewcourseindustry",
+            "/training/programmodulessemester"
+        );
     }
 
     waitForSelector("#frmMain", 5000, 100)
