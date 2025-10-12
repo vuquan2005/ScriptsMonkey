@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.16.2
+// @version      20.16.3
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -360,6 +360,21 @@
 							</a>
 						</li>
 						<li>
+							<a href="/timestable/calendarcl">
+								<svg xmlns="http://www.w3.org/2000/svg" class="shortcut-icon" viewBox="0 0 25 25">
+									<defs>
+										<style>.cls-1{fill:#ff7900;}</style>
+									</defs>
+									<g data-name="calendar 2" id="calendar_2">
+										<path class="cls-1" d="M23,8.52l.84-5.84A1.48,1.48,0,0,0,22.38,1H2.62A1.48,1.48,0,0,0,1.16,2.68L2,8.52l-.92,11.9A1.47,1.47,0,0,0,2.55,22H3v1.05A1,1,0,0,0,4,24h17.1a1,1,0,0,0,.95-.95V22h.45a1.47,1.47,0,0,0,1.47-1.58ZM2.26,2.16A.48.48,0,0,1,2.62,2H22.38a.48.48,0,0,1,.36.16.48.48,0,0,1,.11.38L22.07,8H19V7.5a.5.5,0,0,0-1,0V8H15V7.5a.5.5,0,0,0-1,0V8H11V7.5a.5.5,0,0,0-1,0V8H7V7.5a.5.5,0,0,0-1,0V8H2.93L2.15,2.54A.48.48,0,0,1,2.26,2.16ZM21,23,4,23.05V22H21Zm1.8-2.15a.47.47,0,0,1-.35.15H2.55a.47.47,0,0,1-.35-.15.48.48,0,0,1-.12-.36L3,9H6v.5a.5.5,0,0,0,1,0V9h3v.5a.5.5,0,0,0,1,0V9h3v.5a.5.5,0,0,0,1,0V9h3v.5a.5.5,0,0,0,1,0V9h3l.88,11.49A.48.48,0,0,1,22.8,20.85Z"/>
+										<path class="cls-1" d="M10.43,11.84H9.77a.3.3,0,0,0-.13.06L7.41,13.63a.24.24,0,0,0-.09.15.24.24,0,0,0,0,.18l.27.34a.18.18,0,0,0,.15.09A.22.22,0,0,0,8,14.34L9.65,13v5.73a.21.21,0,0,0,.07.17.24.24,0,0,0,.17.07h.54a.26.26,0,0,0,.17-.07.24.24,0,0,0,.06-.17V12.07a.21.21,0,0,0-.23-.23Z"/>
+										<path class="cls-1" d="M17.12,13.44a2.62,2.62,0,0,0-.45-.88,2,2,0,0,0-.8-.6,2.81,2.81,0,0,0-1.19-.22A2.83,2.83,0,0,0,13.5,12a2,2,0,0,0-.79.6,2.47,2.47,0,0,0-.46.88,4.13,4.13,0,0,0-.15,1.07c0,.19,0,.39,0,.6v.62c0,.21,0,.4,0,.59a4.52,4.52,0,0,0,.15,1.06,2.58,2.58,0,0,0,.45.89,2.1,2.1,0,0,0,.79.61,3.36,3.36,0,0,0,2.39,0,2,2,0,0,0,.79-.61,2.77,2.77,0,0,0,.45-.89,4.05,4.05,0,0,0,.16-1.06c0-.19,0-.38,0-.59v-.62c0-.21,0-.41,0-.6A4.13,4.13,0,0,0,17.12,13.44Zm-.84,2.25c0,.19,0,.38,0,.58a2.43,2.43,0,0,1-.4,1.43,1.38,1.38,0,0,1-1.18.52,1.38,1.38,0,0,1-1.16-.52,2.43,2.43,0,0,1-.41-1.43c0-.2,0-.39,0-.58v-.56c0-.19,0-.38,0-.56a2.55,2.55,0,0,1,.4-1.43,1.35,1.35,0,0,1,1.17-.54,1.34,1.34,0,0,1,1.18.54,2.47,2.47,0,0,1,.4,1.43c0,.18,0,.37,0,.56Z"/>
+									</g>
+									</svg>
+								<span>Thời khoá biểu</span>
+							</a>
+						</li>
+						<li>
 							<a href="/training/viewcourseindustry">
 								<svg xmlns="http://www.w3.org/2000/svg" class="shortcut-icon" viewBox="0 0 24 24" fill="none">
 									<path d="M10 22C7.17157 22 5.75736 22 4.87868 21.1213C4 20.2426 4 18.8284 4 16V8C4 5.17157 4 3.75736 4.87868 2.87868C5.75736 2 7.17157 2 10 2H14C16.8284 2 18.2426 2 19.1213 2.87868C20 3.75736 20 5.17157 20 8M14 22C16.8284 22 18.2426 22 19.1213 21.1213C20 20.2426 20 18.8284 20 16V12" stroke="#1C274D" stroke-width="1.5" stroke-linecap="round"/>
@@ -428,6 +443,14 @@
 									<path fill-rule="evenodd" clip-rule="evenodd" d="M5 4C5 2.34315 6.34315 1 8 1H15.9999C17.6568 1 19 2.34314 19 4H20C21.6569 4 23 5.34315 23 7V7.64593C23 8.87265 22.2531 9.97577 21.1142 10.4314L18.031 11.6646C17.5965 12.464 16.958 13.2715 16.0234 13.8946C15.211 14.4361 14.2124 14.8132 13 14.9467V17H15C16.6569 17 18 18.3431 18 20V21C18 22.1046 17.1046 23 16 23H8C6.89543 23 6 22.1046 6 21V20C6 18.3431 7.34315 17 9 17H11V14.9467C9.78757 14.8133 8.7889 14.4361 7.97651 13.8945C7.04188 13.2715 6.40335 12.464 5.9689 11.6646L2.88583 10.4314C1.74685 9.97577 1 8.87265 1 7.64593V7C1 5.34315 2.34315 4 4 4H5ZM5 6H4C3.44772 6 3 6.44772 3 7V7.64593C3 8.05484 3.24895 8.42255 3.62861 8.57441L5.11907 9.1706C5.05194 8.78628 5.00063 8.39214 5 8.00104L5 6ZM19 8V6H20C20.5523 6 21 6.44772 21 7V7.64593C21 8.05484 20.751 8.42255 20.3714 8.57441L18.8809 9.17062C18.9469 8.78361 19 8.39286 19 8ZM8 3C7.44772 3 7 3.44772 7 4V7.99707L7 7.99832C7 7.99996 7 8.00078 7 7.99832C7.00508 8.25761 7.03756 8.51764 7.08014 8.77311C7.16297 9.27012 7.32677 9.91751 7.6444 10.5528C7.96008 11.1842 8.4179 11.7851 9.08591 12.2305C9.74766 12.6716 10.6749 13 12 13C13.325 13 14.2522 12.6716 14.914 12.2304C15.582 11.7851 16.0398 11.1842 16.3555 10.5528C16.6732 9.9175 16.837 9.27011 16.9198 8.7731C16.9624 8.51735 16.993 8.25848 17 7.99909V4C17 3.44772 16.5522 3 15.9999 3H8ZM9 19C8.44772 19 8 19.4477 8 20V21H16V20C16 19.4477 15.5523 19 15 19H9Z" fill="#0F0F0F"/>
 								</svg>
 								<span>Kết quả thi</span>
+							</a>
+						</li>
+						<li>
+							<a href="/student/result/viewmodules">
+								<svg xmlns="http://www.w3.org/2000/svg" class="shortcut-icon" viewBox="0 0 25 25" fill="none">
+									<path d="M21 10L12 5L3 10L6 11.6667M21 10L18 11.6667M21 10V10C21.6129 10.3064 22 10.9328 22 11.618V16.9998M6 11.6667L12 15L18 11.6667M6 11.6667V17.6667L12 21L18 17.6667L18 11.6667" stroke="#000000" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+								</svg>
+								<span>GPA</span>
 							</a>
 						</li>
 					</ul>
@@ -561,7 +584,7 @@
 					padding: 0;
 					margin: 0;
 					display: grid;
-					grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+					grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 					gap: 10px;
 					padding: 16px;
 				}
@@ -639,7 +662,7 @@
 
 				@media (max-width: 600px) {
 					.shortcut-list {
-						grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+						grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
 					}
 
 					.shortcut-list a {
@@ -1818,7 +1841,7 @@
         document.getElementById("target-3.6").textContent = scoresToGPA36.toFixed(3);
     }
 
-    //
+    // Tô màu, đánh dấu môn học
     function customizeGPA() {
         let yourStudyProcess = GM_getValue("~~yourStudyProcess");
         let plannedCourses = GM_getValue("plannedCourses", []);
@@ -1864,14 +1887,17 @@
                 if (flag) plannedCourses.push(courseCode);
                 else plannedCourses = plannedCourses.filter((code) => code !== courseCode);
                 GM_setValue("plannedCourses", plannedCourses);
+                notyf.success(
+                    `Đã${flag ? "" : " huỷ"} đánh dấu môn ${courseCode}<br>${courseNameCell}`
+                );
             });
         }
     }
 
-    //
+    // Tô màu, đánh dấu môn học
     function customizeProgramFramework() {
         const yourStudyProcess = GM_getValue("~~yourStudyProcess", {});
-        const plannedCourses = GM_getValue("plannedCourses", []);
+        let plannedCourses = GM_getValue("plannedCourses", []);
 
         const courses = document.querySelectorAll("table.table > tbody  >tr");
 
@@ -1905,14 +1931,19 @@
 
             markerCell.addEventListener("click", () => {
                 flag = !flag;
-                markerCell.style.backgroundColor = flag ? "#fcefc3ff" : "";
+                markerCell.style.backgroundColor = flag ? "#b5eec2ff" : "";
                 if (flag) plannedCourses.push(courseCode);
                 else plannedCourses = plannedCourses.filter((code) => code !== courseCode);
                 GM_setValue("plannedCourses", plannedCourses);
+                notyf.success(
+                    `Đã${flag ? "" : " huỷ"} đánh dấu môn: ${courseCode} <br>${
+                        course.children[2].textContent
+                    }`
+                );
             });
         }
 
-		GM_addStyle(`
+        GM_addStyle(`
 			.kTableRowBackground {
 				background-color: #f5f5f5 !important;
 			}
@@ -1925,9 +1956,10 @@
 			.kTableRowBackground:nth-of-type(odd) td:nth-child(12)  {
 				background-color: inherit !important;
 			}
-		`)
+		`);
     }
 
+    // Hiển thị môn đã đánh dấu
     function showPlannedCourses() {
         let plannedCourses = GM_getValue("plannedCourses", []);
 
