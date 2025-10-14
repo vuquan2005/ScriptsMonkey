@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.16.4
+// @version      20.16.5
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -245,6 +245,8 @@
                 info.currentGPA || "..."
             }</a></div>
 			<div><a class="bar-data" href="/training/viewcourseindustry">${info.currentCredits || "..."} / ${
+            info.totalCredits || "..."
+        }</a></div>
 		`;
         menuTitle.insertAdjacentElement("afterbegin", container);
 
@@ -1849,10 +1851,36 @@
         document.getElementById("target-3.6").textContent = scoresToGPA36.toFixed(3);
     }
 
+    // Đánh dấu môn học
+    function markedCourse(courseCode, courseName, markedCell) {
+        let markedCourse = GM_getValue("markedCourse", {});
+
+        let flag = courseCode in markedCourse;
+        if (flag) {
+            markedCell.style.backgroundColor = "#fcefc3ff";
+        }
+
+        markedCell.addEventListener("click", () => {
+            markedCourse = GM_getValue("markedCourse", {});
+            flag = !flag;
+
+            markedCell.style.backgroundColor = flag ? "#fcefc3ff" : "";
+
+            if (flag) {
+                markedCourse[courseCode] = courseName;
+            } else {
+                delete markedCourse[courseCode];
+            }
+
+            GM_setValue("markedCourse", markedCourse);
+
+            notyf.success(`Đã${flag ? "" : " huỷ"} đánh dấu môn ${courseCode}<br>${courseName}`);
+        });
+    }
+
     // Tô màu, đánh dấu môn học
     function customizeGPA() {
         let yourStudyProcess = GM_getValue("~~yourStudyProcess");
-        let plannedCourses = GM_getValue("plannedCourses", []);
 
         const courses = document.querySelectorAll(".table.table-condensed tr");
 
@@ -1881,31 +1909,15 @@
                         creditsBoxColor[creditCell.textContent.trim()];
                     creditCell.style.color = "#FFFFFF";
                 }
-            // Marker plannedCourses
-            const courseNameCell = course.children[3];
-            let flag = false;
-            if (plannedCourses.includes(courseCode)) {
-                flag = true;
-                courseNameCell.style.backgroundColor = "#fcefc3ff";
-            }
 
-            courseNameCell.addEventListener("click", () => {
-                flag = !flag;
-                courseNameCell.style.backgroundColor = flag ? "#fcefc3ff" : "";
-                if (flag) plannedCourses.push(courseCode);
-                else plannedCourses = plannedCourses.filter((code) => code !== courseCode);
-                GM_setValue("plannedCourses", plannedCourses);
-                notyf.success(
-                    `Đã${flag ? "" : " huỷ"} đánh dấu môn ${courseCode}<br>${courseNameCell}`
-                );
-            });
+            const courseNameCell = course.children[3];
+            markedCourse(courseCode, courseNameCell.textContent.trim(), courseNameCell);
         }
     }
 
     // Tô màu, đánh dấu môn học
     function customizeProgramFramework() {
         const yourStudyProcess = GM_getValue("~~yourStudyProcess", {});
-        let plannedCourses = GM_getValue("plannedCourses", []);
 
         const courses = document.querySelectorAll("table.table > tbody  >tr");
 
@@ -1929,26 +1941,9 @@
                     creditCell.style.color = "#FFFFFF";
                 }
 
-            // Marker plannedCourses
             const markerCell = course.children[markerIndex];
-            let flag = false;
-            if (plannedCourses.includes(courseCode)) {
-                flag = true;
-                markerCell.style.backgroundColor = "#b5eec2ff";
-            }
-
-            markerCell.addEventListener("click", () => {
-                flag = !flag;
-                markerCell.style.backgroundColor = flag ? "#b5eec2ff" : "";
-                if (flag) plannedCourses.push(courseCode);
-                else plannedCourses = plannedCourses.filter((code) => code !== courseCode);
-                GM_setValue("plannedCourses", plannedCourses);
-                notyf.success(
-                    `Đã${flag ? "" : " huỷ"} đánh dấu môn: ${courseCode} <br>${
-                        course.children[2].textContent
-                    }`
-                );
-            });
+            const courseName = course.children[2].textContent.trim();
+            markedCourse(courseCode, courseName, markerCell);
         }
 
         GM_addStyle(`
@@ -1962,47 +1957,47 @@
 				background-color: yellow !important;
 			}
 			.kTableRowBackground:nth-of-type(odd) td:nth-child(12)  {
-				background-color: inherit !important;
+				background-color: yellow !important;
 			}
 		`);
     }
 
     // Hiển thị môn đã đánh dấu
-    function showPlannedCourses() {
-        let plannedCourses = GM_getValue("plannedCourses", []);
+    function showmarkedCourse() {
+        let markedCourseList = GM_getValue("markedCourse", {});
 
-        setInterval(() => {
-            // Tô vàng những học phần nằm trong dự định
-            const planningCourses = document.querySelectorAll("#tableorder > tbody > tr");
-            for (const planningCourse of planningCourses) {
-                const courseCodeCell = planningCourse.children[2];
-                if (!courseCodeCell) continue;
-                const courseCode = courseCodeCell.textContent.replace("[Hủy đăng ký]", "").trim();
-                if (/\w{2}\d{4}/.test(courseCode))
-                    if (plannedCourses.includes(courseCode)) {
-                        courseCodeCell.style.backgroundColor = "#fcefc3ff";
-                        plannedCourses = plannedCourses.filter((code) => code !== courseCode);
-                    }
-            }
+        // Tô vàng những học phần nằm trong dự định
+        const planningCourses = document.querySelectorAll("#tableorder > tbody > tr");
+        for (const planningCourse of planningCourses) {
+            const courseCodeCell = planningCourse.children[2];
+            if (!courseCodeCell) continue;
+            const courseCode = courseCodeCell.textContent.replace("[Hủy đăng ký]", "").trim();
+            if (/\w{2}\d{4}/.test(courseCode))
+                if (courseCode in markedCourseList) {
+                    courseCodeCell.style.backgroundColor = "#fcefc3ff";
+                    delete markedCourseList[courseCode];
+                }
+        }
+        console.log(markedCourseList);
 
-            // Hiển thị học phần còn lại
-            const note = document.querySelector("#note");
-            if (note.querySelector("p")) note.querySelector("p").remove();
-            const plannedCoursesContainer = document.createElement("p");
-            plannedCoursesContainer.style.fontSize = "18px";
-            plannedCoursesContainer.title =
-                "Học phần bạn đã đánh dấu trong trang 'Trung bình chung tích lũy'";
-            note.appendChild(plannedCoursesContainer);
+        // Hiển thị học phần còn lại
+        document.querySelector("#note")?.querySelector("p")?.remove();
+        const markedCourseContainer = document.createElement("p");
+        markedCourseContainer.className = "markedCourse";
+        markedCourseContainer.style.fontSize = "18px";
+        note.appendChild(markedCourseContainer);
 
-            plannedCoursesContainer.textContent = "🎯: ";
-            for (const plannedCourse of plannedCourses) {
-                plannedCoursesContainer.textContent += plannedCourse + ", ";
-            }
-            plannedCoursesContainer.textContent = plannedCoursesContainer.textContent.replace(
-                /,\s$/,
-                ""
-            );
-        }, 1000);
+        markedCourseContainer.textContent = "🎯: ";
+
+        for (const [code, name] of Object.entries(markedCourseList)) {
+            const span = document.createElement("span");
+            span.textContent = code;
+            span.title = name;
+            markedCourseContainer.appendChild(span);
+            markedCourseContainer.append(" ");
+        }
+
+        setTimeout(showmarkedCourse, 5000);
     }
 
     //===============================================================
@@ -2093,7 +2088,7 @@
         );
 
         runOnUrl(customizeGPA, "/student/result/viewmodules");
-        runOnUrl(showPlannedCourses, "/register/dangkyhocphan");
+        runOnUrl(showmarkedCourse, "/register/dangkyhocphan");
 
         runOnUrl(
             customizeProgramFramework,
