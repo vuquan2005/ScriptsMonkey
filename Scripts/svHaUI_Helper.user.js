@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.16.3
+// @version      20.16.4
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -235,17 +235,16 @@
 
     // Hiển thị GPA trên thanh menu
     function displayGPA() {
+        const info = GM_getValue("yourInfo") || {};
         const menuTitle = document.querySelector("ul.sidebar-elements");
 
         const container = document.createElement("li");
         container.className = "bar-container";
         container.innerHTML = `
 			<div><a class="bar-data" href="/student/result/examresult">GPA: ${
-                GM_getValue("yourInfo").currentGPA || "..."
+                info.currentGPA || "..."
             }</a></div>
-			<div><a class="bar-data" href="/training/viewcourseindustry">${
-                GM_getValue("yourInfo").currentCredits || "..."
-            } / ${GM_getValue("yourInfo").totalCredits || "..."}</a></div>
+			<div><a class="bar-data" href="/training/viewcourseindustry">${info.currentCredits || "..."} / ${
 		`;
         menuTitle.insertAdjacentElement("afterbegin", container);
 
@@ -1362,6 +1361,15 @@
 
             notyf.success("Đã xuất lịch học");
         });
+    }
+
+        ics += `END:VCALENDAR`;
+
+        const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        link.click();
     }
 
     // Lấy tổng số tín chỉ
