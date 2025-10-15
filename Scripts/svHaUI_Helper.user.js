@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.16.5
+// @version      20.16.6
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -228,9 +228,10 @@
 
     // Thay đổi đường dẫn trang chủ
     function changeHomePagePath() {
-        const sideBar = document.querySelector("div.left-sidebar-content");
-        const homeElement = sideBar.querySelector("a[href='/']");
+        const homeElement = document.querySelector("div.left-sidebar-content a[href='/']");
         homeElement.href = "/home";
+        const logo = document.querySelector(".navbar-brand");
+        logo.href = "/home";
     }
 
     // Hiển thị GPA trên thanh menu
@@ -1365,15 +1366,6 @@
         });
     }
 
-        ics += `END:VCALENDAR`;
-
-        const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = filename;
-        link.click();
-    }
-
     // Lấy tổng số tín chỉ
     function getYourTotalCredits() {
         let totalCredits = document.querySelector(
@@ -2003,7 +1995,6 @@
     //===============================================================
 
     function run() {
-        // console.log("✅ sv.HaUI loaded: " + window.location.href);
         notyf = new Notyf({
             duration: 3500,
             dismissible: true,
