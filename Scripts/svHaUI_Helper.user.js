@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.16.6
+// @version      20.16.7
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -1408,28 +1408,28 @@
         console.log(yourInfo);
         GM_setValue("yourInfo", yourInfo);
 
-        // let courseCodeMap = new Map();
-        // const courses = kgrid.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
-        // for (const course of courses) {
-        //     const code = course.children[1].textContent.trim();
-        //     const scorse4 = Number(course.children[12].textContent.trim()) || "";
+        let courseCodeMap = new Map();
+        const courses = kgrid.querySelectorAll("tr.kTableAltRow, tr.kTableRow");
+        for (const course of courses) {
+            const code = course.children[1].textContent.trim();
+            const scorse4 = Number(course.children[12].textContent.trim()) || "";
 
-        //     if (courseCodeMap.has(code)) {
-        //         const old = courseCodeMap.get(code);
-        //         if (scorse4 > old.scorse4) {
-        //             courseCodeMap.delete(code);
-        //             courseCodeMap.set(code, scorse4);
-        //         }
-        //     } else {
-        //         courseCodeMap.set(code, scorse4);
-        //     }
-        // }
+            if (courseCodeMap.has(code)) {
+                const old = courseCodeMap.get(code);
+                if (scorse4 > old.scorse4) {
+                    courseCodeMap.delete(code);
+                    courseCodeMap.set(code, scorse4);
+                }
+            } else {
+                courseCodeMap.set(code, scorse4);
+            }
+        }
 
-        // const yourStudyProcess = Object.fromEntries(
-        //     Array.from(courseCodeMap.entries()).map(([code, scorse4]) => [code, scorse4])
-        // );
-        // GM_setValue("~~yourStudyProcess", yourStudyProcess);
-        // console.log(yourStudyProcess, courseCodeMap);
+        const yourStudyProcess = Object.fromEntries(
+            Array.from(courseCodeMap.entries()).map(([code, scorse4]) => [code, scorse4])
+        );
+        GM_setValue("~~yourStudyProcess", yourStudyProcess);
+        console.log(yourStudyProcess, courseCodeMap);
     }
 
     // Tính toàn bộ
@@ -1745,7 +1745,8 @@
                     "Một số môn có thể chưa được tính vào GPA, nhấp vào số tín chỉ của môn chưa tính GPA để tính lại."
                 );
         }, 500);
-        const totalCredits = GM_getValue("totalCredits", 0);
+        const info = GM_getValue("yourInfo") || {};
+        const totalCredits = info.totalCredits;
         if (isSameTotalCredits && totalCredits > 0) {
             document.getElementById("total-credits").textContent = totalCredits;
         } else {
@@ -2067,6 +2068,7 @@
         );
 
         runOnUrl(createCSVCalendar, "/timestable/calendarcl");
+        runOnUrl(exportCalender, "/timestable/calendarcl");
 
         runOnUrl(getYourTotalCredits, "/training/viewcourseindustry");
         runOnUrl(getYourLearningProgress, "/student/result/examresult");
