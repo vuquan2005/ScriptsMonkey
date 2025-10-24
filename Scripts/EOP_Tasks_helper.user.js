@@ -1,10 +1,10 @@
 // ==UserScript==
 // @name         EOP Task helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.0.8
+// @version      2.0.9
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
-// @match        https://eop.edu.vn/study/task/*
+// @match        https://eop.edu.vn/*
 // @updateURL    https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/EOP_Tasks_helper.user.js
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/EOP_Tasks_helper.user.js
 // @grant        GM_addStyle
@@ -12,7 +12,7 @@
 // @grant        GM_setValue
 // @require      https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js
 // @require      https://cdn.jsdelivr.net/npm/notyf/notyf.min.js
-// @require      https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/EOP_Helper.user.js
+// @require      https://github.com/vuquan2005/ScriptsMonkey/raw/refs/heads/main/Scripts/EOP_Helper.user.js
 // ==/UserScript==
 
 (function () {
@@ -416,6 +416,7 @@
     async function run() {
         await waitForSelector("div#mbody");
         console.log("▶️▶️▶️", document.querySelector("div#mbody").children[0].className, "◀️◀️◀️");
+        console.log("⏱️ Time: ", new Date().toLocaleString());
 
         if (document.querySelector("span#dtasktitle")) {
             // Tránh lặp lại
@@ -461,7 +462,8 @@
     }
     var dtasktitle = "";
     waitForSelector("div#mbody", 10000, 500).then(() => {
-        run();
+
+        if (window.location.href.startsWith("https://eop.edu.vn/study/task/")) run();
         const observe = new MutationObserver(run);
         observe.observe(document.querySelector("span#dtasktitle"), {
             childList: true,
