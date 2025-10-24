@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      3.0.1
+// @version      3.0.2
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -70,6 +70,18 @@
 
     GM_addStyle(`
       @import url("https://cdn.jsdelivr.net/npm/notyf/notyf.min.css");
+    `);
+
+    // From repo AdBlock
+    GM_addStyle(`
+        .footer,
+        a[href="/exam"],
+        a[href="/modules/sns/base/studentclass"] {
+            display: none !important;
+        }
+		aside > div#navigation > div {
+            display: block !important;
+        }
     `);
 
     var notyf;
