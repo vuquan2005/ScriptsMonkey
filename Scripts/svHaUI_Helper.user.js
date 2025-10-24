@@ -1248,344 +1248,344 @@
         }
     }
 
-    // Tạo file CSV lịch học
-    function createCSVCalendar() {
-        const exportBtnContainer = document.querySelector(
-            "div.boxpanel-mc > .form-horizontal > .form-group:nth-child(3) > div.col-sm-4"
-        );
-        const exportBtn = document.createElement("input");
-        exportBtn.type = "button";
-        exportBtn.className = "btn btn-primary btn-space hover";
-        exportBtn.value = "Xuất file CSV";
-        exportBtnContainer.appendChild(exportBtn);
+//     // Tạo file CSV lịch học
+//     function createCSVCalendar() {
+//         const exportBtnContainer = document.querySelector(
+//             "div.boxpanel-mc > .form-horizontal > .form-group:nth-child(3) > div.col-sm-4"
+//         );
+//         const exportBtn = document.createElement("input");
+//         exportBtn.type = "button";
+//         exportBtn.className = "btn btn-primary btn-space hover";
+//         exportBtn.value = "Xuất file CSV";
+//         exportBtnContainer.appendChild(exportBtn);
 
-        exportBtn.addEventListener("click", async () => {
-            const calendarTable = document.querySelector(".panel-body > table > tbody");
-            const calendarRows = calendarTable.querySelectorAll("tr");
-            let csvContent = "Subject,Start Date,Start Time,End Time,Description,Location\n";
+//         exportBtn.addEventListener("click", async () => {
+//             const calendarTable = document.querySelector(".panel-body > table > tbody");
+//             const calendarRows = calendarTable.querySelectorAll("tr");
+//             let csvContent = "Subject,Start Date,Start Time,End Time,Description,Location\n";
 
-            const startPeriodToTime = {
-                1: "07:00",
-                2: "07:50",
-                3: "08:45",
-                4: "09:40",
-                5: "10:35",
-                6: "11:25",
-                7: "12:30",
-                8: "13:20",
-                9: "14:15",
-                10: "15:10",
-                11: "16:05",
-                12: "16:55",
-                13: "18:00",
-                14: "18:50",
-                15: "19:45",
-                16: "20:35",
-            };
+//             const startPeriodToTime = {
+//                 1: "07:00",
+//                 2: "07:50",
+//                 3: "08:45",
+//                 4: "09:40",
+//                 5: "10:35",
+//                 6: "11:25",
+//                 7: "12:30",
+//                 8: "13:20",
+//                 9: "14:15",
+//                 10: "15:10",
+//                 11: "16:05",
+//                 12: "16:55",
+//                 13: "18:00",
+//                 14: "18:50",
+//                 15: "19:45",
+//                 16: "20:35",
+//             };
 
-            const endPeriodToTime = {
-                1: "07:50",
-                2: "08:40",
-                3: "09:35",
-                4: "10:30",
-                5: "11:25",
-                6: "12:15",
-                7: "13:20",
-                8: "14:10",
-                9: "15:05",
-                10: "16:00",
-                11: "16:55",
-                12: "17:45",
-                13: "18:50",
-                14: "19:40",
-                15: "20:35",
-                16: "21:25",
-            };
+//             const endPeriodToTime = {
+//                 1: "07:50",
+//                 2: "08:40",
+//                 3: "09:35",
+//                 4: "10:30",
+//                 5: "11:25",
+//                 6: "12:15",
+//                 7: "13:20",
+//                 8: "14:10",
+//                 9: "15:05",
+//                 10: "16:00",
+//                 11: "16:55",
+//                 12: "17:45",
+//                 13: "18:50",
+//                 14: "19:40",
+//                 15: "20:35",
+//                 16: "21:25",
+//             };
 
-            for (const row of calendarRows) {
-                let date = row.children[2].textContent.trim();
-                const dateParts = date.split("/");
-                if (dateParts.length !== 3) continue;
-                const formattedDate = `${dateParts[1].padStart(2, "0")}/${dateParts[0].padStart(
-                    2,
-                    "0"
-                )}/${dateParts[2]}`;
+//             for (const row of calendarRows) {
+//                 let date = row.children[2].textContent.trim();
+//                 const dateParts = date.split("/");
+//                 if (dateParts.length !== 3) continue;
+//                 const formattedDate = `${dateParts[1].padStart(2, "0")}/${dateParts[0].padStart(
+//                     2,
+//                     "0"
+//                 )}/${dateParts[2]}`;
 
-                for (let i = 3; i <= 5; i++) {
-                    let timesOfDay = row.children[i].textContent;
-                    if (!timesOfDay) continue;
+//                 for (let i = 3; i <= 5; i++) {
+//                     let timesOfDay = row.children[i].textContent;
+//                     if (!timesOfDay) continue;
 
-                    const courses = timesOfDay.split(/\n?\d+\.\s/).filter(Boolean);
-                    if (courses.length === 0) continue;
-                    for (const courseData of courses) {
-                        // Subject
-                        const subject = courseData.match(/-\s*(.+?)\s*\(Lớp:/)?.[1];
-                        if (!subject) continue;
+//                     const courses = timesOfDay.split(/\n?\d+\.\s/).filter(Boolean);
+//                     if (courses.length === 0) continue;
+//                     for (const courseData of courses) {
+//                         // Subject
+//                         const subject = courseData.match(/-\s*(.+?)\s*\(Lớp:/)?.[1];
+//                         if (!subject) continue;
 
-                        const period = courseData.match(/\((\d+).+?(\d+)\)/);
+//                         const period = courseData.match(/\((\d+).+?(\d+)\)/);
 
-                        const startPeriod = parseInt(period[1]);
-                        const endPeriod = parseInt(period[2]);
-                        let startTime = startPeriodToTime[startPeriod];
-                        let endTime = endPeriodToTime[endPeriod];
+//                         const startPeriod = parseInt(period[1]);
+//                         const endPeriod = parseInt(period[2]);
+//                         let startTime = startPeriodToTime[startPeriod];
+//                         let endTime = endPeriodToTime[endPeriod];
 
-                        // Description
-                        const classCode = courseData.match(/\(Lớp:\s(.+?)\)/)?.[1];
-                        const GV = courseData.match(/GV:\s(.+?)\(/)?.[1];
-                        const sdt = courseData.match(/\s\((\d{10})\s/)?.[1];
+//                         // Description
+//                         const classCode = courseData.match(/\(Lớp:\s(.+?)\)/)?.[1];
+//                         const GV = courseData.match(/GV:\s(.+?)\(/)?.[1];
+//                         const sdt = courseData.match(/\s\((\d{10})\s/)?.[1];
 
-                        let description = `${GV} ${sdt} ${classCode}`;
+//                         let description = `${GV} ${sdt} ${classCode}`;
 
-                        // Location
-                        const location = courseData.match(
-                            /\((\d{1,4}\s*\-\s*\w+?)\s*\-\s*.+\-.+\)/
-                        )?.[1];
-                        // console.log(location);
-                        // room.replace(" - Cơ sở 1 - Khu A", "").trim();
-                        // room.replace(" - Cơ sở 2 - Khu B", "").trim();
-                        // room.replace(" - Cơ sở 3 - Khu C", "").trim();
+//                         // Location
+//                         const location = courseData.match(
+//                             /\((\d{1,4}\s*\-\s*\w+?)\s*\-\s*.+\-.+\)/
+//                         )?.[1];
+//                         // console.log(location);
+//                         // room.replace(" - Cơ sở 1 - Khu A", "").trim();
+//                         // room.replace(" - Cơ sở 2 - Khu B", "").trim();
+//                         // room.replace(" - Cơ sở 3 - Khu C", "").trim();
 
-                        let courseData1 = [
-                            subject || "",
-                            formattedDate || "",
-                            startTime || "",
-                            endTime || "",
-                            description || "",
-                            location || "",
-                        ];
+//                         let courseData1 = [
+//                             subject || "",
+//                             formattedDate || "",
+//                             startTime || "",
+//                             endTime || "",
+//                             description || "",
+//                             location || "",
+//                         ];
 
-                        // console.log(courseData1);
+//                         // console.log(courseData1);
 
-                        csvContent += courseData1.join(",") + "\n";
-                    }
-                }
-            }
-            console.log("csvContent: ", csvContent);
+//                         csvContent += courseData1.join(",") + "\n";
+//                     }
+//                 }
+//             }
+//             console.log("csvContent: ", csvContent);
 
-            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.href = url;
-            link.setAttribute("download", "Lich_hoc.csv");
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
+//             const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+//             const url = URL.createObjectURL(blob);
+//             const link = document.createElement("a");
+//             link.href = url;
+//             link.setAttribute("download", "Lich_hoc.csv");
+//             document.body.appendChild(link);
+//             link.click();
+//             document.body.removeChild(link);
+//             URL.revokeObjectURL(url);
 
-            notyf.success("Đã xuất lịch học");
-        });
-    }
+//             notyf.success("Đã xuất lịch học");
+//         });
+//     }
 
-    function exportCalender() {
-        const exportBtnContainer = document.querySelector(
-            "div.boxpanel-mc > .form-horizontal > .form-group:nth-child(3) > div.col-sm-4"
-        );
-        const exportBtn = document.createElement("input");
-        exportBtn.type = "button";
-        exportBtn.className = "btn btn-primary btn-space hover";
-        exportBtn.value = "Xuất file ICS";
-        exportBtnContainer.appendChild(exportBtn);
+//     function exportCalender() {
+//         const exportBtnContainer = document.querySelector(
+//             "div.boxpanel-mc > .form-horizontal > .form-group:nth-child(3) > div.col-sm-4"
+//         );
+//         const exportBtn = document.createElement("input");
+//         exportBtn.type = "button";
+//         exportBtn.className = "btn btn-primary btn-space hover";
+//         exportBtn.value = "Xuất file ICS";
+//         exportBtnContainer.appendChild(exportBtn);
 
-        let calendarAlarms = GM_getValue("calendarAlarms");
-        if (!calendarAlarms) {
-            calendarAlarms = [15, 30];
-            GM_setValue("calendarAlarms", calendarAlarms);
-        }
+//         let calendarAlarms = GM_getValue("calendarAlarms");
+//         if (!calendarAlarms) {
+//             calendarAlarms = [15, 30];
+//             GM_setValue("calendarAlarms", calendarAlarms);
+//         }
 
-        exportBtn.addEventListener("click", async () => {
-            const calendarData = exportCalenderData();
+//         exportBtn.addEventListener("click", async () => {
+//             const calendarData = exportCalenderData();
 
-            const grouped = calendarData.reduce((acc, cur) => {
-                if (!acc[cur.class]) acc[cur.class] = [];
-                acc[cur.class].push(cur);
-                return acc;
-            }, {});
+//             const grouped = calendarData.reduce((acc, cur) => {
+//                 if (!acc[cur.class]) acc[cur.class] = [];
+//                 acc[cur.class].push(cur);
+//                 return acc;
+//             }, {});
 
-            console.log(grouped);
+//             console.log(grouped);
 
-            for (const [classCode, list] of Object.entries(grouped)) {
-                console.log("----------");
-                console.log(list[0].class, "--", list[0].course);
-                analyzeRecurrence(list);
-            }
-        });
-    }
+//             for (const [classCode, list] of Object.entries(grouped)) {
+//                 console.log("----------");
+//                 console.log(list[0].class, "--", list[0].course);
+//                 analyzeRecurrence(list);
+//             }
+//         });
+//     }
 
-    function exportCalenderData(scope = document) {
-        const calendarRows = scope.querySelectorAll(".panel-body > table > tbody > tr");
+//     function exportCalenderData(scope = document) {
+//         const calendarRows = scope.querySelectorAll(".panel-body > table > tbody > tr");
 
-        let listCourseData = [];
-        let listSkipClassCode = [];
+//         let listCourseData = [];
+//         let listSkipClassCode = [];
 
-        const regex =
-            /\((?<start>\d+),(?:\d*,)*?(?<end>\d+)\)\s*-\s*(?<course>.+?)\s*\(Lớp:\s*(?<class>\d+\w+\d+)\)\s*GV:\s*(?<lecturer>.+?)\s*\((?<sdt>\d+)?\s*-\s*(?<khoa>[^)]+)\)\s*\((?<location>.*)\)/;
+//         const regex =
+//             /\((?<start>\d+),(?:\d*,)*?(?<end>\d+)\)\s*-\s*(?<course>.+?)\s*\(Lớp:\s*(?<class>\d+\w+\d+)\)\s*GV:\s*(?<lecturer>.+?)\s*\((?<sdt>\d+)?\s*-\s*(?<khoa>[^)]+)\)\s*\((?<location>.*)\)/;
 
-        for (const row of calendarRows) {
-            let date = row.children[2].textContent.trim();
-            if (!/\d+\/\d+\/\d+/.test(date)) continue;
-            date = date.replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$3$2$1");
+//         for (const row of calendarRows) {
+//             let date = row.children[2].textContent.trim();
+//             if (!/\d+\/\d+\/\d+/.test(date)) continue;
+//             date = date.replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$3$2$1");
 
-            for (let i = 3; i <= 5; i++) {
-                let timesOfDay = row.children[i].textContent;
-                if (!timesOfDay) continue;
+//             for (let i = 3; i <= 5; i++) {
+//                 let timesOfDay = row.children[i].textContent;
+//                 if (!timesOfDay) continue;
 
-                const courses = timesOfDay.split(/\n?\d+\.\s/).filter(Boolean);
-                if (courses.length == 0) continue;
-                for (const course of courses) {
-                    const classCode = course.match(/\d{5}\w\w\d{7}/)?.[0] || course;
-                    if (listSkipClassCode.includes(classCode)) continue;
+//                 const courses = timesOfDay.split(/\n?\d+\.\s/).filter(Boolean);
+//                 if (courses.length == 0) continue;
+//                 for (const course of courses) {
+//                     const classCode = course.match(/\d{5}\w\w\d{7}/)?.[0] || course;
+//                     if (listSkipClassCode.includes(classCode)) continue;
 
-                    const match = course.match(regex);
-                    if (!match) {
-                        listSkipClassCode.push(classCode);
-                        const courseName = course.match(/\(.+?\)\s*-\s*(.+?)\s\(/)?.[1];
-                        notyf.error(`Có lỗi khi lấy dữ liệu lớp:<br>${classCode}<br>${courseName}`);
-                        console.error(
-                            `Có lỗi khi lấy dữ liệu:\n${classCode}: ${courseName}\n${course}`
-                        );
-                        continue;
-                    }
-                    const courseData = {
-                        ...match.groups,
-                        date,
-                    };
-                    listCourseData.push(courseData);
-                }
-            }
-        }
-        return listCourseData;
-    }
+//                     const match = course.match(regex);
+//                     if (!match) {
+//                         listSkipClassCode.push(classCode);
+//                         const courseName = course.match(/\(.+?\)\s*-\s*(.+?)\s\(/)?.[1];
+//                         notyf.error(`Có lỗi khi lấy dữ liệu lớp:<br>${classCode}<br>${courseName}`);
+//                         console.error(
+//                             `Có lỗi khi lấy dữ liệu:\n${classCode}: ${courseName}\n${course}`
+//                         );
+//                         continue;
+//                     }
+//                     const courseData = {
+//                         ...match.groups,
+//                         date,
+//                     };
+//                     listCourseData.push(courseData);
+//                 }
+//             }
+//         }
+//         return listCourseData;
+//     }
 
-    function analyzeRecurrence(events) {
-        const dayNames = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
-        const grouped = {};
-        for (let e of events) {
-            const y = +e.date.slice(0, 4);
-            const m = +e.date.slice(4, 6) - 1;
-            const d = +e.date.slice(6, 8);
-            const dateObj = new Date(y, m, d);
-            e.dateObj = dateObj;
-            const key = dayNames[dateObj.getDay()];
-            grouped[key] ??= [];
-            grouped[key].push(e);
-        }
+//     function analyzeRecurrence(events) {
+//         const dayNames = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
+//         const grouped = {};
+//         for (let e of events) {
+//             const y = +e.date.slice(0, 4);
+//             const m = +e.date.slice(4, 6) - 1;
+//             const d = +e.date.slice(6, 8);
+//             const dateObj = new Date(y, m, d);
+//             e.dateObj = dateObj;
+//             const key = dayNames[dateObj.getDay()];
+//             grouped[key] ??= [];
+//             grouped[key].push(e);
+//         }
 
-        // Find the smallest interval
-        let minInterval = Infinity;
-        for (let key in grouped) {
-            let group = grouped[key];
-            group.sort((a, b) => a.dateObj - b.dateObj);
-            for (let i = 1; i < group.length; i++) {
-                let diff = (group[i].dateObj - group[i - 1].dateObj) / (1000 * 60 * 60 * 24);
-                if (diff < minInterval) {
-                    minInterval = diff;
-                }
-            }
-        }
+//         // Find the smallest interval
+//         let minInterval = Infinity;
+//         for (let key in grouped) {
+//             let group = grouped[key];
+//             group.sort((a, b) => a.dateObj - b.dateObj);
+//             for (let i = 1; i < group.length; i++) {
+//                 let diff = (group[i].dateObj - group[i - 1].dateObj) / (1000 * 60 * 60 * 24);
+//                 if (diff < minInterval) {
+//                     minInterval = diff;
+//                 }
+//             }
+//         }
 
-        // Now, find missing days based on the minInterval for each group
-        const missingByGroup = {};
-        for (let key in grouped) {
-            let group = grouped[key];
-            if (group.length < 2) continue; // Can't determine missing if less than 2
-            let startDate = group[0].dateObj;
-            let endDate = group[group.length - 1].dateObj;
-            let expectedDates = [];
-            let current = new Date(startDate);
-            while (current <= endDate) {
-                expectedDates.push(new Date(current));
-                current.setDate(current.getDate() + minInterval);
-            }
-            // Find which expected dates are missing in the group
-            let missing = [];
-            for (let exp of expectedDates) {
-                if (!group.some((e) => e.dateObj.getTime() === exp.getTime())) {
-                    missing.push(exp.toISOString().slice(0, 10));
-                }
-            }
-            if (missing.length > 0) {
-                missingByGroup[key] = missing;
-            }
-        }
+//         // Now, find missing days based on the minInterval for each group
+//         const missingByGroup = {};
+//         for (let key in grouped) {
+//             let group = grouped[key];
+//             if (group.length < 2) continue; // Can't determine missing if less than 2
+//             let startDate = group[0].dateObj;
+//             let endDate = group[group.length - 1].dateObj;
+//             let expectedDates = [];
+//             let current = new Date(startDate);
+//             while (current <= endDate) {
+//                 expectedDates.push(new Date(current));
+//                 current.setDate(current.getDate() + minInterval);
+//             }
+//             // Find which expected dates are missing in the group
+//             let missing = [];
+//             for (let exp of expectedDates) {
+//                 if (!group.some((e) => e.dateObj.getTime() === exp.getTime())) {
+//                     missing.push(exp.toISOString().slice(0, 10));
+//                 }
+//             }
+//             if (missing.length > 0) {
+//                 missingByGroup[key] = missing;
+//             }
+//         }
 
-        console.log({ minInterval, missingByGroup });
-    }
+//         console.log({ minInterval, missingByGroup });
+//     }
 
-    function createICalendarFile(events) {
-        const DTStamp = Date().toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
-        let ics = `BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-// VuQuan // svHaUI_Helper //EN
-CALSCALE:GREGORIAN
-METHOD:PUBLISH
-X-WR-CALNAME:${calendarName}
-X-WR-TIMEZONE:Asia/Ho_Chi_Minh
-BEGIN:VTIMEZONE
-TZID:Asia/Ho_Chi_Minh
-X-LIC-LOCATION:Asia/Ho_Chi_Minh
-BEGIN:STANDARD
-TZOFFSETFROM:+0700
-TZOFFSETTO:+0700
-TZNAME:GMT+7
-DTSTART:19700101T000000
-END:STANDARD
-END:VTIMEZONE
-`;
-        //
-        for (const event of events) {
-            const date = event.date.replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$3$2$1");
-            // Info
-            let str = "";
-            str += `BEGIN:VEVENT\n`;
-            str += `UID:${event.uid}\n`;
-            str += `SUMMARY:${event.title}\n`;
-            str += `DESCRIPTION:${event.description || ""}\n`;
-            str += `LOCATION:${event.location || ""}\n`;
-            str += `DTSTAMP:${DTStamp}\n`;
-            str += `DTSTART;TZID=Asia/Ho_Chi_Minh:${date + "T" + event.start}00\n`;
-            str += `DTEND;TZID=Asia/Ho_Chi_Minh:${date + "T" + event.end}00\n`;
+//     function createICalendarFile(events) {
+//         const DTStamp = Date().toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+//         let ics = `BEGIN:VCALENDAR
+// VERSION:2.0
+// PRODID:-// VuQuan // svHaUI_Helper //EN
+// CALSCALE:GREGORIAN
+// METHOD:PUBLISH
+// X-WR-CALNAME:${calendarName}
+// X-WR-TIMEZONE:Asia/Ho_Chi_Minh
+// BEGIN:VTIMEZONE
+// TZID:Asia/Ho_Chi_Minh
+// X-LIC-LOCATION:Asia/Ho_Chi_Minh
+// BEGIN:STANDARD
+// TZOFFSETFROM:+0700
+// TZOFFSETTO:+0700
+// TZNAME:GMT+7
+// DTSTART:19700101T000000
+// END:STANDARD
+// END:VTIMEZONE
+// `;
+//         //
+//         for (const event of events) {
+//             const date = event.date.replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$3$2$1");
+//             // Info
+//             let str = "";
+//             str += `BEGIN:VEVENT\n`;
+//             str += `UID:${event.uid}\n`;
+//             str += `SUMMARY:${event.title}\n`;
+//             str += `DESCRIPTION:${event.description || ""}\n`;
+//             str += `LOCATION:${event.location || ""}\n`;
+//             str += `DTSTAMP:${DTStamp}\n`;
+//             str += `DTSTART;TZID=Asia/Ho_Chi_Minh:${date + "T" + event.start}00\n`;
+//             str += `DTEND;TZID=Asia/Ho_Chi_Minh:${date + "T" + event.end}00\n`;
 
-            // Repeat
-            if (event.repeat) {
-                let rrule = `RRULE:FREQ=${event.repeat.freq};WKST=MO`;
-                if (event.repeat.count) rrule += `;COUNT=${event.repeat.count}`;
-                if (event.repeat.byDay) rrule += `;BYDAY=${event.repeat.byDay.join(",")}`;
-                str += rrule + "\n";
+//             // Repeat
+//             if (event.repeat) {
+//                 let rrule = `RRULE:FREQ=${event.repeat.freq};WKST=MO`;
+//                 if (event.repeat.count) rrule += `;COUNT=${event.repeat.count}`;
+//                 if (event.repeat.byDay) rrule += `;BYDAY=${event.repeat.byDay.join(",")}`;
+//                 str += rrule + "\n";
 
-                if (event.repeat.exDates?.length) {
-                    for (const exDate of event.repeat.exDates) {
-                        const exDatef = exDate.replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$3$2$1");
-                        str += `EXDATE;TZID=Asia/Ho_Chi_Minh:${exDatef}\n`;
-                    }
-                }
-            }
-            //
-            str += `STATUS:CONFIRMED\n`;
-            str += `TRANSP:OPAQUE\n`;
-            // Alarms
-            if (e.alarms?.length) {
-                for (const min of event.alarms) {
-                    str += "BEGIN:VALARM\n";
-                    str += "ACTION:DISPLAY\n";
-                    str += `DESCRIPTION:Nhắc trước ${min} phút\n`;
-                    str += `TRIGGER:-PT${min}M\n`;
-                    str += "END:VALARM\n";
-                }
-            }
-            // End event
-            str += "END:VEVENT\n\n";
-            ics += str;
-        }
+//                 if (event.repeat.exDates?.length) {
+//                     for (const exDate of event.repeat.exDates) {
+//                         const exDatef = exDate.replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$3$2$1");
+//                         str += `EXDATE;TZID=Asia/Ho_Chi_Minh:${exDatef}\n`;
+//                     }
+//                 }
+//             }
+//             //
+//             str += `STATUS:CONFIRMED\n`;
+//             str += `TRANSP:OPAQUE\n`;
+//             // Alarms
+//             if (e.alarms?.length) {
+//                 for (const min of event.alarms) {
+//                     str += "BEGIN:VALARM\n";
+//                     str += "ACTION:DISPLAY\n";
+//                     str += `DESCRIPTION:Nhắc trước ${min} phút\n`;
+//                     str += `TRIGGER:-PT${min}M\n`;
+//                     str += "END:VALARM\n";
+//                 }
+//             }
+//             // End event
+//             str += "END:VEVENT\n\n";
+//             ics += str;
+//         }
 
-        //
-        ics += `END:VCALENDAR`;
+//         //
+//         ics += `END:VCALENDAR`;
 
-        const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = filename;
-        link.click();
-    }
+//         const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+//         const link = document.createElement("a");
+//         link.href = URL.createObjectURL(blob);
+//         link.download = filename;
+//         link.click();
+//     }
 
     // Lấy tổng số tín chỉ
     function getYourTotalCredits() {
@@ -2288,8 +2288,8 @@ END:VTIMEZONE
             "/student/result/viewstudyresult"
         );
 
-        runOnUrl(createCSVCalendar, "/timestable/calendarcl");
-        runOnUrl(exportCalender, "/timestable/calendarcl");
+        // runOnUrl(createCSVCalendar, "/timestable/calendarcl");
+        // runOnUrl(exportCalender, "/timestable/calendarcl");
 
         runOnUrl(getYourTotalCredits, "/training/viewcourseindustry");
         runOnUrl(getYourLearningProgress, "/student/result/examresult");
