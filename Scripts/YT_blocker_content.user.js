@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         YouTube Content Filter
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      1.0.3
+// @version      1.0.4
 // @description  Ẩn video, short, playlist dựa trên từ khóa tiêu đề hoặc tên kênh
 // @author       QuanVu
 // @updateURL    https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/YT_blocker_content.user.js
@@ -474,7 +474,6 @@ function doGet(e) {
     .setMimeType(ContentService.MimeType.JSON);
 }
 
-*/
   return JSON.stringify(result, null, 2);
 }
 
