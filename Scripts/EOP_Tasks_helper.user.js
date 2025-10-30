@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         EOP Task helper
+// @name         EOP Task helper en
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.0.9
+// @version      2.0.10
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -134,7 +134,7 @@
             return listeningTime.textContent
                 .replace(" -", "")
                 .split(":")
-                .reduce((acc, time) => 60 * acc + +time, 0);
+                .reduce((acc, time) => 40 * acc + +time, 0);
 
         if (contentElement) {
             const text = contentElement.textContent;
@@ -142,7 +142,7 @@
             const words = text.matchAll(wordMatchRegExp);
             const wordCount = [...words].length;
             let readingTime = (wordCount / 320) * 60;
-            if (readingTime > 30) readingTime = (wordCount / 640) * 60;
+            if (readingTime > 30) readingTime = (wordCount / 900) * 60;
             return readingTime;
         }
     }
@@ -288,11 +288,23 @@
         await waitForSelector("input.danw.dinline[type='text']");
         const ditem = document.querySelector("div.ditem");
         const inputs = ditem.querySelectorAll("input.danw.dinline[type='text']");
+        const totalInputsChar = Array.from(inputs).reduce((a, i) => {
+            const charsForThis = i.clientWidth <= 35 ? 1 : Math.round(i.clientWidth / 10);
+            return a + charsForThis;
+        }, 0);
+        const timeEachChar = 30 / totalInputsChar;
         await forEachList(inputs, async (i, input, lenght) => {
-            await delay(30.5 / lenght, false);
-            input.value = "a";
+            const chars = "abcdefghijklmnopqrstuvwxyz";
+            const width = input.clientWidth;
+            const estimatedChars = width <= 35 ? 1 : Math.round(width / 10);
+            for (let c = 0; c < estimatedChars; c++) {
+                const randomChar = chars.charAt(Math.floor(Math.random() * chars.length));
+                delay(timeEachChar);
+                input.value += randomChar;
+            }
         });
 
+        await delay(0.5);
         await clickDone();
         await delay(1);
         await clickShowAnswer();
@@ -462,7 +474,6 @@
     }
     var dtasktitle = "";
     waitForSelector("div#mbody", 10000, 500).then(() => {
-
         if (window.location.href.startsWith("https://eop.edu.vn/study/task/")) run();
         const observe = new MutationObserver(run);
         observe.observe(document.querySelector("span#dtasktitle"), {
