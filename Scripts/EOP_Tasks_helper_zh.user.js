@@ -203,7 +203,7 @@
             const estimatedChars = width <= 35 ? 1 : Math.round(width / 10);
             for (let c = 0; c < estimatedChars; c++) {
                 const randomChar = chars.charAt(Math.floor(Math.random() * chars.length));
-                delay(timeEachChar);
+                await delay(timeEachChar);
                 input.value += randomChar;
             }
         });
