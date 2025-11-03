@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Task helper en
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.3.0
+// @version      2.3.1
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -121,12 +121,21 @@
         });
     }
 
+    const defaultDelayTime = {
+        timeDoTaskFactor: -1,
+        clickDone: 2,
+        autoChooseAnswer: 1,
+        doVocabularyDefault: 2.5,
+    };
+
     GM_addStyle(`
       @import url("https://cdn.jsdelivr.net/npm/notyf/notyf.min.css");
     `);
     //===============================================================
 
     function TimeDoTask() {
+        if (defaultDelayTime.timeDoTaskFactor >= 0) return defaultDelayTime.clickDone;
+
         const contentElement = document.querySelector("div.ditem");
 
         const listeningTime = document.querySelector(".vjs-remaining-time-display");
@@ -198,15 +207,14 @@
 
         forEachList(questions[0].querySelectorAll(".dchk"), async (i0, el) => {
             await delay(1);
-            // console.log(i0);
             if (i0 === 0)
                 await forEachList(questions, async (i1, question) => {
-                    await delay(1.5);
+                    await delay(defaultDelayTime.autoChooseAnswer);
                     question.querySelector(".iCheck-helper").click();
                 });
             else
                 await forEachList(questions, async (i2, question) => {
-                    await delay(1.5);
+                    await delay(defaultDelayTime.autoChooseAnswer);
                     const answer = question.querySelectorAll(".dchk");
                     // console.log(answer);
                     // console.log(answer[i0 - 1]);
@@ -215,7 +223,7 @@
                         answer[i0].querySelector(`.iCheck-helper`).click();
                     }
                 });
-            await clickDone(3);
+            await clickDone(defaultDelayTime.clickDone);
         });
 
         finishTask();
@@ -380,7 +388,7 @@
             async () => {
                 for (const [i, playBtn] of playBtns.entries()) {
                     if (i === 0) continue;
-                    await delay(2);
+                    await delay(defaultDelayTime.doVocabularyDefault);
                     playBtn.click();
                 }
 
@@ -445,7 +453,7 @@
         });
         getAnswer(ques[0]);
 
-		GM_addStyle(`
+        GM_addStyle(`
 			p.dqtit::after {
 				content: " 👈 Click";
 			}
