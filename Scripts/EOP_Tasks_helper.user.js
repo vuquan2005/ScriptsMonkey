@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Task helper en
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.1.4
+// @version      2.2.0
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -399,6 +399,40 @@
         });
     }
 
+    async function doMCQ() {
+        const mbody = document.querySelector("div#mbody");
+
+        const ques = document.querySelectorAll('[id^="qid"]');
+
+        const chooseAnswer = async (question) => {
+            const answers = question.querySelectorAll(".dans");
+            forEachList(answers, async (i, div) => {
+                await delay(0.5);
+                div.querySelector("a").click();
+            });
+        };
+
+        const observer = new MutationObserver((mutationsList) => {
+            for (const mutation of mutationsList) {
+                if (mutation.type === "attributes" && mutation.attributeName === "class") {
+                    const el = mutation.target;
+                    if (el.classList.contains("active")) {
+                        chooseAnswer(el);
+                    }
+
+                    if (el === ques[ques.length - 1]) clickDone(2);
+                }
+            }
+        });
+
+        mbody.addEventListener("click", () => {
+            chooseAnswer(ques[0]);
+            ques.forEach((el) => {
+                observer.observe(el, { attributes: true });
+            });
+        });
+    }
+
     async function doContent() {
         console.log("View content...");
         const timeDo = TimeDoTask();
@@ -468,6 +502,16 @@
 
         runOnTaskType(
             enhanceMCQ,
+            "dmcq",
+            "word-choose-meaning",
+            "audio-choose-word",
+            "audio-choose-image",
+            "image-choose-word",
+            /^\w+-choose-\w+$/
+        );
+
+        runOnTaskType(
+            doMCQ,
             "dmcq",
             "word-choose-meaning",
             "audio-choose-word",
