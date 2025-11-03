@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Task helper en
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.1.2
+// @version      2.1.3
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -94,7 +94,7 @@
         } else {
             if (taskType1 === type1) {
                 for (const t2 of type2) {
-                    if (taskType2 === t2) {
+                    if (taskType2 === t2 || (t2 instanceof RegExp && t2.test(taskType2))) {
                         console.log(`✅ ${callbackName} :`, type1, " / ", t2);
                         return callback();
                     }
@@ -187,7 +187,7 @@
                     clickDone();
                 }
             }
-        }, 5000);
+        }, 3000);
     }
 
     async function autoChooseAnswer() {
@@ -470,7 +470,8 @@
             "dmcq",
             "word-choose-meaning",
             "audio-choose-word",
-            "image-choose-word"
+            "image-choose-word",
+            /^\w+-choose-\w+$/
         );
 
         runOnTaskType(doContent, "dcontent", "view-content");
@@ -479,7 +480,7 @@
         runOnTaskType(
             autoChooseAnswer,
             "dquestion",
-			"choose-manual",
+            "choose-manual",
             "choose-reading-choose-answer",
             "choose-listening-choose-answer"
         );
@@ -487,10 +488,11 @@
         runOnTaskType(
             autoFillAnswer,
             "dquestion",
-			"fill-vocabulary-block-blank",
+            "fill-vocabulary-block-blank",
             "fill-grammar-word-blank",
             "fill-reading-word-blank",
-            "fill-listening-write-answer"
+            "fill-listening-write-answer",
+            /^fill.*blank$/
         );
     }
     var dtasktitle = "";
