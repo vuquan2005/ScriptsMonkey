@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Task helper en
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.1.3
+// @version      2.1.4
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -177,14 +177,15 @@
         } else console.error("❌ Wrong button undo selected");
     }
 
-    function finishTask() {
-        const oldTaskTitle = dtasktitle;
+    function finishTask(oldTaskTitle = null) {
+        if (!oldTaskTitle) oldTaskTitle = dtasktitle;
         setTimeout(() => {
             if (dtasktitle === oldTaskTitle) {
                 if (document.querySelector("i.fa.fa-close")) {
                     document.querySelector("i.fa.fa-close").click();
                     console.log("Captcha");
                     clickDone();
+                    finishTask(oldTaskTitle);
                 }
             }
         }, 3000);
