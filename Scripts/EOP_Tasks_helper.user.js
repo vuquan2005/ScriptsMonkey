@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Task helper en
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.2.0
+// @version      2.3.0
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -390,6 +390,68 @@
         );
     }
 
+    function enhancePronunciation() {
+        const mbody = document.querySelector("div#mbody");
+
+        const ques = mbody.querySelectorAll('[id^="qid"]');
+
+        const getAnswer = async (question) => {
+            let answer = "";
+            question.querySelector("p.dqtit").addEventListener("click", async () => {
+                answer = prompt("Nhập đáp án: ", answer) || answer;
+                answer = answer.toUpperCase();
+
+                const viewTable = question.querySelector("ul.dview.sortable");
+                const choosedChar = viewTable.querySelectorAll("li");
+                await forEachList(choosedChar, async (i, li) => {
+                    await delay(0.1);
+                    li.click();
+                });
+
+                const answerChars = answer.split("");
+                forEachList(answerChars, async (i, char) => {
+                    await delay(0.1);
+
+                    const storeTable = question.querySelector("ul.dstore.sortable");
+                    const allChar = storeTable.querySelectorAll("li");
+
+                    for (const li of allChar) {
+                        console.log(li.textContent.trim(), char);
+                        if (li.textContent.trim() === char) {
+                            li.click();
+                            await delay(0.2);
+                            break;
+                        }
+                    }
+                });
+            });
+        };
+
+        const observer = new MutationObserver((mutationsList) => {
+            for (const mutation of mutationsList) {
+                if (mutation.type === "attributes" && mutation.attributeName === "class") {
+                    const el = mutation.target;
+                    if (el.classList.contains("active")) {
+                        getAnswer(el);
+                    }
+
+                    if (el === ques[ques.length - 1]) clickDone(2);
+                }
+            }
+        });
+
+        ques.forEach((el) => {
+            observer.observe(el, { attributes: true });
+        });
+        getAnswer(ques[0]);
+
+		GM_addStyle(`
+			p.dqtit::after {
+				content: " 👈 Click";
+			}
+		`);
+    }
+
     function enhanceMCQ() {
         const mbody = document.querySelector("div#mbody");
         mbody.querySelectorAll(".dans").forEach((div) => {
@@ -402,7 +464,7 @@
     async function doMCQ() {
         const mbody = document.querySelector("div#mbody");
 
-        const ques = document.querySelectorAll('[id^="qid"]');
+        const ques = mbody.querySelectorAll('[id^="qid"]');
 
         const chooseAnswer = async (question) => {
             const answers = question.querySelectorAll(".dans");
@@ -518,6 +580,8 @@
             "image-choose-word",
             /^\w+-choose-\w+$/
         );
+
+        runOnTaskType(enhancePronunciation, "dmcq", "pronunciation-write-word");
 
         runOnTaskType(doContent, "dcontent", "view-content");
         runOnTaskType(uploadContent, "dcontent", "upload-content");
