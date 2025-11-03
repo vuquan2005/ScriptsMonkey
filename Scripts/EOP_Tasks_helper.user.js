@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Task helper en
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.1.1
+// @version      2.1.2
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -487,7 +487,7 @@
         runOnTaskType(
             autoFillAnswer,
             "dquestion",
-			"fill-vocabulary-word-blank",
+			"fill-vocabulary-block-blank",
             "fill-grammar-word-blank",
             "fill-reading-word-blank",
             "fill-listening-write-answer"
