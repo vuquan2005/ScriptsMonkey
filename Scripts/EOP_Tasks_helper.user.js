@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Task helper en
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.3.2
+// @version      2.4.0
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -18,6 +18,13 @@
 (function () {
     "use strict";
     console.log("EOP Task helper");
+
+    const defaultDelayTime = {
+        timeDoTaskFactor: -1,
+        clickDone: 2,
+        autoChooseAnswer: 1,
+        doVocabularyDefault: 2.5,
+    };
 
     function waitForSelector(selector, timeout = 10000, delay = 100, scope = document) {
         return new Promise((resolve, reject) => {
@@ -121,12 +128,43 @@
         });
     }
 
-    const defaultDelayTime = {
-        timeDoTaskFactor: -1,
-        clickDone: 2,
-        autoChooseAnswer: 1,
-        doVocabularyDefault: 2.5,
-    };
+    async function callLMStudio(promptText, max_tokens = 512) {
+        const url = "http://127.0.0.1:1234/v1/chat/completions";
+        const body = {
+            model: "qwen/qwen3-4b",
+            messages: [
+                { role: "system", content: "You are a helpful assistant." },
+                { role: "user", content: promptText + "/no_think" },
+            ],
+            max_tokens: max_tokens,
+        };
+
+        try {
+            const res = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(body),
+            });
+
+            if (!res.ok) {
+                const t = await res.text();
+                throw new Error(`HTTP ${res.status}: ${t}`);
+            }
+
+            const data = await res.json();
+            let reply = data.choices?.[0]?.message?.content ?? JSON.stringify(data);
+            reply = reply
+                .replace(/<think>[\s\S]*?<\/think>/gi, "")
+                .replace(/\s+/g, " ")
+                .trim();
+            return reply;
+        } catch (err) {
+            console.error("Error calling LMStudio:", err);
+            throw err;
+        }
+    }
 
     GM_addStyle(`
       @import url("https://cdn.jsdelivr.net/npm/notyf/notyf.min.css");
@@ -403,35 +441,50 @@
 
         const ques = mbody.querySelectorAll('[id^="qid"]');
 
+        const choicesChar = async (question, answer) => {
+            answer = answer.toUpperCase();
+            const viewTable = question.querySelector("ul.dview.sortable");
+            const choosedChar = viewTable.querySelectorAll("li");
+            await forEachList(choosedChar, async (i, li) => {
+                await delay(0.1);
+                li.click();
+            });
+
+            const answerChars = answer.split("");
+            forEachList(answerChars, async (i, char) => {
+                await delay(0.1);
+
+                const storeTable = question.querySelector("ul.dstore.sortable");
+                const allChar = storeTable.querySelectorAll("li");
+
+                for (const li of allChar) {
+                    if (li.textContent === char) {
+                        li.click();
+                        await delay(0.1);
+                        break;
+                    }
+                }
+            });
+        };
+
         const getAnswer = async (question) => {
+            const pronun = question.querySelector("p.title");
+            if (pronun) {
+                callLMStudio(
+                    "Give only the word (no explanation): " + pronun.textContent.trim(),
+                    128
+                )
+                    .then((text) => {
+                        choicesChar(question, text);
+                        console.log("Answer:", text);
+                    })
+                    .catch(() => {});
+            }
+
             let answer = "";
             question.querySelector("p.dqtit").addEventListener("click", async () => {
                 answer = prompt("Nhập đáp án: ", answer) || answer;
-                answer = answer.toUpperCase();
-
-                const viewTable = question.querySelector("ul.dview.sortable");
-                const choosedChar = viewTable.querySelectorAll("li");
-                await forEachList(choosedChar, async (i, li) => {
-                    await delay(0.1);
-                    li.click();
-                });
-
-                const answerChars = answer.split("");
-                forEachList(answerChars, async (i, char) => {
-                    await delay(0.1);
-
-                    const storeTable = question.querySelector("ul.dstore.sortable");
-                    const allChar = storeTable.querySelectorAll("li");
-
-                    for (const li of allChar) {
-                        console.log(li.textContent.trim(), char);
-                        if (li.textContent.trim() === char) {
-                            li.click();
-                            await delay(0.2);
-                            break;
-                        }
-                    }
-                });
+                choicesChar(question, answer);
             });
         };
 
@@ -451,7 +504,14 @@
         ques.forEach((el) => {
             observer.observe(el, { attributes: true });
         });
-        getAnswer(ques[0]);
+
+        mbody.addEventListener(
+            "click",
+            () => {
+                getAnswer(ques[0]);
+            },
+            { once: true }
+        );
 
         GM_addStyle(`
 			p.dqtit::after {
