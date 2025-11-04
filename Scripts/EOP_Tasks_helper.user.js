@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Task helper en
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.4.1
+// @version      2.4.2
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -19,7 +19,15 @@
     "use strict";
     console.log("EOP Task helper");
 
-    const defaultDelayTime = {
+    // Minimum
+    let defaultDelayTime = {
+        timeDoTaskFactor: 0.5,
+        clickDone: 0.5,
+        autoChooseAnswer: 0.2,
+        doVocabularyDefault: 0.2,
+    };
+    // Normal
+    defaultDelayTime = {
         timeDoTaskFactor: -1,
         clickDone: 2,
         autoChooseAnswer: 1,
@@ -58,32 +66,6 @@
             });
         });
     }
-
-    // function waitForVisible(element, timeout = 10000, delay = 200) {
-    //     return new Promise((resolve, reject) => {
-    //         const start = Date.now();
-    //         function check() {
-    //             const elapsed = Date.now() - start;
-    //             if (!document.body.contains(element)) {
-    //                 return reject(new Error("❌ Element was removed from DOM"));
-    //             }
-
-    //             if (getComputedStyle(element).display !== "none") {
-    //                 // console.log(element, ": is visible");
-    //                 return setTimeout(() => resolve(element), delay - elapsed);
-    //             }
-
-    //             if (elapsed >= timeout) {
-    //                 console.error("⏱️ Timeout: Element not visible after", timeout, "ms");
-    //                 return resolve(element);
-    //             }
-
-    //             requestAnimationFrame(check);
-    //         }
-
-    //         requestAnimationFrame(check);
-    //     });
-    // }
 
     function runOnTaskType(callback, type1 = null, ...type2) {
         const mbody = document.querySelector("div#mbody");
@@ -577,12 +559,16 @@
             }
         });
 
-        mbody.addEventListener("click", () => {
-            chooseAnswer(ques[0]);
-            ques.forEach((el) => {
-                observer.observe(el, { attributes: true });
-            });
-        });
+        mbody.addEventListener(
+            "click",
+            () => {
+                chooseAnswer(ques[0]);
+                ques.forEach((el) => {
+                    observer.observe(el, { attributes: true });
+                });
+            },
+            { once: true }
+        );
     }
 
     async function doContent() {
