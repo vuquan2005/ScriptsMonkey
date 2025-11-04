@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Task helper en
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.4.0
+// @version      2.4.1
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -128,15 +128,16 @@
         });
     }
 
-    async function callLMStudio(promptText, max_tokens = 512) {
+    async function callLMStudio(promptText, systemPromt = "You are a helpful assistant.") {
+        console.log("Calling LMStudio with prompt:", promptText);
+
         const url = "http://127.0.0.1:1234/v1/chat/completions";
         const body = {
             model: "qwen/qwen3-4b",
             messages: [
-                { role: "system", content: "You are a helpful assistant." },
-                { role: "user", content: promptText + "/no_think" },
+                { role: "system", content: systemPromt },
+                { role: "user", content: promptText },
             ],
-            max_tokens: max_tokens,
         };
 
         try {
@@ -443,8 +444,7 @@
 
         const choicesChar = async (question, answer) => {
             answer = answer.toUpperCase();
-            const viewTable = question.querySelector("ul.dview.sortable");
-            const choosedChar = viewTable.querySelectorAll("li");
+            const choosedChar = question.querySelectorAll("ul.dview.sortable li");
             await forEachList(choosedChar, async (i, li) => {
                 await delay(0.1);
                 li.click();
@@ -454,8 +454,7 @@
             forEachList(answerChars, async (i, char) => {
                 await delay(0.1);
 
-                const storeTable = question.querySelector("ul.dstore.sortable");
-                const allChar = storeTable.querySelectorAll("li");
+                const allChar = question.querySelectorAll("ul.dstore.sortable li");
 
                 for (const li of allChar) {
                     if (li.textContent === char) {
@@ -468,10 +467,19 @@
         };
 
         const getAnswer = async (question) => {
+            const allChar = question.querySelectorAll(
+                "ul.dstore.sortable li, ul.dview.sortable li"
+            );
+            const letters = Array.from(allChar)
+                .map((li) => li.textContent.trim())
+                .join(", ");
+
+            // Bài phát âm
             const pronun = question.querySelector("p.title");
             if (pronun) {
                 callLMStudio(
-                    "Give only the word (no explanation): " + pronun.textContent.trim(),
+                    "Pronunciation: " + pronun.textContent.trim(),
+                    `Give only the word (no explanation)./no_think`,
                     128
                 )
                     .then((text) => {
@@ -481,6 +489,22 @@
                     .catch(() => {});
             }
 
+            // Bài nghe
+            const audioEl = question.querySelector("i.fa.daudio");
+            if (audioEl && audioEl.offsetParent != null) {
+                console.log("Detect audio question");
+                callLMStudio(
+                    letters,
+                    `Provide only one valid, meaningful English word using the following letters. Use all letters, no explanation /no_think`
+                )
+                    .then((text) => {
+                        choicesChar(question, text);
+                        console.log("Answer:", text);
+                    })
+                    .catch(() => {});
+            }
+
+            // Nhập đáp án
             let answer = "";
             question.querySelector("p.dqtit").addEventListener("click", async () => {
                 answer = prompt("Nhập đáp án: ", answer) || answer;
@@ -495,8 +519,6 @@
                     if (el.classList.contains("active")) {
                         getAnswer(el);
                     }
-
-                    if (el === ques[ques.length - 1]) clickDone(2);
                 }
             }
         });
