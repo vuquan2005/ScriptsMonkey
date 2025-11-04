@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Task helper en
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.3.1
+// @version      2.3.2
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -398,7 +398,7 @@
         );
     }
 
-    function enhancePronunciation() {
+    function enhanceWriteWord() {
         const mbody = document.querySelector("div#mbody");
 
         const ques = mbody.querySelectorAll('[id^="qid"]');
@@ -589,7 +589,7 @@
             /^\w+-choose-\w+$/
         );
 
-        runOnTaskType(enhancePronunciation, "dmcq", "pronunciation-write-word");
+        runOnTaskType(enhanceWriteWord, "dmcq", /-write-word$/);
 
         runOnTaskType(doContent, "dcontent", "view-content");
         runOnTaskType(uploadContent, "dcontent", "upload-content");
