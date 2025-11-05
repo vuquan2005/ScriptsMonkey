@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Task helper en
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.4.4
+// @version      2.4.5
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -20,12 +20,12 @@
     console.log("EOP Task helper");
 
     let defaultDelayTime = GM_getValue("defaultDelayTime", null);
-    if (defaultDelayTime) {
+    if (!defaultDelayTime) {
         defaultDelayTime = {
             timeDoTaskFactor: -1,
             clickDone: 2,
             autoChooseAnswer: 1,
-            doVocabularyDefault: 2.5,
+            doVocabularyDefault: 1.5,
         };
         GM_setValue("defaultDelayTime", defaultDelayTime);
     }
@@ -398,7 +398,6 @@
         await waitForSelector("i.fa.daudio.fa-play-circle");
         const mbody = document.querySelector("div#mbody");
         const playBtns = mbody.querySelectorAll("i.fa.daudio.fa-play-circle");
-        console.log(playBtns);
 
         playBtns[0].addEventListener(
             "click",
@@ -612,11 +611,23 @@
     }
 
     //===============================================================
+    var dtasktitle = "";
+    var lastTime = 0;
 
     async function run() {
         await waitForSelector("div#mbody");
         console.log("▶️▶️▶️", document.querySelector("div#mbody").children[0].className, "◀️◀️◀️");
-        console.log("⏱️ Time: ", new Date().toLocaleString());
+
+        if (lastTime == 0) {
+            console.log("⏱️ Time: ", new Date().toLocaleTimeString());
+			lastTime = new Date();
+        } else {
+            const diffMs = Math.abs(new Date() - lastTime);
+            const diffMinutes = Math.floor(diffMs / (1000 * 60));
+            const diffSeconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+            console.log(`⏱️ Time: ${diffMinutes}p ${diffSeconds}s`);
+            lastTime = new Date();
+        }
 
         if (document.querySelector("span#dtasktitle")) {
             // Tránh lặp lại
@@ -676,7 +687,6 @@
             /^fill.*blank$/
         );
     }
-    var dtasktitle = "";
     waitForSelector("div#mbody", 10000, 500).then(() => {
         if (window.location.href.startsWith("https://eop.edu.vn/study/task/")) run();
         const observe = new MutationObserver(run);
