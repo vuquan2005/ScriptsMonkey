@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Task helper en
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.4.2
+// @version      2.4.3
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -19,20 +19,16 @@
     "use strict";
     console.log("EOP Task helper");
 
-    // Minimum
-    let defaultDelayTime = {
-        timeDoTaskFactor: 0.5,
-        clickDone: 0.5,
-        autoChooseAnswer: 0.2,
-        doVocabularyDefault: 0.2,
-    };
-    // Normal
-    defaultDelayTime = {
-        timeDoTaskFactor: -1,
-        clickDone: 2,
-        autoChooseAnswer: 1,
-        doVocabularyDefault: 2.5,
-    };
+    let defaultDelayTime = GM_getValue("defaultDelayTime", null);
+    if (defaultDelayTime) {
+        defaultDelayTime = {
+            timeDoTaskFactor: -1,
+            clickDone: 2,
+            autoChooseAnswer: 1,
+            doVocabularyDefault: 2.5,
+        };
+        GM_setValue("defaultDelayTime", defaultDelayTime);
+    }
 
     function waitForSelector(selector, timeout = 10000, delay = 100, scope = document) {
         return new Promise((resolve, reject) => {
