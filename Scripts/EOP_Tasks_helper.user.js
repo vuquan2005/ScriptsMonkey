@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Task helper en
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.4.5
+// @version      2.4.6
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -580,8 +580,9 @@
         console.log("Upload content...");
         const notyf = new Notyf();
         const oDienLink = document.querySelector("#dupload > div > textarea");
+        const file = document.querySelector("#dupload a.fname");
 
-        if (oDienLink && oDienLink.value.trim() != "") return;
+        if (oDienLink || oDienLink.value.trim() != '' || file.textContent.trim() != "") return;
 
         let isAutoUpload = await GM_getValue("isAutoUpload", null);
         if (isAutoUpload == null) {
@@ -620,7 +621,7 @@
 
         if (lastTime == 0) {
             console.log("⏱️ Time: ", new Date().toLocaleTimeString());
-			lastTime = new Date();
+            lastTime = new Date();
         } else {
             const diffMs = Math.abs(new Date() - lastTime);
             const diffMinutes = Math.floor(diffMs / (1000 * 60));
