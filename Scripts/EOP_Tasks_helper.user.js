@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Task helper en
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.4.3
+// @version      2.4.4
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -580,7 +580,10 @@
     async function uploadContent() {
         console.log("Upload content...");
         const notyf = new Notyf();
-        const oDienLink = document.querySelector("#dupload > div > textarea").value;
+        const oDienLink = document.querySelector("#dupload > div > textarea");
+
+        if (oDienLink && oDienLink.value.trim() != "") return;
+
         let isAutoUpload = await GM_getValue("isAutoUpload", null);
         if (isAutoUpload == null) {
             isAutoUpload = confirm("Tự động điền link (Google drive, padlet,...) ?");
@@ -602,13 +605,10 @@
                     notyf.success("Link upload saved: " + linkUpLoad);
                 }
             }
-            document.querySelector("#dupload > div > textarea").value = linkUpLoad;
-            console.log(
-                "Link upload = ",
-                document.querySelector("#dupload > div > textarea").value
-            );
+            oDienLink.value = linkUpLoad;
+            console.log("Link upload = ", oDienLink.value);
         }
-        clickDone(7);
+        clickDone(5);
     }
 
     //===============================================================
