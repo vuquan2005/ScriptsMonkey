@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Task helper en
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.4.8
+// @version      2.4.9
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -22,7 +22,7 @@
     let defaultDelayTime = GM_getValue("defaultDelayTime", null);
     if (!defaultDelayTime) {
         defaultDelayTime = {
-            timeDoTaskFactor: -1,
+            timeDoTaskFactor: 1,
             clickDone: 2,
             autoChooseAnswer: 1,
             doVocabularyDefault: 1.5,
