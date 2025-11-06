@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Task helper en
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.4.6
+// @version      2.4.7
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -26,6 +26,7 @@
             clickDone: 2,
             autoChooseAnswer: 1,
             doVocabularyDefault: 1.5,
+            mcq: 1,
         };
         GM_setValue("defaultDelayTime", defaultDelayTime);
     }
@@ -393,7 +394,7 @@
         finishTask();
     }
 
-    async function doVocabularyDefault() {
+    async function doVocabulary() {
         console.log("Do vocabulary default...");
         await waitForSelector("i.fa.daudio.fa-play-circle");
         const mbody = document.querySelector("div#mbody");
@@ -536,7 +537,7 @@
         const chooseAnswer = async (question) => {
             const answers = question.querySelectorAll(".dans");
             forEachList(answers, async (i, div) => {
-                await delay(0.5);
+                await delay(defaultDelayTime.mcq);
                 div.querySelector("a").click();
             });
         };
@@ -582,7 +583,7 @@
         const oDienLink = document.querySelector("#dupload > div > textarea");
         const file = document.querySelector("#dupload a.fname");
 
-        if (oDienLink || oDienLink.value.trim() != '' || file.textContent.trim() != "") return;
+        if (oDienLink || oDienLink.value.trim() != "" || file.textContent.trim() != "") return;
 
         let isAutoUpload = await GM_getValue("isAutoUpload", null);
         if (isAutoUpload == null) {
@@ -644,7 +645,7 @@
             return;
         }
 
-        runOnTaskType(doVocabularyDefault, "dvocabulary", "default");
+        runOnTaskType(doVocabulary, "dvocabulary", "default");
 
         runOnTaskType(
             enhanceMCQ,
