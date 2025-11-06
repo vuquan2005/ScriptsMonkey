@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Task helper en
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.4.7
+// @version      2.4.8
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -91,6 +91,7 @@
     }
 
     function delay(s, sRandom = true) {
+        if (s <= 0) s = 0.1;
         let factor = 1;
         if (sRandom) factor = 0.8 + Math.random() * 0.4;
         const randomS = s * factor;
@@ -152,25 +153,25 @@
     //===============================================================
 
     function TimeDoTask() {
-        if (defaultDelayTime.timeDoTaskFactor >= 0) return defaultDelayTime.clickDone;
-
         const contentElement = document.querySelector("div.ditem");
 
         const listeningTime = document.querySelector(".vjs-remaining-time-display");
         if (listeningTime)
-            return listeningTime.textContent
-                .replace(" -", "")
-                .split(":")
-                .reduce((acc, time) => 40 * acc + +time, 0);
+            return (
+                listeningTime.textContent
+                    .replace(" -", "")
+                    .split(":")
+                    .reduce((acc, time) => 40 * acc + +time, 0) * defaultDelayTime.timeDoTaskFactor
+            );
 
         if (contentElement) {
             const text = contentElement.textContent;
             const wordMatchRegExp = /[^\s]+/g;
             const words = text.matchAll(wordMatchRegExp);
             const wordCount = [...words].length;
-            let readingTime = (wordCount / 320) * 60;
+            let readingTime = (wordCount / 620) * 60;
             if (readingTime > 30) readingTime = (wordCount / 900) * 60;
-            return readingTime;
+            return readingTime * defaultDelayTime.timeDoTaskFactor;
         }
     }
 
