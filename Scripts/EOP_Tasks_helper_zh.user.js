@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Task helper zh
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      1.0.2
+// @version      1.1.0
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -18,6 +18,18 @@
 (function () {
     "use strict";
     console.log("EOP Task helper");
+
+    let defaultDelayTime = GM_getValue("defaultDelayTime", null);
+    if (!defaultDelayTime) {
+        defaultDelayTime = {
+            timeDoTaskFactor: -1,
+            clickDone: 2,
+            autoChooseAnswer: 1,
+            doVocabularyDefault: 1.5,
+            mcq: 1,
+        };
+        GM_setValue("defaultDelayTime", defaultDelayTime);
+    }
 
     function waitForSelector(selector, timeout = 10000, delay = 100, scope = document) {
         return new Promise((resolve, reject) => {
@@ -52,32 +64,6 @@
         });
     }
 
-    // function waitForVisible(element, timeout = 10000, delay = 200) {
-    //     return new Promise((resolve, reject) => {
-    //         const start = Date.now();
-    //         function check() {
-    //             const elapsed = Date.now() - start;
-    //             if (!document.body.contains(element)) {
-    //                 return reject(new Error("❌ Element was removed from DOM"));
-    //             }
-
-    //             if (getComputedStyle(element).display !== "none") {
-    //                 // console.log(element, ": is visible");
-    //                 return setTimeout(() => resolve(element), delay - elapsed);
-    //             }
-
-    //             if (elapsed >= timeout) {
-    //                 console.error("⏱️ Timeout: Element not visible after", timeout, "ms");
-    //                 return resolve(element);
-    //             }
-
-    //             requestAnimationFrame(check);
-    //         }
-
-    //         requestAnimationFrame(check);
-    //     });
-    // }
-
     function runOnTaskType(callback, type1 = null, ...type2) {
         const mbody = document.querySelector("div#mbody");
         const firstChild = mbody.children[0];
@@ -94,7 +80,7 @@
         } else {
             if (taskType1 === type1) {
                 for (const t2 of type2) {
-                    if (taskType2 === t2) {
+                    if (taskType2 === t2 || (t2 instanceof RegExp && t2.test(taskType2))) {
                         console.log(`✅ ${callbackName} :`, type1, " / ", t2);
                         return callback();
                     }
@@ -105,6 +91,7 @@
     }
 
     function delay(s, sRandom = true) {
+        if (s <= 0) s = 0.1;
         let factor = 1;
         if (sRandom) factor = 0.8 + Math.random() * 0.4;
         const randomS = s * factor;
@@ -121,13 +108,71 @@
         });
     }
 
+    async function callLMStudio(promptText, systemPromt = "You are a helpful assistant.") {
+        console.log("Calling LMStudio with prompt:", promptText);
+
+        const url = "http://127.0.0.1:1234/v1/chat/completions";
+        const body = {
+            model: "qwen/qwen3-4b",
+            messages: [
+                { role: "system", content: systemPromt },
+                { role: "user", content: promptText },
+            ],
+        };
+
+        try {
+            const res = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(body),
+            });
+
+            if (!res.ok) {
+                const t = await res.text();
+                throw new Error(`HTTP ${res.status}: ${t}`);
+            }
+
+            const data = await res.json();
+            let reply = data.choices?.[0]?.message?.content ?? JSON.stringify(data);
+            reply = reply
+                .replace(/<think>[\s\S]*?<\/think>/gi, "")
+                .replace(/\s+/g, " ")
+                .trim();
+            return reply;
+        } catch (err) {
+            console.error("Error calling LMStudio:", err);
+            throw err;
+        }
+    }
+
     GM_addStyle(`
       @import url("https://cdn.jsdelivr.net/npm/notyf/notyf.min.css");
     `);
     //===============================================================
 
     function TimeDoTask() {
-        return 3;
+        const contentElement = document.querySelector("div.ditem");
+
+        const listeningTime = document.querySelector(".vjs-remaining-time-display");
+        if (listeningTime)
+            return (
+                listeningTime.textContent
+                    .replace(" -", "")
+                    .split(":")
+                    .reduce((acc, time) => 40 * acc + +time, 0) * defaultDelayTime.timeDoTaskFactor
+            );
+
+        if (contentElement) {
+            const text = contentElement.textContent;
+            const wordMatchRegExp = /[^\s]+/g;
+            const words = text.matchAll(wordMatchRegExp);
+            const wordCount = [...words].length;
+            let readingTime = (wordCount / 620) * 60;
+            if (readingTime > 30) readingTime = (wordCount / 900) * 60;
+            return readingTime * defaultDelayTime.timeDoTaskFactor;
+        }
     }
 
     async function clickDone(seconds = 0.5) {
@@ -160,6 +205,20 @@
         } else console.error("❌ Wrong button undo selected");
     }
 
+    function finishTask(oldTaskTitle = null) {
+        if (!oldTaskTitle) oldTaskTitle = dtasktitle;
+        setTimeout(() => {
+            if (dtasktitle === oldTaskTitle) {
+                if (document.querySelector("i.fa.fa-close")) {
+                    document.querySelector("i.fa.fa-close").click();
+                    console.log("Captcha");
+                    clickDone();
+                    finishTask(oldTaskTitle);
+                }
+            }
+        }, 3000);
+    }
+
     async function autoChooseAnswer() {
         await waitForSelector(".iCheck-helper");
         const ditem = document.querySelector("div.ditem");
@@ -167,15 +226,14 @@
 
         forEachList(questions[0].querySelectorAll(".dchk"), async (i0, el) => {
             await delay(1);
-            // console.log(i0);
             if (i0 === 0)
                 await forEachList(questions, async (i1, question) => {
-                    await delay(0.2);
+                    await delay(defaultDelayTime.autoChooseAnswer);
                     question.querySelector(".iCheck-helper").click();
                 });
             else
                 await forEachList(questions, async (i2, question) => {
-                    await delay(0.2);
+                    await delay(defaultDelayTime.autoChooseAnswer);
                     const answer = question.querySelectorAll(".dchk");
                     // console.log(answer);
                     // console.log(answer[i0 - 1]);
@@ -184,7 +242,88 @@
                         answer[i0].querySelector(`.iCheck-helper`).click();
                     }
                 });
-            await clickDone(3);
+            await clickDone(defaultDelayTime.clickDone);
+        });
+
+        finishTask();
+    }
+
+    function normalizeOcrText(text) {
+        try {
+            const numMap = {};
+
+            const charMap = {
+                0: "o",
+                1: "i",
+                5: "s",
+                Cc: "C",
+            };
+
+            const wordMap = {
+                intemet: "internet",
+                inthe: "in the",
+            };
+
+            text = text.trim();
+            let output = "";
+
+            for (let token of text.match(/\w+|\W+/g)) {
+                // console.log("Token:", token);
+                if (/^\d+.*$/.test(token)) {
+                    output += token;
+                    continue;
+                }
+                if (/^\w+$/.test(token)) {
+                    for (const [wrong, correct] of Object.entries(charMap)) {
+                        const regex = new RegExp(wrong, "g");
+                        token = token.replace(regex, correct);
+                    }
+                }
+                output += token;
+            }
+
+            for (const [wrong, correct] of Object.entries(wordMap)) {
+                const regex = new RegExp(wrong, "gi");
+                output = output.replace(regex, correct);
+            }
+
+            return output;
+        } catch (error) {
+            console.error("Error in normalizeOcrText:", error);
+            return text;
+        }
+    }
+
+    async function recognizeTextFromListImage(imgList) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const worker = await Tesseract.createWorker("eng");
+
+                await worker.setParameters({
+                    tessedit_char_whitelist:
+                        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,!?;:'\"()- ",
+                    tessedit_char_blacklist: "%^&",
+                    preserve_interword_spaces: "1",
+                });
+
+                let listText = [];
+
+                for (const img of imgList) {
+                    let {
+                        data: { text },
+                    } = await worker.recognize(img);
+
+                    // console.log("✏️ ", text);
+                    text = normalizeOcrText(text);
+
+                    listText.push(text);
+                }
+                await worker.terminate();
+
+                resolve(listText);
+            } catch (error) {
+                reject(error);
+            }
         });
     }
 
@@ -228,21 +367,130 @@
         clickDone(timeDo);
     }
 
-    async function doVocabularyDefault() {
+    async function doVocabulary() {
         console.log("Do vocabulary default...");
         await waitForSelector("i.fa.daudio.fa-play-circle");
         const mbody = document.querySelector("div#mbody");
         const playBtns = mbody.querySelectorAll("i.fa.daudio.fa-play-circle");
 
-        delay(1);
+        playBtns[0].addEventListener(
+            "click",
+            async () => {
+                for (const [i, playBtn] of playBtns.entries()) {
+                    if (i === 0) continue;
+                    await delay(defaultDelayTime.doVocabularyDefault);
+                    playBtn.click();
+                }
 
-        for (const [i, playBtn] of playBtns.entries()) {
-            if (i === 0) continue;
-            await delay(0.1);
-            playBtn.click();
-        }
+                await clickDone(3);
+            },
+            { once: true }
+        );
+    }
 
-        await clickDone(3);
+    function enhanceWriteWord() {
+        const mbody = document.querySelector("div#mbody");
+
+        const ques = mbody.querySelectorAll('[id^="qid"]');
+
+        const choicesChar = async (question, answer) => {
+            answer = answer.toUpperCase();
+            const choosedChar = question.querySelectorAll("ul.dview.sortable li");
+            await forEachList(choosedChar, async (i, li) => {
+                await delay(0.1);
+                li.click();
+            });
+
+            const answerChars = answer.split("");
+            forEachList(answerChars, async (i, char) => {
+                await delay(0.1);
+
+                const allChar = question.querySelectorAll("ul.dstore.sortable li");
+
+                for (const li of allChar) {
+                    if (li.textContent === char) {
+                        li.click();
+                        await delay(0.1);
+                        break;
+                    }
+                }
+            });
+        };
+
+        const getAnswer = async (question) => {
+            const allChar = question.querySelectorAll(
+                "ul.dstore.sortable li, ul.dview.sortable li"
+            );
+            const letters = Array.from(allChar)
+                .map((li) => li.textContent.trim())
+                .join(", ");
+
+            // Bài phát âm
+            const pronun = question.querySelector("p.title");
+            if (pronun) {
+                callLMStudio(
+                    "Pronunciation: " + pronun.textContent.trim(),
+                    `Give only the word (no explanation)./no_think`,
+                    128
+                )
+                    .then((text) => {
+                        choicesChar(question, text);
+                        console.log("Answer:", text);
+                    })
+                    .catch(() => {});
+            }
+
+            // Bài nghe
+            const audioEl = question.querySelector("i.fa.daudio");
+            if (audioEl && audioEl.offsetParent != null) {
+                console.log("Detect audio question");
+                callLMStudio(
+                    letters,
+                    `Provide only one valid, meaningful English word using the following letters. Use all letters, no explanation /no_think`
+                )
+                    .then((text) => {
+                        choicesChar(question, text);
+                        console.log("Answer:", text);
+                    })
+                    .catch(() => {});
+            }
+
+            // Nhập đáp án
+            let answer = "";
+            question.querySelector("p.dqtit").addEventListener("click", async () => {
+                answer = prompt("Nhập đáp án: ", answer) || answer;
+                choicesChar(question, answer);
+            });
+        };
+
+        const observer = new MutationObserver((mutationsList) => {
+            for (const mutation of mutationsList) {
+                if (mutation.type === "attributes" && mutation.attributeName === "class") {
+                    const el = mutation.target;
+                    if (el.classList.contains("active")) {
+                        getAnswer(el);
+                    }
+                }
+            }
+        });
+
+        ques.forEach((el) => {
+            observer.observe(el, { attributes: true });
+        });
+
+        mbody.addEventListener(
+            "click",
+            () => {
+                getAnswer(ques[0]);
+            },
+            { once: true }
+        );
+
+        GM_addStyle(`
+			p.dqtit::after {
+				content: " 👈 Click";
+			}
+		`);
     }
 
     function enhanceMCQ() {
@@ -254,18 +502,62 @@
         });
     }
 
+    async function doMCQ() {
+        const mbody = document.querySelector("div#mbody");
+
+        const ques = mbody.querySelectorAll('[id^="qid"]');
+
+        const chooseAnswer = async (question) => {
+            const answers = question.querySelectorAll(".dans");
+            forEachList(answers, async (i, div) => {
+                await delay(defaultDelayTime.mcq);
+                div.querySelector("a").click();
+            });
+        };
+
+        const observer = new MutationObserver((mutationsList) => {
+            for (const mutation of mutationsList) {
+                if (mutation.type === "attributes" && mutation.attributeName === "class") {
+                    const el = mutation.target;
+                    if (el.classList.contains("active")) {
+                        chooseAnswer(el);
+                    }
+
+                    if (el === ques[ques.length - 1]) clickDone(2);
+                }
+            }
+        });
+
+        mbody.addEventListener(
+            "click",
+            () => {
+                chooseAnswer(ques[0]);
+                ques.forEach((el) => {
+                    observer.observe(el, { attributes: true });
+                });
+            },
+            { once: true }
+        );
+    }
+
     async function doContent() {
         console.log("View content...");
         const timeDo = TimeDoTask();
         console.log("Đợi thêm: ", timeDo, "s");
         await delay(timeDo);
         clickDone();
+
+        finishTask();
     }
 
     async function uploadContent() {
         console.log("Upload content...");
         const notyf = new Notyf();
-        const oDienLink = document.querySelector("#dupload > div > textarea").value;
+        const oDienLink = document.querySelector("#dupload > div > textarea");
+        const file = document.querySelector("#dupload a.fname");
+
+        if (oDienLink || oDienLink.value.trim() != "" || file.textContent.trim() != "") return;
+
         let isAutoUpload = await GM_getValue("isAutoUpload", null);
         if (isAutoUpload == null) {
             isAutoUpload = confirm("Tự động điền link (Google drive, padlet,...) ?");
@@ -287,21 +579,30 @@
                     notyf.success("Link upload saved: " + linkUpLoad);
                 }
             }
-            document.querySelector("#dupload > div > textarea").value = linkUpLoad;
-            console.log(
-                "Link upload = ",
-                document.querySelector("#dupload > div > textarea").value
-            );
+            oDienLink.value = linkUpLoad;
+            console.log("Link upload = ", oDienLink.value);
         }
-        clickDone(7);
+        clickDone(5);
     }
 
     //===============================================================
+    var dtasktitle = "";
+    var lastTime = 0;
 
     async function run() {
         await waitForSelector("div#mbody");
         console.log("▶️▶️▶️", document.querySelector("div#mbody").children[0].className, "◀️◀️◀️");
-        console.log("⏱️ Time: ", new Date().toLocaleString());
+
+        if (lastTime == 0) {
+            console.log("⏱️ Time: ", new Date().toLocaleTimeString());
+            lastTime = new Date();
+        } else {
+            const diffMs = Math.abs(new Date() - lastTime);
+            const diffMinutes = Math.floor(diffMs / (1000 * 60));
+            const diffSeconds = Math.floor((diffMs % (1000 * 60)) / 1000);
+            console.log(`⏱️ Time: ${diffMinutes}p ${diffSeconds}s`);
+            lastTime = new Date();
+        }
 
         if (document.querySelector("span#dtasktitle")) {
             // Tránh lặp lại
@@ -317,15 +618,28 @@
             return;
         }
 
-        runOnTaskType(doVocabularyDefault, "dvocabulary", "default");
+        runOnTaskType(doVocabulary, "dvocabulary", "default");
 
         runOnTaskType(
             enhanceMCQ,
             "dmcq",
             "word-choose-meaning",
             "audio-choose-word",
-            "image-choose-word"
+            "audio-choose-image",
+            "image-choose-word",
+            /^\w+-choose-\w+$/
         );
+
+        runOnTaskType(
+            doMCQ,
+            "dmcq",
+            "word-choose-meaning",
+            "audio-choose-word",
+            "image-choose-word",
+            /^\w+-choose-\w+$/
+        );
+
+        runOnTaskType(enhanceWriteWord, "dmcq", /-write-word$/);
 
         runOnTaskType(doContent, "dcontent", "view-content");
         runOnTaskType(uploadContent, "dcontent", "upload-content");
@@ -333,6 +647,7 @@
         runOnTaskType(
             autoChooseAnswer,
             "dquestion",
+            "choose-manual",
             "choose-reading-choose-answer",
             "choose-listening-choose-answer"
         );
@@ -340,12 +655,13 @@
         runOnTaskType(
             autoFillAnswer,
             "dquestion",
+            "fill-vocabulary-block-blank",
             "fill-grammar-word-blank",
             "fill-reading-word-blank",
-            "fill-listening-write-answer"
+            "fill-listening-write-answer",
+            /^fill.*blank$/
         );
     }
-    var dtasktitle = "";
     waitForSelector("div#mbody", 10000, 500).then(() => {
         if (window.location.href.startsWith("https://eop.edu.vn/study/task/")) run();
         const observe = new MutationObserver(run);
