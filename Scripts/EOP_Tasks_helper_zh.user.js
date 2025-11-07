@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Task helper zh
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      1.1.1
+// @version      1.1.2
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -248,85 +248,6 @@
         finishTask();
     }
 
-    function normalizeOcrText(text) {
-        try {
-            const numMap = {};
-
-            const charMap = {
-                0: "o",
-                1: "i",
-                5: "s",
-                Cc: "C",
-            };
-
-            const wordMap = {
-                intemet: "internet",
-                inthe: "in the",
-            };
-
-            text = text.trim();
-            let output = "";
-
-            for (let token of text.match(/\w+|\W+/g)) {
-                // console.log("Token:", token);
-                if (/^\d+.*$/.test(token)) {
-                    output += token;
-                    continue;
-                }
-                if (/^\w+$/.test(token)) {
-                    for (const [wrong, correct] of Object.entries(charMap)) {
-                        const regex = new RegExp(wrong, "g");
-                        token = token.replace(regex, correct);
-                    }
-                }
-                output += token;
-            }
-
-            for (const [wrong, correct] of Object.entries(wordMap)) {
-                const regex = new RegExp(wrong, "gi");
-                output = output.replace(regex, correct);
-            }
-
-            return output;
-        } catch (error) {
-            console.error("Error in normalizeOcrText:", error);
-            return text;
-        }
-    }
-
-    async function recognizeTextFromListImage(imgList) {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const worker = await Tesseract.createWorker("eng");
-
-                await worker.setParameters({
-                    tessedit_char_whitelist:
-                        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.,!?;:'\"()- ",
-                    tessedit_char_blacklist: "%^&",
-                    preserve_interword_spaces: "1",
-                });
-
-                let listText = [];
-
-                for (const img of imgList) {
-                    let {
-                        data: { text },
-                    } = await worker.recognize(img);
-
-                    // console.log("✏️ ", text);
-                    text = normalizeOcrText(text);
-
-                    listText.push(text);
-                }
-                await worker.terminate();
-
-                resolve(listText);
-            } catch (error) {
-                reject(error);
-            }
-        });
-    }
-
     async function autoFillAnswer() {
         await waitForSelector("input.danw.dinline[type='text']");
         const ditem = document.querySelector("div.ditem");
@@ -365,6 +286,8 @@
         const timeDo = TimeDoTask();
         console.log("Đợi thêm: ", timeDo, "s");
         clickDone(timeDo);
+
+		finishTask();
     }
 
     async function doVocabulary() {
