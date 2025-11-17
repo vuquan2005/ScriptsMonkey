@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Task helper en
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.4.9
+// @version      2.4.10
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -208,10 +208,11 @@
     function finishTask(oldTaskTitle = null) {
         if (!oldTaskTitle) oldTaskTitle = dtasktitle;
         setTimeout(() => {
+            console.log("Check captcha...");
             if (dtasktitle === oldTaskTitle) {
                 if (document.querySelector("i.fa.fa-close")) {
                     document.querySelector("i.fa.fa-close").click();
-                    console.log("Captcha");
+                    console.log("✅ Close captcha");
                     clickDone();
                     finishTask(oldTaskTitle);
                 }
