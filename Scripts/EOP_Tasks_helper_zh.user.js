@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Task helper zh
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      1.1.3
+// @version      1.1.4
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -433,18 +433,18 @@
 
         const chooseAnswer = async (question) => {
             const answers = question.querySelectorAll(".dans");
-            forEachList(answers, async (i, div) => {
+            await forEachList(answers, async (i, div) => {
                 await delay(defaultDelayTime.mcq);
                 div.querySelector("a").click();
             });
         };
 
-        const observer = new MutationObserver((mutationsList) => {
+        const observer = new MutationObserver(async (mutationsList) => {
             for (const mutation of mutationsList) {
                 if (mutation.type === "attributes" && mutation.attributeName === "class") {
                     const el = mutation.target;
                     if (el.classList.contains("active")) {
-                        chooseAnswer(el);
+                        await chooseAnswer(el);
                     }
 
                     if (el === ques[ques.length - 1]) clickDone(2);
