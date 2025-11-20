@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Task helper en
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.4.11
+// @version      2.4.12
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -74,20 +74,20 @@
 
         if (type2 === null) {
             if (taskType1 === type1) {
-                console.log(`✅ ${callbackName} :`, type1);
+                console.log(`🧪 ${callbackName} :`, type1);
                 return callback();
             }
         } else {
             if (taskType1 === type1) {
                 for (const t2 of type2) {
                     if (taskType2 === t2 || (t2 instanceof RegExp && t2.test(taskType2))) {
-                        console.log(`✅ ${callbackName} :`, type1, " / ", t2);
+                        console.log(`🧪 ${callbackName} :`, type1, " / ", t2);
                         return callback();
                     }
                 }
             }
         }
-        // console.log(`❌ ${callback.name || "'Callback'"} :`, type1, " / ", type2);
+        // console.log(`❌🧪 ${callback.name || "'Callback'"} :`, type1, " / ", type2);
     }
 
     function delay(s, sRandom = true) {
@@ -181,7 +181,7 @@
         await delay(seconds);
         if (btn.children[0].className === "fa fa-check") {
             btn.click();
-            console.log("✅ Button done clicked!");
+            console.log("▶️ Button done clicked!");
         } else console.error("❌ Wrong button done selected");
     }
 
@@ -191,7 +191,7 @@
         await delay(seconds);
         if (btn.children[0].className === "fa fa-eye") {
             btn.click();
-            console.log("✅ Button answer clicked!");
+            console.log("▶️ Button answer clicked!");
         } else console.error("❌ Wrong button answer selected");
     }
 
@@ -201,7 +201,7 @@
         await delay(seconds);
         if (btn.children[0].className === "fa fa-undo") {
             btn.click();
-            console.log("✅ Button undo clicked!");
+            console.log("▶️ Button undo clicked!");
         } else console.error("❌ Wrong button undo selected");
     }
 
@@ -288,6 +288,7 @@
                 output = output.replace(regex, correct);
             }
 
+            if (output == "") output = "i";
             return output;
         } catch (error) {
             console.error("Error in normalizeOcrText:", error);
@@ -387,6 +388,43 @@
         clickDone(timeDo);
 
         finishTask();
+    }
+
+    async function enhanceAutoFillAnswer() {
+        let listAns = [];
+
+        waitForSelector("div#mfooter button.btn.btn-danger.dnut", 500000).then(() => {
+            const btnShowAns = document.querySelector("div#mfooter button.btn.btn-danger.dnut");
+            const inputs = document.querySelectorAll("div.ditem input.danw.dinline[type='text']");
+
+            btnShowAns.addEventListener(
+                "click",
+                () => {
+                    forEachList(inputs, (i, el) => {
+                        listAns.push(el.value);
+                    });
+					console.log("List answers saved:", listAns);
+                },
+                true
+            );
+        });
+
+        waitForSelector("div#mfooter button.btn.btn-primary.dnut", 500000).then(() => {
+            const btnReDoQues = document.querySelector("div#mfooter button.btn.btn-primary.dnut");
+            const inputs = document.querySelectorAll("div.ditem input.danw.dinline[type='text']");
+
+            btnReDoQues.addEventListener(
+                "click",
+                () => {
+					console.log("Fill answers:", listAns);
+                    forEachList(inputs, async (i, input) => {
+						await delay(0.05);
+                        input.value = listAns[i];
+                    });
+                },
+                true
+            );
+        });
     }
 
     async function doVocabulary() {
@@ -613,10 +651,10 @@
 
     async function run() {
         await waitForSelector("div#mbody");
-        console.log("▶️▶️▶️", document.querySelector("div#mbody").children[0].className, "◀️◀️◀️");
+        console.log("✏️✏️✏️", document.querySelector("div#mbody").children[0].className, "✏️✏️✏️");
 
         if (lastTime == 0) {
-            console.log("⏱️ Time: ", new Date().toLocaleTimeString());
+            console.log("⏱️ Start: ", new Date().toLocaleTimeString());
             lastTime = new Date();
         } else {
             const diffMs = Math.abs(new Date() - lastTime);
@@ -672,6 +710,16 @@
             "choose-manual",
             "choose-reading-choose-answer",
             "choose-listening-choose-answer"
+        );
+
+        runOnTaskType(
+            enhanceAutoFillAnswer,
+            "dquestion",
+            "fill-vocabulary-block-blank",
+            "fill-grammar-word-blank",
+            "fill-reading-word-blank",
+            "fill-listening-write-answer",
+            /^fill.*blank$/
         );
 
         runOnTaskType(

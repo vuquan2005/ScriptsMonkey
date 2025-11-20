@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      3.0.2
+// @version      3.0.3
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -55,17 +55,17 @@
             if (typeof link === "string") {
                 link = link.replace(/\/$/, "");
                 if (link === pathname || link === href || link === "") {
-                    console.log(`✅ ${callbackName} :`, link || "All");
+                    console.log(`🧪 ${callbackName} :`, link || "All");
                     return callback();
                 }
             } else if (link instanceof RegExp) {
                 if (link.test(href)) {
-                    console.log(`✅ ${callbackName} :`, link);
+                    console.log(`🧪 ${callbackName} :`, link);
                     return callback();
                 }
             }
         }
-        console.log(`❌ ${callback.name || "'Callback'"} :`, validLinks);
+        console.log(`❌🧪 ${callback.name || "'Callback'"} :`, validLinks);
     }
 
     GM_addStyle(`
