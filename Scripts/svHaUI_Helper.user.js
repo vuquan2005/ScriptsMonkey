@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.16.8
+// @version      20.16.9
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -359,14 +359,10 @@
 							<a href="/sso/blearning">
 								<svg xmlns="http://www.w3.org/2000/svg" class="shortcut-icon" version="1.1" viewBox="144 144 512 512">
 									<defs>
-										<clipPath id="a">
-											<path d="m148.09 148.09h503.81v503.81h-503.81z"/>
-										</clipPath>
+										<style>.cls-1{fill:#ff7900;}</style>
 									</defs>
-									<g clip-path="url(#a)">
-										<path d="m183.92 148.09c-19.652 0-35.828 16.176-35.828 35.828v261.88h22.902v-261.88c0-7.3633 5.5625-12.926 12.926-12.926h432.16c7.3594 0 12.926 5.5625 12.926 12.926v284.78h-480.91v44.324c0 19.652 16.176 35.828 35.828 35.828h156.01l-17.824 80.152h-59.508v22.902h274.8v-22.902h-59.242l-17.824-80.152h155.74c19.648 0 35.824-16.176 35.824-35.828v-329.1c0-19.652-16.176-35.828-35.824-35.828zm-12.926 343.51h458.01v21.426c0 7.3555-5.5664 12.922-12.926 12.922h-432.16c-7.3633 0-12.926-5.5664-12.926-12.926zm192.39 57.25h73.488l17.824 80.152h-109.14z"/>
-									</g>
-									<path d="m400.11 205.23c-1.4336 0.035156-2.9062 0.35547-4.1367 0.84766l-137.4 51.527c-9.8711 3.7305-9.8711 17.695 0 21.426l49.402 18.516v79.547c0 4.1172 2.2109 7.918 5.7891 9.9531l80.578 45.801c3.5078 1.9922 7.8086 1.9922 11.316 0l80.578-45.801h-0.003906c3.582-2.0352 5.793-5.8359 5.793-9.9531v-79.547l33.926-12.727v69.375h22.902v-85.875c-0.078124-5.8086-3.6758-8.8359-7.4258-10.711l-137.4-51.527c-1.0898-0.64844-2.4805-0.88672-3.9141-0.84766zm-0.10938 23.77 104.82 39.316-104.82 39.293-104.82-39.293zm-69.125 77.133 65.102 24.422c2.5938 0.97266 5.457 0.97266 8.0508 0l65.102-24.422v64.297l-69.129 39.293-69.129-39.293z"/>
+									<path class="cls-1" d="m183.92 148.09c-19.652 0-35.828 16.176-35.828 35.828v261.88h22.902v-261.88c0-7.3633 5.5625-12.926 12.926-12.926h432.16c7.3594 0 12.926 5.5625 12.926 12.926v284.78h-480.91v44.324c0 19.652 16.176 35.828 35.828 35.828h156.01l-17.824 80.152h-59.508v22.902h274.8v-22.902h-59.242l-17.824-80.152h155.74c19.648 0 35.824-16.176 35.824-35.828v-329.1c0-19.652-16.176-35.828-35.824-35.828zm-12.926 343.51h458.01v21.426c0 7.3555-5.5664 12.922-12.926 12.922h-432.16c-7.3633 0-12.926-5.5664-12.926-12.926zm192.39 57.25h73.488l17.824 80.152h-109.14z"/>
+									<path class="cls-1" d="m400.11 205.23c-1.4336 0.035156-2.9062 0.35547-4.1367 0.84766l-137.4 51.527c-9.8711 3.7305-9.8711 17.695 0 21.426l49.402 18.516v79.547c0 4.1172 2.2109 7.918 5.7891 9.9531l80.578 45.801c3.5078 1.9922 7.8086 1.9922 11.316 0l80.578-45.801h-0.003906c3.582-2.0352 5.793-5.8359 5.793-9.9531v-79.547l33.926-12.727v69.375h22.902v-85.875c-0.078124-5.8086-3.6758-8.8359-7.4258-10.711l-137.4-51.527c-1.0898-0.64844-2.4805-0.88672-3.9141-0.84766zm-0.10938 23.77 104.82 39.316-104.82 39.293-104.82-39.293zm-69.125 77.133 65.102 24.422c2.5938 0.97266 5.457 0.97266 8.0508 0l65.102-24.422v64.297l-69.129 39.293-69.129-39.293z"/>
 								</svg>
 								<span>Học kết hợp</span>
 							</a>
@@ -389,10 +385,10 @@
 						<li>
 							<a href="/training/viewcourseindustry">
 								<svg xmlns="http://www.w3.org/2000/svg" class="shortcut-icon" viewBox="0 0 24 24" fill="none">
-									<path d="M10 22C7.17157 22 5.75736 22 4.87868 21.1213C4 20.2426 4 18.8284 4 16V8C4 5.17157 4 3.75736 4.87868 2.87868C5.75736 2 7.17157 2 10 2H14C16.8284 2 18.2426 2 19.1213 2.87868C20 3.75736 20 5.17157 20 8M14 22C16.8284 22 18.2426 22 19.1213 21.1213C20 20.2426 20 18.8284 20 16V12" stroke="#1C274D" stroke-width="1.5" stroke-linecap="round"/>
-									<path d="M19.8978 16H7.89778C6.96781 16 6.50282 16 6.12132 16.1022C5.08604 16.3796 4.2774 17.1883 4 18.2235" stroke="#1C274D" stroke-width="1.5"/>
-									<path d="M7 16V9M7 2.5V5" stroke="#1C274D" stroke-width="1.5" stroke-linecap="round"/>
-									<path d="M13 16V19.5309C13 19.8065 13 19.9443 12.9051 20C12.8103 20.0557 12.6806 19.9941 12.4211 19.8708L11.1789 19.2808C11.0911 19.2391 11.0472 19.2182 11 19.2182C10.9528 19.2182 10.9089 19.2391 10.8211 19.2808L9.57889 19.8708C9.31943 19.9941 9.18971 20.0557 9.09485 20C9 19.9443 9 19.8065 9 19.5309V16.45" stroke="#1C274D" stroke-width="1.5" stroke-linecap="round"/>
+									<path d="M10 22C7.17157 22 5.75736 22 4.87868 21.1213C4 20.2426 4 18.8284 4 16V8C4 5.17157 4 3.75736 4.87868 2.87868C5.75736 2 7.17157 2 10 2H14C16.8284 2 18.2426 2 19.1213 2.87868C20 3.75736 20 5.17157 20 8M14 22C16.8284 22 18.2426 22 19.1213 21.1213C20 20.2426 20 18.8284 20 16V12" stroke="#0F0F0F"/>
+									<path d="M19.8978 16H7.89778C6.96781 16 6.50282 16 6.12132 16.1022C5.08604 16.3796 4.2774 17.1883 4 18.2235" stroke="#0F0F0F"/>
+									<path d="M7 16V9M7 2.5V5" stroke="#0F0F0F" />
+									<path d="M13 16V19.5309C13 19.8065 13 19.9443 12.9051 20C12.8103 20.0557 12.6806 19.9941 12.4211 19.8708L11.1789 19.2808C11.0911 19.2391 11.0472 19.2182 11 19.2182C10.9528 19.2182 10.9089 19.2391 10.8211 19.2808L9.57889 19.8708C9.31943 19.9941 9.18971 20.0557 9.09485 20C9 19.9443 9 19.8065 9 19.5309V16.45" stroke="#0F0F0F"/>
 								</svg>
 								<span>Khung chương trình</span>
 							</a>
@@ -400,11 +396,11 @@
 						<li>
 							<a href="/training/programmodulessemester">
 								<svg xmlns="http://www.w3.org/2000/svg" class="shortcut-icon" viewBox="0 0 24 24" fill="none">
-									<path d="M19.8978 16H7.89778C6.96781 16 6.50282 16 6.12132 16.1022C5.08604 16.3796 4.2774 17.1883 4 18.2235" stroke="#1C274D" stroke-width="1.5"/>
-									<path d="M8 7H16" stroke="#1C274D" stroke-width="1.5" stroke-linecap="round"/>
-									<path d="M8 10.5H13" stroke="#1C274D" stroke-width="1.5" stroke-linecap="round"/>
-									<path d="M13 16V19.5309C13 19.8065 13 19.9443 12.9051 20C12.8103 20.0557 12.6806 19.9941 12.4211 19.8708L11.1789 19.2808C11.0911 19.2391 11.0472 19.2182 11 19.2182C10.9528 19.2182 10.9089 19.2391 10.8211 19.2808L9.57889 19.8708C9.31943 19.9941 9.18971 20.0557 9.09485 20C9 19.9443 9 19.8065 9 19.5309V16.45" stroke="#1C274D" stroke-width="1.5" stroke-linecap="round"/>
-									<path d="M10 22C7.17157 22 5.75736 22 4.87868 21.1213C4 20.2426 4 18.8284 4 16V8C4 5.17157 4 3.75736 4.87868 2.87868C5.75736 2 7.17157 2 10 2H14C16.8284 2 18.2426 2 19.1213 2.87868C20 3.75736 20 5.17157 20 8M14 22C16.8284 22 18.2426 22 19.1213 21.1213C20 20.2426 20 18.8284 20 16V12" stroke="#1C274D" stroke-width="1.5" stroke-linecap="round"/>
+									<path d="M19.8978 16H7.89778C6.96781 16 6.50282 16 6.12132 16.1022C5.08604 16.3796 4.2774 17.1883 4 18.2235" stroke="#0F0F0F"/>
+									<path d="M8 7H16" stroke="#0F0F0F" />
+									<path d="M8 10.5H13" stroke="#000000ff" />
+									<path d="M13 16V19.5309C13 19.8065 13 19.9443 12.9051 20C12.8103 20.0557 12.6806 19.9941 12.4211 19.8708L11.1789 19.2808C11.0911 19.2391 11.0472 19.2182 11 19.2182C10.9528 19.2182 10.9089 19.2391 10.8211 19.2808L9.57889 19.8708C9.31943 19.9941 9.18971 20.0557 9.09485 20C9 19.9443 9 19.8065 9 19.5309V16.45" stroke="#0F0F0F"/>
+									<path d="M10 22C7.17157 22 5.75736 22 4.87868 21.1213C4 20.2426 4 18.8284 4 16V8C4 5.17157 4 3.75736 4.87868 2.87868C5.75736 2 7.17157 2 10 2H14C16.8284 2 18.2426 2 19.1213 2.87868C20 3.75736 20 5.17157 20 8M14 22C16.8284 22 18.2426 22 19.1213 21.1213C20 20.2426 20 18.8284 20 16V12" stroke="#0F0F0F"/>
 								</svg>
 								<span>Khung theo kỳ</span>
 							</a>
@@ -452,7 +448,10 @@
 						<li>
 							<a href="/student/result/examresult">
 								<svg xmlns="http://www.w3.org/2000/svg" class="shortcut-icon" viewBox="0 0 24 24" fill="none">
-									<path fill-rule="evenodd" clip-rule="evenodd" d="M5 4C5 2.34315 6.34315 1 8 1H15.9999C17.6568 1 19 2.34314 19 4H20C21.6569 4 23 5.34315 23 7V7.64593C23 8.87265 22.2531 9.97577 21.1142 10.4314L18.031 11.6646C17.5965 12.464 16.958 13.2715 16.0234 13.8946C15.211 14.4361 14.2124 14.8132 13 14.9467V17H15C16.6569 17 18 18.3431 18 20V21C18 22.1046 17.1046 23 16 23H8C6.89543 23 6 22.1046 6 21V20C6 18.3431 7.34315 17 9 17H11V14.9467C9.78757 14.8133 8.7889 14.4361 7.97651 13.8945C7.04188 13.2715 6.40335 12.464 5.9689 11.6646L2.88583 10.4314C1.74685 9.97577 1 8.87265 1 7.64593V7C1 5.34315 2.34315 4 4 4H5ZM5 6H4C3.44772 6 3 6.44772 3 7V7.64593C3 8.05484 3.24895 8.42255 3.62861 8.57441L5.11907 9.1706C5.05194 8.78628 5.00063 8.39214 5 8.00104L5 6ZM19 8V6H20C20.5523 6 21 6.44772 21 7V7.64593C21 8.05484 20.751 8.42255 20.3714 8.57441L18.8809 9.17062C18.9469 8.78361 19 8.39286 19 8ZM8 3C7.44772 3 7 3.44772 7 4V7.99707L7 7.99832C7 7.99996 7 8.00078 7 7.99832C7.00508 8.25761 7.03756 8.51764 7.08014 8.77311C7.16297 9.27012 7.32677 9.91751 7.6444 10.5528C7.96008 11.1842 8.4179 11.7851 9.08591 12.2305C9.74766 12.6716 10.6749 13 12 13C13.325 13 14.2522 12.6716 14.914 12.2304C15.582 11.7851 16.0398 11.1842 16.3555 10.5528C16.6732 9.9175 16.837 9.27011 16.9198 8.7731C16.9624 8.51735 16.993 8.25848 17 7.99909V4C17 3.44772 16.5522 3 15.9999 3H8ZM9 19C8.44772 19 8 19.4477 8 20V21H16V20C16 19.4477 15.5523 19 15 19H9Z" fill="#0F0F0F"/>
+									<defs>
+										<style>.cls-1{fill:#ff7900;}</style>
+									</defs>
+									<path class="cls-1" fill-rule="evenodd" clip-rule="evenodd" d="M5 4C5 2.34315 6.34315 1 8 1H15.9999C17.6568 1 19 2.34314 19 4H20C21.6569 4 23 5.34315 23 7V7.64593C23 8.87265 22.2531 9.97577 21.1142 10.4314L18.031 11.6646C17.5965 12.464 16.958 13.2715 16.0234 13.8946C15.211 14.4361 14.2124 14.8132 13 14.9467V17H15C16.6569 17 18 18.3431 18 20V21C18 22.1046 17.1046 23 16 23H8C6.89543 23 6 22.1046 6 21V20C6 18.3431 7.34315 17 9 17H11V14.9467C9.78757 14.8133 8.7889 14.4361 7.97651 13.8945C7.04188 13.2715 6.40335 12.464 5.9689 11.6646L2.88583 10.4314C1.74685 9.97577 1 8.87265 1 7.64593V7C1 5.34315 2.34315 4 4 4H5ZM5 6H4C3.44772 6 3 6.44772 3 7V7.64593C3 8.05484 3.24895 8.42255 3.62861 8.57441L5.11907 9.1706C5.05194 8.78628 5.00063 8.39214 5 8.00104L5 6ZM19 8V6H20C20.5523 6 21 6.44772 21 7V7.64593C21 8.05484 20.751 8.42255 20.3714 8.57441L18.8809 9.17062C18.9469 8.78361 19 8.39286 19 8ZM8 3C7.44772 3 7 3.44772 7 4V7.99707L7 7.99832C7 7.99996 7 8.00078 7 7.99832C7.00508 8.25761 7.03756 8.51764 7.08014 8.77311C7.16297 9.27012 7.32677 9.91751 7.6444 10.5528C7.96008 11.1842 8.4179 11.7851 9.08591 12.2305C9.74766 12.6716 10.6749 13 12 13C13.325 13 14.2522 12.6716 14.914 12.2304C15.582 11.7851 16.0398 11.1842 16.3555 10.5528C16.6732 9.9175 16.837 9.27011 16.9198 8.7731C16.9624 8.51735 16.993 8.25848 17 7.99909V4C17 3.44772 16.5522 3 15.9999 3H8ZM9 19C8.44772 19 8 19.4477 8 20V21H16V20C16 19.4477 15.5523 19 15 19H9Z"/>
 								</svg>
 								<span>Kết quả thi</span>
 							</a>
@@ -460,7 +459,7 @@
 						<li>
 							<a href="/student/result/viewmodules">
 								<svg xmlns="http://www.w3.org/2000/svg" class="shortcut-icon" viewBox="0 0 25 25" fill="none">
-									<path d="M21 10L12 5L3 10L6 11.6667M21 10L18 11.6667M21 10V10C21.6129 10.3064 22 10.9328 22 11.618V16.9998M6 11.6667L12 15L18 11.6667M6 11.6667V17.6667L12 21L18 17.6667L18 11.6667" stroke="#000000" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+									<path d="M21 10L12 5L3 10L6 11.6667M21 10L18 11.6667M21 10V10C21.6129 10.3064 22 10.9328 22 11.618V16.9998M6 11.6667L12 15L18 11.6667M6 11.6667V17.6667L12 21L18 17.6667L18 11.6667" stroke="#0F0F0F" stroke-width="1.1"/>
 								</svg>
 								<span>GPA</span>
 							</a>
@@ -1248,345 +1247,6 @@
         }
     }
 
-//     // Tạo file CSV lịch học
-//     function createCSVCalendar() {
-//         const exportBtnContainer = document.querySelector(
-//             "div.boxpanel-mc > .form-horizontal > .form-group:nth-child(3) > div.col-sm-4"
-//         );
-//         const exportBtn = document.createElement("input");
-//         exportBtn.type = "button";
-//         exportBtn.className = "btn btn-primary btn-space hover";
-//         exportBtn.value = "Xuất file CSV";
-//         exportBtnContainer.appendChild(exportBtn);
-
-//         exportBtn.addEventListener("click", async () => {
-//             const calendarTable = document.querySelector(".panel-body > table > tbody");
-//             const calendarRows = calendarTable.querySelectorAll("tr");
-//             let csvContent = "Subject,Start Date,Start Time,End Time,Description,Location\n";
-
-//             const startPeriodToTime = {
-//                 1: "07:00",
-//                 2: "07:50",
-//                 3: "08:45",
-//                 4: "09:40",
-//                 5: "10:35",
-//                 6: "11:25",
-//                 7: "12:30",
-//                 8: "13:20",
-//                 9: "14:15",
-//                 10: "15:10",
-//                 11: "16:05",
-//                 12: "16:55",
-//                 13: "18:00",
-//                 14: "18:50",
-//                 15: "19:45",
-//                 16: "20:35",
-//             };
-
-//             const endPeriodToTime = {
-//                 1: "07:50",
-//                 2: "08:40",
-//                 3: "09:35",
-//                 4: "10:30",
-//                 5: "11:25",
-//                 6: "12:15",
-//                 7: "13:20",
-//                 8: "14:10",
-//                 9: "15:05",
-//                 10: "16:00",
-//                 11: "16:55",
-//                 12: "17:45",
-//                 13: "18:50",
-//                 14: "19:40",
-//                 15: "20:35",
-//                 16: "21:25",
-//             };
-
-//             for (const row of calendarRows) {
-//                 let date = row.children[2].textContent.trim();
-//                 const dateParts = date.split("/");
-//                 if (dateParts.length !== 3) continue;
-//                 const formattedDate = `${dateParts[1].padStart(2, "0")}/${dateParts[0].padStart(
-//                     2,
-//                     "0"
-//                 )}/${dateParts[2]}`;
-
-//                 for (let i = 3; i <= 5; i++) {
-//                     let timesOfDay = row.children[i].textContent;
-//                     if (!timesOfDay) continue;
-
-//                     const courses = timesOfDay.split(/\n?\d+\.\s/).filter(Boolean);
-//                     if (courses.length === 0) continue;
-//                     for (const courseData of courses) {
-//                         // Subject
-//                         const subject = courseData.match(/-\s*(.+?)\s*\(Lớp:/)?.[1];
-//                         if (!subject) continue;
-
-//                         const period = courseData.match(/\((\d+).+?(\d+)\)/);
-
-//                         const startPeriod = parseInt(period[1]);
-//                         const endPeriod = parseInt(period[2]);
-//                         let startTime = startPeriodToTime[startPeriod];
-//                         let endTime = endPeriodToTime[endPeriod];
-
-//                         // Description
-//                         const classCode = courseData.match(/\(Lớp:\s(.+?)\)/)?.[1];
-//                         const GV = courseData.match(/GV:\s(.+?)\(/)?.[1];
-//                         const sdt = courseData.match(/\s\((\d{10})\s/)?.[1];
-
-//                         let description = `${GV} ${sdt} ${classCode}`;
-
-//                         // Location
-//                         const location = courseData.match(
-//                             /\((\d{1,4}\s*\-\s*\w+?)\s*\-\s*.+\-.+\)/
-//                         )?.[1];
-//                         // console.log(location);
-//                         // room.replace(" - Cơ sở 1 - Khu A", "").trim();
-//                         // room.replace(" - Cơ sở 2 - Khu B", "").trim();
-//                         // room.replace(" - Cơ sở 3 - Khu C", "").trim();
-
-//                         let courseData1 = [
-//                             subject || "",
-//                             formattedDate || "",
-//                             startTime || "",
-//                             endTime || "",
-//                             description || "",
-//                             location || "",
-//                         ];
-
-//                         // console.log(courseData1);
-
-//                         csvContent += courseData1.join(",") + "\n";
-//                     }
-//                 }
-//             }
-//             console.log("csvContent: ", csvContent);
-
-//             const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-//             const url = URL.createObjectURL(blob);
-//             const link = document.createElement("a");
-//             link.href = url;
-//             link.setAttribute("download", "Lich_hoc.csv");
-//             document.body.appendChild(link);
-//             link.click();
-//             document.body.removeChild(link);
-//             URL.revokeObjectURL(url);
-
-//             notyf.success("Đã xuất lịch học");
-//         });
-//     }
-
-//     function exportCalender() {
-//         const exportBtnContainer = document.querySelector(
-//             "div.boxpanel-mc > .form-horizontal > .form-group:nth-child(3) > div.col-sm-4"
-//         );
-//         const exportBtn = document.createElement("input");
-//         exportBtn.type = "button";
-//         exportBtn.className = "btn btn-primary btn-space hover";
-//         exportBtn.value = "Xuất file ICS";
-//         exportBtnContainer.appendChild(exportBtn);
-
-//         let calendarAlarms = GM_getValue("calendarAlarms");
-//         if (!calendarAlarms) {
-//             calendarAlarms = [15, 30];
-//             GM_setValue("calendarAlarms", calendarAlarms);
-//         }
-
-//         exportBtn.addEventListener("click", async () => {
-//             const calendarData = exportCalenderData();
-
-//             const grouped = calendarData.reduce((acc, cur) => {
-//                 if (!acc[cur.class]) acc[cur.class] = [];
-//                 acc[cur.class].push(cur);
-//                 return acc;
-//             }, {});
-
-//             console.log(grouped);
-
-//             for (const [classCode, list] of Object.entries(grouped)) {
-//                 console.log("----------");
-//                 console.log(list[0].class, "--", list[0].course);
-//                 analyzeRecurrence(list);
-//             }
-//         });
-//     }
-
-//     function exportCalenderData(scope = document) {
-//         const calendarRows = scope.querySelectorAll(".panel-body > table > tbody > tr");
-
-//         let listCourseData = [];
-//         let listSkipClassCode = [];
-
-//         const regex =
-//             /\((?<start>\d+),(?:\d*,)*?(?<end>\d+)\)\s*-\s*(?<course>.+?)\s*\(Lớp:\s*(?<class>\d+\w+\d+)\)\s*GV:\s*(?<lecturer>.+?)\s*\((?<sdt>\d+)?\s*-\s*(?<khoa>[^)]+)\)\s*\((?<location>.*)\)/;
-
-//         for (const row of calendarRows) {
-//             let date = row.children[2].textContent.trim();
-//             if (!/\d+\/\d+\/\d+/.test(date)) continue;
-//             date = date.replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$3$2$1");
-
-//             for (let i = 3; i <= 5; i++) {
-//                 let timesOfDay = row.children[i].textContent;
-//                 if (!timesOfDay) continue;
-
-//                 const courses = timesOfDay.split(/\n?\d+\.\s/).filter(Boolean);
-//                 if (courses.length == 0) continue;
-//                 for (const course of courses) {
-//                     const classCode = course.match(/\d{5}\w\w\d{7}/)?.[0] || course;
-//                     if (listSkipClassCode.includes(classCode)) continue;
-
-//                     const match = course.match(regex);
-//                     if (!match) {
-//                         listSkipClassCode.push(classCode);
-//                         const courseName = course.match(/\(.+?\)\s*-\s*(.+?)\s\(/)?.[1];
-//                         notyf.error(`Có lỗi khi lấy dữ liệu lớp:<br>${classCode}<br>${courseName}`);
-//                         console.error(
-//                             `Có lỗi khi lấy dữ liệu:\n${classCode}: ${courseName}\n${course}`
-//                         );
-//                         continue;
-//                     }
-//                     const courseData = {
-//                         ...match.groups,
-//                         date,
-//                     };
-//                     listCourseData.push(courseData);
-//                 }
-//             }
-//         }
-//         return listCourseData;
-//     }
-
-//     function analyzeRecurrence(events) {
-//         const dayNames = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
-//         const grouped = {};
-//         for (let e of events) {
-//             const y = +e.date.slice(0, 4);
-//             const m = +e.date.slice(4, 6) - 1;
-//             const d = +e.date.slice(6, 8);
-//             const dateObj = new Date(y, m, d);
-//             e.dateObj = dateObj;
-//             const key = dayNames[dateObj.getDay()];
-//             grouped[key] ??= [];
-//             grouped[key].push(e);
-//         }
-
-//         // Find the smallest interval
-//         let minInterval = Infinity;
-//         for (let key in grouped) {
-//             let group = grouped[key];
-//             group.sort((a, b) => a.dateObj - b.dateObj);
-//             for (let i = 1; i < group.length; i++) {
-//                 let diff = (group[i].dateObj - group[i - 1].dateObj) / (1000 * 60 * 60 * 24);
-//                 if (diff < minInterval) {
-//                     minInterval = diff;
-//                 }
-//             }
-//         }
-
-//         // Now, find missing days based on the minInterval for each group
-//         const missingByGroup = {};
-//         for (let key in grouped) {
-//             let group = grouped[key];
-//             if (group.length < 2) continue; // Can't determine missing if less than 2
-//             let startDate = group[0].dateObj;
-//             let endDate = group[group.length - 1].dateObj;
-//             let expectedDates = [];
-//             let current = new Date(startDate);
-//             while (current <= endDate) {
-//                 expectedDates.push(new Date(current));
-//                 current.setDate(current.getDate() + minInterval);
-//             }
-//             // Find which expected dates are missing in the group
-//             let missing = [];
-//             for (let exp of expectedDates) {
-//                 if (!group.some((e) => e.dateObj.getTime() === exp.getTime())) {
-//                     missing.push(exp.toISOString().slice(0, 10));
-//                 }
-//             }
-//             if (missing.length > 0) {
-//                 missingByGroup[key] = missing;
-//             }
-//         }
-
-//         console.log({ minInterval, missingByGroup });
-//     }
-
-//     function createICalendarFile(events) {
-//         const DTStamp = Date().toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
-//         let ics = `BEGIN:VCALENDAR
-// VERSION:2.0
-// PRODID:-// VuQuan // svHaUI_Helper //EN
-// CALSCALE:GREGORIAN
-// METHOD:PUBLISH
-// X-WR-CALNAME:${calendarName}
-// X-WR-TIMEZONE:Asia/Ho_Chi_Minh
-// BEGIN:VTIMEZONE
-// TZID:Asia/Ho_Chi_Minh
-// X-LIC-LOCATION:Asia/Ho_Chi_Minh
-// BEGIN:STANDARD
-// TZOFFSETFROM:+0700
-// TZOFFSETTO:+0700
-// TZNAME:GMT+7
-// DTSTART:19700101T000000
-// END:STANDARD
-// END:VTIMEZONE
-// `;
-//         //
-//         for (const event of events) {
-//             const date = event.date.replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$3$2$1");
-//             // Info
-//             let str = "";
-//             str += `BEGIN:VEVENT\n`;
-//             str += `UID:${event.uid}\n`;
-//             str += `SUMMARY:${event.title}\n`;
-//             str += `DESCRIPTION:${event.description || ""}\n`;
-//             str += `LOCATION:${event.location || ""}\n`;
-//             str += `DTSTAMP:${DTStamp}\n`;
-//             str += `DTSTART;TZID=Asia/Ho_Chi_Minh:${date + "T" + event.start}00\n`;
-//             str += `DTEND;TZID=Asia/Ho_Chi_Minh:${date + "T" + event.end}00\n`;
-
-//             // Repeat
-//             if (event.repeat) {
-//                 let rrule = `RRULE:FREQ=${event.repeat.freq};WKST=MO`;
-//                 if (event.repeat.count) rrule += `;COUNT=${event.repeat.count}`;
-//                 if (event.repeat.byDay) rrule += `;BYDAY=${event.repeat.byDay.join(",")}`;
-//                 str += rrule + "\n";
-
-//                 if (event.repeat.exDates?.length) {
-//                     for (const exDate of event.repeat.exDates) {
-//                         const exDatef = exDate.replace(/(\d{2})\/(\d{2})\/(\d{4})/, "$3$2$1");
-//                         str += `EXDATE;TZID=Asia/Ho_Chi_Minh:${exDatef}\n`;
-//                     }
-//                 }
-//             }
-//             //
-//             str += `STATUS:CONFIRMED\n`;
-//             str += `TRANSP:OPAQUE\n`;
-//             // Alarms
-//             if (e.alarms?.length) {
-//                 for (const min of event.alarms) {
-//                     str += "BEGIN:VALARM\n";
-//                     str += "ACTION:DISPLAY\n";
-//                     str += `DESCRIPTION:Nhắc trước ${min} phút\n`;
-//                     str += `TRIGGER:-PT${min}M\n`;
-//                     str += "END:VALARM\n";
-//                 }
-//             }
-//             // End event
-//             str += "END:VEVENT\n\n";
-//             ics += str;
-//         }
-
-//         //
-//         ics += `END:VCALENDAR`;
-
-//         const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
-//         const link = document.createElement("a");
-//         link.href = URL.createObjectURL(blob);
-//         link.download = filename;
-//         link.click();
-//     }
-
     // Lấy tổng số tín chỉ
     function getYourTotalCredits() {
         let totalCredits = document.querySelector(
@@ -1604,7 +1264,7 @@
     // Lấy Thông tin, tiến trình học
     function getYourLearningProgress() {
         let yourInfo = GM_getValue("yourInfo", {});
-        const infoTable = document.querySelector("#frmMain div.panel-body  > table");
+        const infoTable = document.querySelector("#frmMain div.panel-body > table");
         yourInfo.name = infoTable
             .querySelector("tbody > tr:nth-child(1) > td:nth-child(2) > strong")
             .textContent.replace(/\s+/g, " ");
@@ -2133,7 +1793,7 @@
     function customizeProgramFramework() {
         const yourStudyProcess = GM_getValue("~~yourStudyProcess", {});
 
-        const courses = document.querySelectorAll("table.table > tbody  >tr");
+        const courses = document.querySelectorAll("table.table > tbody > tr");
 
         const markerIndex = window.location.pathname == "/training/programmodulessemester" ? 2 : 0;
 
@@ -2170,7 +1830,7 @@
 			.kTableRowBackground td:nth-child(12) {
 				background-color: yellow !important;
 			}
-			.kTableRowBackground:nth-of-type(odd) td:nth-child(12)  {
+			.kTableRowBackground:nth-of-type(odd) td:nth-child(12) {
 				background-color: yellow !important;
 			}
 		`);
