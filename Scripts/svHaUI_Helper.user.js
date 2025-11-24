@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.16.8
+// @version      20.17.0
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -1837,6 +1837,423 @@
         setTimeout(showmarkedCourse, 5000);
     }
 
+    // Export calender
+    function enhanceCalender() {
+        const btnContainer = document.querySelector(
+            "div.boxpanel-mc > .form-horizontal > .form-group:nth-child(3) > div.col-sm-4"
+        );
+        // Curent
+        const findTermBtn = document.createElement("input");
+        findTermBtn.type = "button";
+        findTermBtn.className = "btn btn-primary btn-space hover";
+        findTermBtn.value = "Lọc kì hiện tại";
+        btnContainer.appendChild(findTermBtn);
+
+        findTermBtn.addEventListener("click", () => {
+            const { year, term } = findCalender((data, date) => {
+                const match = data.match(/(\d{5})\w\w\d{7}/);
+                if (!match) return false;
+                const classCode = match[1];
+                return { year: classCode.slice(0, 4), term: classCode[4] };
+            });
+            console.log(year, term);
+            calendarFilterTerm(year, term);
+        });
+
+        // Select
+        const selectElement = document.createElement("select");
+        selectElement.id = "termSelector";
+
+        const currentYear = new Date().getFullYear();
+
+        const defaultOption = document.createElement("option");
+        defaultOption.text = "--- Chọn Kì/Năm Học ---";
+        defaultOption.value = "";
+        defaultOption.disabled = true;
+        defaultOption.selected = true;
+        selectElement.appendChild(defaultOption);
+
+        for (let year = currentYear; year >= currentYear - 4; year--) {
+            for (let term = 1; term <= 4; term++) {
+                const optionI = document.createElement("option");
+                const termName = ["1️⃣", "2️⃣", "🌸", "☀️"];
+                optionI.text = `${termName[term - 1]} : ${year} - ${year + 1}`;
+
+                if (term == 1) optionI.value = `${year}${term}`;
+                else optionI.value = `${year + 1}${term}`;
+
+                selectElement.appendChild(optionI);
+            }
+        }
+        btnContainer.appendChild(selectElement);
+
+        selectElement.addEventListener("change", (e) => {
+            const value = e.target.value;
+            const year = value.slice(0, 4);
+            const term = value[4];
+            calendarFilterTerm(year, term);
+        });
+
+        // Export
+        const exportBtn = document.createElement("input");
+        exportBtn.type = "button";
+        exportBtn.className = "btn btn-primary btn-space hover";
+        exportBtn.value = "Xuất lịch học (.ics)";
+        btnContainer.appendChild(exportBtn);
+        exportBtn.addEventListener("click", () => {
+            const { year, term } = findCalender((data, date) => {
+                const match = data.match(/(\d{5})\w\w\d{7}/);
+                if (!match) return false;
+                const classCode = match[1];
+                return { year: classCode.slice(0, 4), term: classCode[4] };
+            });
+            const calendarName = `Học kỳ ${term} ${year}-${Number(year) + 1}`;
+            createICSFile(calendarName);
+        });
+    }
+
+    function findCalender(callback) {
+        const rows = document.querySelectorAll(".panel-body > table > tbody tr:nth-child(n+2)");
+        for (const row of rows) {
+            const dateElement = row.children[2];
+            const date =
+                /(?<day>\d+)\/(?<month>\d+)\/(?<year>\d+)/.exec(dateElement.textContent.trim())
+                    ?.groups || {};
+            const calenders = row.querySelectorAll("td:nth-child(n+4)");
+            for (const calendar of calenders) {
+                const data = calendar.textContent.trim();
+                const value = callback(data, date);
+                if (value) return value;
+            }
+        }
+    }
+
+    function calendarFilterTerm(year, term) {
+        document.querySelector("#ctl02_inpStartDate").value = year;
+        document.querySelector("#ctl02_inpEndDate").value = year;
+        const termTimeMap = [
+            { startD: 1, startM: 9, endD: 30, endM: 12 },
+            { startD: 1, startM: 3, endD: 30, endM: 6 },
+            { startD: 1, startM: 1, endD: 31, endM: 3 },
+            { startD: 1, startM: 7, endD: 31, endM: 8 },
+        ];
+        const termTime = termTimeMap[term - 1];
+
+        document.querySelector("#ctl02_inpStartDate_d").value = termTime.startD;
+        document.querySelector("#ctl02_inpEndDate_d").value = termTime.endD;
+
+        document.querySelector("#ctl02_inpStartDate_m").value = termTime.startM;
+        document.querySelector("#ctl02_inpEndDate_m").value = termTime.endM;
+
+        document.querySelector("#ctl02_butGet").click();
+    }
+
+    function createICSFile(calendarName) {
+        const subjectsData = getData();
+        let icsContent = `BEGIN:VCALENDAR
+PRODID:-// VuQuan // svHaUI Helper //EN
+VERSION:2.0
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+X-WR-CALNAME:${calendarName}
+X-WR-TIMEZONE:Asia/Ho_Chi_Minh
+X-WR-CALDESC:Lịch học sinh viên HAUI
+BEGIN:VTIMEZONE
+TZID:Asia/Ho_Chi_Minh
+X-LIC-LOCATION:Asia/Ho_Chi_Minh
+BEGIN:STANDARD
+TZOFFSETFROM:+0700
+TZOFFSETTO:+0700
+TZNAME:GMT+7
+DTSTART:19700101T000000
+END:STANDARD
+END:VTIMEZONE
+`;
+        for (const [classCode, data] of subjectsData) {
+            icsContent += toICSEvent(data);
+        }
+        icsContent += `END:VCALENDAR`;
+
+        console.log(icsContent);
+
+        const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `Lich-Hoc.ics`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    function getData() {
+        const days = document.querySelectorAll(".panel-body > table > tbody tr:nth-child(n+2)");
+
+        const regex1 =
+            /\((?<start>\d+),(?:\d*,)*?(?<end>\d+)\)\s*-\s*(?<course>.+?)\s*\(Lớp:\s*(?<class>\d+\w+\d+)\)/;
+        const regex2 = /GV:\s*(?<lecturer>.+?)\s*\((?<sdt>\d+)?\s*-\s*(?<khoa>[^)]+)\)/;
+
+        const listCourseData = new Map();
+        let listErrorClassCode = [];
+
+        for (const day of days) {
+            const dateElement = day.children[2];
+            const date =
+                /(?<day>\d+)\/(?<month>\d+)\/(?<year>\d+)/.exec(dateElement.textContent.trim())
+                    ?.groups || {};
+            const sessions = day.querySelectorAll(
+                "td:nth-child(4), td:nth-child(5), td:nth-child(6)"
+            );
+            for (const session of sessions) {
+                const sessionContent = session.innerText.trim();
+                if (sessionContent == "") continue;
+
+                const subjects = sessionContent.split(/\n?\d+\.\s/).filter(Boolean);
+                if (subjects.length == 0) continue;
+
+                for (const subject of subjects) {
+                    const subjectLine = subject.split("\n");
+                    const classCode = subjectLine[0].match(/\d{5}\w+\d{7}/)?.[0] || subject;
+                    if (listErrorClassCode.includes(classCode)) continue;
+                    if (listCourseData.has(classCode)) {
+                        listCourseData.get(classCode).date.push(date);
+                        continue;
+                    }
+                    const match1 = subjectLine[0].match(regex1);
+                    const match2 = subjectLine[1].match(regex2);
+                    const match3 = subjectLine[2]
+                        .replaceAll(/[()]|( - Cơ sở \d* - Khu \w)/g, "")
+                        .trim();
+                    // Nếu không khớp thì lưu lại mã lớp bị lỗi và thông báo lỗi
+                    if (!match1 || !match2) {
+                        listErrorClassCode.push(classCode);
+                        const courseName = subject.match(/\(.+?\)\s*-\s*(.+?)\s\(/)?.[1];
+                        notyf.error(`Có lỗi khi lấy dữ liệu lớp:<br>${classCode}<br>${courseName}`);
+                        console.error(
+                            `Có lỗi khi lấy dữ liệu:\n${classCode}: ${courseName}\n${subject}`
+                        );
+                        continue;
+                    }
+
+                    const courseData = {
+                        ...match1.groups,
+                        ...match2.groups,
+                        location: match3,
+                        date: [date],
+                    };
+                    listCourseData.set(classCode, courseData);
+                }
+            }
+        }
+        return listCourseData;
+    }
+
+    function toICSEvent(data) {
+        const DTStamp = new Date().toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+        const rule = findRule(data.date);
+
+        const startPeriodToTime = {
+            1: "07:00",
+            2: "07:50",
+            3: "08:45",
+            4: "09:40",
+            5: "10:35",
+            6: "11:25",
+            7: "12:30",
+            8: "13:20",
+            9: "14:15",
+            10: "15:10",
+            11: "16:05",
+            12: "16:55",
+            13: "18:00",
+            14: "18:50",
+            15: "19:45",
+            16: "20:35",
+        };
+
+        const endPeriodToTime = {
+            1: "07:50",
+            2: "08:40",
+            3: "09:35",
+            4: "10:30",
+            5: "11:25",
+            6: "12:15",
+            7: "13:20",
+            8: "14:10",
+            9: "15:05",
+            10: "16:00",
+            11: "16:55",
+            12: "17:45",
+            13: "18:50",
+            14: "19:40",
+            15: "20:35",
+            16: "21:25",
+        };
+
+        const date0 = `${data.date[0].year}${String(data.date[0].month).padStart(2, "0")}${String(
+            data.date[0].day
+        ).padStart(2, "0")}`;
+        const startTime = startPeriodToTime[data.start].replace(":", "");
+        const endTime = endPeriodToTime[data.end].replace(":", "");
+
+        let alamr = GM_getValue("alamrCalender", [15, 30]);
+
+        const eventData = {
+            dtstart: `${date0}T${startTime}00`,
+            dtend: `${date0}T${endTime}00`,
+            description: `${data.lecturer} \\n${data.sdt} - ${data.khoa}\\n${data.class}`,
+            byday: rule.byday.join(","),
+            exdate: rule.exday.map((d) => {
+                const day = String(d.getDate()).padStart(2, "0");
+                const month = String(d.getMonth() + 1).padStart(2, "0");
+                const year = d.getFullYear();
+                return `${year}${month}${day}`;
+            }),
+        };
+
+        let event = `
+BEGIN:VEVENT
+SUMMARY:${data.course}
+UID:${data.class}@sv.haui.edu.vn
+DTSTAMP:${DTStamp}
+DTSTART;TZID=Asia/Ho_Chi_Minh:${eventData.dtstart}
+DTEND;TZID=Asia/Ho_Chi_Minh:${eventData.dtend}
+DESCRIPTION:${eventData.description}
+LOCATION:${data.location}
+RRULE:FREQ=WEEKLY;WKST=MO;BYDAY=${eventData.byday};INTERVAL=${rule.interval};COUNT=${rule.total}`;
+        // Thêm EXDATE nếu có
+        for (const exdate of eventData.exdate) {
+            event += `\nEXDATE;TZID=Asia/Ho_Chi_Minh:${eventData.exdate}T${startTime}00`;
+        }
+        // Thêm ALARM nếu có
+        for (const minutes of alamr) {
+            event += `
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P0DT0H${minutes}M0S
+DESCRIPTION:Báo trước ${minutes} phút
+END:VALARM`;
+        }
+        event += `
+END:VEVENT
+`;
+
+        for (const exdate of eventData.exdate) {
+            event += `
+BEGIN:VEVENT
+SUMMARY:${data.course}
+UID:${data.class}@sv.haui.edu.vn
+DTSTAMP:${DTStamp}
+DTSTART;TZID=Asia/Ho_Chi_Minh:${exdate}T${startTime}00
+DTEND;TZID=Asia/Ho_Chi_Minh:${exdate}T${endTime}00
+DESCRIPTION:${eventData.description}
+LOCATION:${data.location}
+RECURRENCE-ID;TZID=Asia/Ho_Chi_Minh:${exdate}T${startTime}00`;
+            for (const minutes of alamr) {
+                event += `
+BEGIN:VALARM
+ACTION:DISPLAY
+TRIGGER:-P0DT0H${minutes}M0S
+DESCRIPTION:Báo trước ${minutes} phút
+END:VALARM`;
+            }
+            event += `
+END:VEVENT
+`;
+        }
+        event += "\n";
+        return event;
+    }
+
+    function findRule(listDate) {
+        const groupedDates = groupDatesByDayOfWeek(listDate);
+
+        let groupedMissingDates = {};
+
+        for (const [byday, days] of Object.entries(groupedDates)) {
+            groupedMissingDates[byday] = findMissingDates(days);
+        }
+
+        let result = { byday: [], interval: null, total: listDate.length, exday: [] };
+
+        for (const [byday, days] of Object.entries(groupedMissingDates)) {
+            if (result.interval === null) result.interval = days.interval;
+            else if (result.interval !== days.interval) {
+                result.interval = 0;
+                console.warn("Different intervals found:", byday, result.interval, days.interval);
+                notyf.error("Không thể xuất lịch do các buổi học có khoảng cách không đều nhau.");
+                break;
+            }
+            result.byday.push(byday);
+            result.exday.push(...days.missingDates);
+            result.total += days.missingDates.length;
+        }
+        return result;
+    }
+
+    function groupDatesByDayOfWeek(dateArray) {
+        const daysOfWeekNames = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
+
+        const groupedDates = {};
+
+        dateArray.forEach((dateObj) => {
+            const year = parseInt(dateObj.year);
+            const month = parseInt(dateObj.month) - 1;
+            const day = parseInt(dateObj.day);
+            const date = new Date(year, month, day);
+
+            const dayIndex = date.getDay();
+            const dayName = daysOfWeekNames[dayIndex];
+
+            if (!groupedDates[dayName]) {
+                groupedDates[dayName] = [];
+            }
+            groupedDates[dayName].push(date);
+        });
+
+        return groupedDates;
+    }
+
+    function findMissingDates(dateStrings) {
+        const dates = dateStrings.map((d) => new Date(d)).sort((a, b) => a - b);
+
+        if (dates.length < 2) return [];
+
+        let minDiff = Infinity;
+
+        for (let i = 0; i < dates.length - 1; i++) {
+            const diff = dates[i + 1] - dates[i];
+            if (diff > 0 && diff < minDiff) {
+                minDiff = diff;
+            }
+        }
+
+        const oneDayMs = 24 * 60 * 60 * 1000;
+        const weeksInterval = Math.round(minDiff / oneDayMs) / 7;
+
+        const missingDates = [];
+
+        for (let i = 0; i < dates.length - 1; i++) {
+            let current = dates[i].getTime();
+            const next = dates[i + 1].getTime();
+
+            if (next - current > minDiff * 1.1) {
+                let tempTime = current + minDiff;
+
+                while (tempTime < next - minDiff * 0.5) {
+                    missingDates.push(new Date(tempTime));
+                    tempTime += minDiff;
+                }
+            }
+        }
+
+        return {
+            interval: weeksInterval,
+            missingDates: missingDates,
+        };
+    }
+
     //===============================================================
 
     function run() {
@@ -1911,9 +2328,6 @@
             "/student/result/viewstudyresult"
         );
 
-        // runOnUrl(createCSVCalendar, "/timestable/calendarcl");
-        // runOnUrl(exportCalender, "/timestable/calendarcl");
-
         runOnUrl(getYourTotalCredits, "/training/viewcourseindustry");
         runOnUrl(getYourLearningProgress, "/student/result/examresult");
 
@@ -1932,6 +2346,8 @@
             "/training/viewcourseindustry",
             "/training/programmodulessemester"
         );
+
+        runOnUrl(enhanceCalender, "/timestable/calendarcl");
     }
 
     waitForSelector("#frmMain", 5000, 100)
