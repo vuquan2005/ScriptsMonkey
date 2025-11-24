@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.16.7
+// @version      20.16.8
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -714,48 +714,85 @@
         });
     }
 
-    // Hiển thị kế hoạch thi
-    async function showExamPlanInHomePage() {
-        const examPlanDOM = await fetchDOM("https://sv.haui.edu.vn/student/schedulefees/examplant");
-        let listCourseCode = getCourseCode(examPlanDOM);
-        // Lấy 13 học phần gần nhất
+    // Lấy mã học phần từ trang kế hoạch thi
+    function getCourseCode(scope = document) {
+        const listCourseCodeElement = scope.querySelectorAll(
+            "div:nth-child(3) > div > div > table > tbody > tr > td:nth-child(2) > a"
+        );
+        let listHPCode = [];
+        for (const element of listCourseCodeElement) {
+            const hpCode = element.textContent.trim();
+            if (hpCode) {
+                listHPCode.push(hpCode);
+            }
+        }
+        listHPCode.reverse();
+        return listHPCode;
+    }
+
+    // Lấy kế hoạch thi của học phần
+    async function getExamPlan(courseCode) {
+        const url = `https://sv.haui.edu.vn/student/schedulefees/examplant?code=${courseCode}`;
+        try {
+            const dom = await fetchDOM(url);
+            return dom.querySelector("#ctl02_ctl00_viewResult > div > div > table > tbody > tr");
+        } catch (err) {
+            console.error(`❌ Lỗi khi lấy lịch thi cho ${getHPCode}: `, err);
+            notyf.error(`Lỗi khi lấy lịch thi cho ${getHPCode}: `, err);
+        }
+    }
+
+    // Hàm xử lý logic chung cho việc hiển thị kế hoạch thi
+    async function processExamPlans(listCourseCode, container) {
+        // Lấy 12 học phần gần nhất
         listCourseCode = listCourseCode.slice(0, 12);
-        const examScheduleContainer = document.querySelector("#exam-plan-body");
+
         let i = 0;
         for (const courseCode of listCourseCode) {
             let examPlan = await getExamPlan(courseCode);
-            // console.log(courseCode, " : " , examPlan);
-            // Nếu không có lịch
             if (examPlan == null) continue;
-            // Hiển thị kế hoạch thi
 
             const examDate = examPlan.children[3].textContent.trim();
             const examHour = examPlan.children[4].textContent.trim();
             const examTime = `${examHour} ${examDate}`;
-            // Kiểm tra thời gian thi
             const diffTime = getTimeDifference(examTime);
 
             if ((diffTime.direction === -1 && diffTime.days <= 20) || diffTime.direction === 1) {
                 i++;
-                const indexItem = examPlan.children[0];
+                examPlan.children[0].textContent = `${i}`;
 
-                indexItem.textContent = `${i}`;
-
-                // Tô màu sắp thi
                 if (diffTime.direction === 1 && diffTime.days <= 7)
                     examPlan.style.backgroundColor = "#f89c87";
-                else if (diffTime.direction === 1)
-                    examPlan.style.backgroundColor = "#f8e287";
+                else if (diffTime.direction === 1) examPlan.style.backgroundColor = "#f8e287";
 
-                // Hiển thị khoảng cách ngày
-                examPlan.children[2].innerHTML += `<br>(${diffTime.toString()})`;
+                examPlan.children[3].innerHTML += `<br>(${diffTime.toString()})`;
 
-                examScheduleContainer.appendChild(examPlan);
+                container.appendChild(examPlan);
             }
             await delay(10);
         }
+        return i;
+    }
 
-        if (i === 0) notyf.error("Không có kế hoạch thi");
+    async function showExamPlan() {
+        let listCourseCode = getCourseCode(document);
+
+        const container = document.querySelector(
+            "#ctl02_ctl00_viewResult > div > div > table > tbody"
+        );
+
+        await processExamPlans(listCourseCode, container);
+    }
+
+    async function showExamPlanInHomePage() {
+        const examPlanDOM = await fetchDOM("https://sv.haui.edu.vn/student/schedulefees/examplant");
+        let listCourseCode = getCourseCode(examPlanDOM);
+
+        const container = document.querySelector("#exam-plan-body");
+
+        const count = await processExamPlans(listCourseCode, container);
+
+        if (count === 0) notyf.error("Không có kế hoạch thi");
         else notyf.success("Đã lấy thành công kế hoạch thi");
     }
 
@@ -828,78 +865,6 @@
                 // Hiển thị khoảng cách ngày
                 examElement.children[2].innerHTML += `<br>(${diffTime.toString()})`;
             }
-        }
-    }
-
-    // Lấy mã học phần từ trang kế hoạch thi
-    function getCourseCode(scope = document) {
-        const listCourseCodeElement = scope.querySelectorAll(
-            "div:nth-child(3) > div > div > table > tbody > tr > td:nth-child(2) > a"
-        );
-        let listHPCode = [];
-        for (const element of listCourseCodeElement) {
-            const hpCode = element.textContent.trim();
-            if (hpCode) {
-                listHPCode.push(hpCode);
-            }
-        }
-        listHPCode.reverse();
-        return listHPCode;
-    }
-
-    // Lấy kế hoạch thi của học phần
-    async function getExamPlan(courseCode) {
-        const url = `https://sv.haui.edu.vn/student/schedulefees/examplant?code=${courseCode}`;
-        try {
-            const dom = await fetchDOM(url);
-            return dom.querySelector("#ctl02_ctl00_viewResult > div > div > table > tbody > tr");
-        } catch (err) {
-            console.error(`❌ Lỗi khi lấy lịch thi cho ${getHPCode}: `, err);
-            notyf.error(`Lỗi khi lấy lịch thi cho ${getHPCode}: `, err);
-        }
-    }
-
-    // Hiển thị toàn bộ kế hoạch thi các học phần
-    async function showExamPlan() {
-        let listCourseCode = getCourseCode(document);
-        // Lấy 13 học phần gần nhất
-        listCourseCode = listCourseCode.slice(0, 12);
-        const examScheduleContainer = document.querySelector(
-            "#ctl02_ctl00_viewResult > div > div > table > tbody"
-        );
-        let i = 0;
-        for (const courseCode of listCourseCode) {
-            let examPlan = await getExamPlan(courseCode);
-            // console.log(courseCode, " : " , examPlan);
-            // Nếu không có lịch
-            if (examPlan == null) continue;
-            // Hiển thị kế hoạch thi
-
-            const examDate = examPlan.children[3].textContent.trim();
-            const examHour = examPlan.children[4].textContent.trim();
-            const examTime = `${examHour} ${examDate}`;
-            // Kiểm tra thời gian thi
-            const diffTime = getTimeDifference(examTime);
-
-            if ((diffTime.direction === -1 && diffTime.days <= 20) || diffTime.direction === 1) {
-                i++;
-                const indexItem = examPlan.children[0];
-
-                indexItem.textContent = `${i}`;
-
-                if (diffTime.direction === 1) {
-                    // Nếu chưa đến ngày thi thì tô màu vàng
-                    examPlan.style.backgroundColor = "rgb(248,226,135)";
-                    // Hiển thị khoảng cách ngày
-                    examPlan.children[3].innerHTML += `<br>(${diffTime.toString()})`;
-                } else {
-                    // Hiển thị khoảng cách ngày
-                    examPlan.children[3].innerHTML += `<br>(${diffTime.toString()})`;
-                }
-
-                examScheduleContainer.appendChild(examPlan);
-            }
-            await delay(10);
         }
     }
 
