@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      3.0.3
+// @version      3.1.0
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -68,9 +68,18 @@
         console.log(`❌🧪 ${callback.name || "'Callback'"} :`, validLinks);
     }
 
-    GM_addStyle(`
-      @import url("https://cdn.jsdelivr.net/npm/notyf/notyf.min.css");
-    `);
+    function downloadTxt(filename, text) {
+        const blob = new Blob([text], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+
+        a.dispatchEvent(new MouseEvent("click"));
+
+        URL.revokeObjectURL(url);
+    }
 
     // From repo AdBlock
     GM_addStyle(`
@@ -84,8 +93,11 @@
         }
     `);
 
+    GM_addStyle(`
+      @import url("https://cdn.jsdelivr.net/npm/notyf/notyf.min.css");
+    `);
     var notyf;
-    // =====================================================================================
+    //===============================================================
     // Bỏ chặn một số thứ
     function BoChan() {
         const events = ["copy", "cut", "paste", "contextmenu"];
@@ -114,7 +126,7 @@
             );
         }
     }
-    // =====================================================================================
+
     // Auto viết hoa captcha
     function captchaHelper() {
         const captchaInput = document.querySelector("div.dgcaptcha > input#txtcaptcha");
@@ -173,7 +185,14 @@
             });
         });
     }
-    // =====================================================================================
+
+	// Tắt thông báo hoàn thành
+	function disableCompleteNotification() {
+		waitForSelector(".btn_L3", 10000, 100).then(() => {
+			document.querySelector(".btn_L3").click();
+		});
+	}
+
     // Tô màu số tiết nghỉ
     function highlightAbsence() {
         const absenceElements = document.querySelector(
@@ -194,7 +213,7 @@
         else if (absenceCount > 0) rgb = "#66FF00";
         absenceElements.style.backgroundColor = rgb;
     }
-    // =====================================================================================
+
     // Tính điểm
     function calculateScore() {
         const TX1 = Number(
@@ -261,7 +280,6 @@
             if (elfix) elfix.textContent = targetScoresfix[key];
         }
     }
-
     function showCalculateScore() {
         const container = document.querySelector(".diemht");
 
@@ -272,9 +290,94 @@
 
         scoreElement.innerHTML = `<p>Điểm hiện có: <span id="tolalScore"></span><br>A &nbsp;&nbsp;🎯: <span id="targetScores-a"></span> ➡️ <span id="targetScores-afix"></span><br>B+ 🎯: <span id="targetScores-bplus"></span> ➡️ <span id="targetScores-bplusfix"></span><br>B &nbsp;&nbsp;🎯: <span id="targetScores-b"></span> ➡️ <span id="targetScores-bfix"></span><br>C+ 🎯: <span id="targetScores-cplus"></span> ➡️ <span id="targetScores-cplusfix"></span><br>C &nbsp;&nbsp;🎯: <span id="targetScores-c"></span> ➡️ <span id="targetScores-cfix"></span><br>D+ 🎯: <span id="targetScores-dplus"></span> ➡️ <span id="targetScores-dplusfix"></span><br>D &nbsp;&nbsp;🎯: <span id="targetScores-d"></span> ➡️ <span id="targetScores-dfix"></span><br></p>`;
         container.appendChild(scoreElement);
-        setTimeout(calculateScore, 700);
+        setTimeout(calculateScore, 500);
+
+        const scoreBox = container.querySelectorAll(
+            "table > tbody > tr > td:nth-child(4), table > tbody > tr > td:nth-child(5), table > tbody > tr > td:nth-child(7)"
+        );
+
+        scoreBox.forEach((box) => {
+            box.setAttribute("contenteditable", "true");
+            box.addEventListener("blur", () => {
+                box.textContent = box.textContent.replace(/[^0-9.]/g, "");
+                box.textContent = Math.floor(Number(box.textContent) * 2) / 2;
+
+                calculateScore();
+            });
+        });
     }
-    // =====================================================================================
+
+    // Tải từ mới
+    async function downloadNewWords() {
+        await waitForSelector("div#mbody div", 10000, 100);
+        if (document.querySelector("div#mbody div").classList[0] !== "dvocabulary") return;
+
+        const taskNum = document
+            .querySelector(".hbreadcrumb.breadcrumb")
+            ?.textContent.match(/\w+\s(\d+)/)?.[1];
+
+        // All
+        document.querySelector(".modal-footer .btn-secondary").addEventListener(
+            "click",
+            () => {
+                const dataArr = exportDataNewWords();
+
+                let txtContent = dataArr
+                    .map(
+                        (item) =>
+                            `${item.newWord} ;;${item.phonetic} ;${item.meaning} ;${item.example} `
+                    )
+                    .join("\n\n");
+
+                downloadTxt("new_words-" + taskNum, txtContent);
+
+                window.history.back();
+            },
+            true
+        );
+
+        // New words only
+        document.querySelector(".modal-header .close").addEventListener(
+            "click",
+            () => {
+                const dataArr = exportDataNewWords();
+
+                const maxLen = Math.max(...dataArr.map((item) => item.newWord.length));
+
+                downloadTxt("new_words_only-" + taskNum, txtContent);
+
+                window.history.back();
+            },
+            true
+        );
+    }
+
+    function exportDataNewWords() {
+        const data = document.querySelectorAll("div.ditem");
+        const dataArr = [];
+
+        data.forEach((item) => {
+            let newWord = item.querySelector("h4")?.textContent.trim() || "";
+            newWord = newWord.charAt(0).toUpperCase() + newWord.slice(1);
+
+            let phonetic = item.querySelector("div.minhhoa i").textContent;
+            phonetic = phonetic.replace(/(^\/)|(\/$)/g, "");
+
+            let meaning = item.querySelector("b")?.textContent.trim() || "";
+
+            let example = "";
+            item.querySelectorAll("p").forEach((p) => {
+                if (p.textContent.trim() !== "") {
+                    example = p.textContent.trim();
+                }
+            });
+
+            dataArr.push({ newWord, phonetic, meaning, example });
+        });
+
+        return dataArr;
+    }
+
     // Hiển thị toàn bộ task trong unit
     function showTasks() {
         document.querySelector(".content > .row > .col-md-3").remove();
@@ -331,6 +434,7 @@
 			}
 		`);
     }
+
     function showTaskType() {
         const taskElements = document.querySelectorAll("a.dpop.allow");
         for (let taskElement of taskElements) {
@@ -344,7 +448,7 @@
                 }
             `);
     }
-    // =====================================================================================
+
     // Tắt tiếng khi làm buổi tối
     function turnOffDoneSound() {
         const doneSound = document.querySelector("a#dsound");
@@ -366,8 +470,10 @@
             runOnUrl(showTaskType, /study\/unit\/\w+\?id=/);
 
             runOnUrl(captchaHelper, /study\/course\/\w+\?id=/);
+            runOnUrl(disableCompleteNotification, /study\/course\/\w+\?id=/);
 
             runOnUrl(turnOffDoneSound, /study\/task\/\w+\?id=/);
+            runOnUrl(downloadNewWords, /study\/task\/\w+\?id=/);
         })
         .catch((error) => {
             console.error(error);
