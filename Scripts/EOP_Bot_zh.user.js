@@ -1,12 +1,12 @@
 // ==UserScript==
-// @name         EOP Task helper en
+// @name         EOP Bot zh
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.4.13
+// @version      1.1.7
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
-// @updateURL    https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/EOP_Bot.user.js
-// @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/EOP_Bot.user.js
+// @updateURL    https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/EOP_Bot_zh.user.js
+// @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/EOP_Bot_zh.user.js
 // @grant        GM_addStyle
 // @grant        GM_getValue
 // @grant        GM_setValue
@@ -249,79 +249,6 @@
         finishTask();
     }
 
-    function normalizeOcrText(text) {
-        try {
-            const numMap = {};
-
-            const charMap = {
-                0: "o",
-                1: "i",
-                5: "s",
-                Cc: "C",
-            };
-
-            const wordMap = {
-                intemet: "internet",
-                inthe: "in the",
-            };
-
-            text = text.trim();
-            let output = "";
-
-            for (let token of text.match(/\w+|\W+/g)) {
-                // console.log("Token:", token);
-                if (/^\d+.*$/.test(token)) {
-                    output += token;
-                    continue;
-                }
-                if (/^\w+$/.test(token)) {
-                    for (const [wrong, correct] of Object.entries(charMap)) {
-                        const regex = new RegExp(wrong, "g");
-                        token = token.replace(regex, correct);
-                    }
-                }
-                output += token;
-            }
-
-            for (const [wrong, correct] of Object.entries(wordMap)) {
-                const regex = new RegExp(wrong, "gi");
-                output = output.replace(regex, correct);
-            }
-
-            if (output == "") output = "i";
-            return output;
-        } catch (error) {
-            console.error("Error in normalizeOcrText:", error);
-            return text;
-        }
-    }
-
-    async function recognizeTextFromListImage(imgList) {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const worker = await Tesseract.createWorker("eng");
-
-                let listText = [];
-
-                for (const img of imgList) {
-                    let {
-                        data: { text },
-                    } = await worker.recognize(img);
-
-                    // console.log("✏️ ", text);
-                    text = normalizeOcrText(text);
-
-                    listText.push(text);
-                }
-                await worker.terminate();
-
-                resolve(listText);
-            } catch (error) {
-                reject(error);
-            }
-        });
-    }
-
     async function autoFillAnswer() {
         await waitForSelector("input.danw.dinline[type='text']");
         const ditem = document.querySelector("div.ditem");
@@ -342,52 +269,26 @@
             }
         });
 
-        await delay(0.5);
         await clickDone();
         await delay(1);
         await clickShowAnswer();
-
-        await waitForSelector(
-            `input.danw.dinline[type='text'][disabled="disabled"][style*="background-image"]`
-        );
-        const inputsImg = ditem.querySelectorAll(
-            `input.danw.dinline[type='text'][disabled="disabled"][style*="background-image"]`
-        );
-
-        let listImg64 = [];
-
-        await forEachList(inputsImg, async (i, input) => {
-            const base64Match = input.style.backgroundImage.match(/url\(["']?(.*?)["']?\)/);
-            const img64 = base64Match ? base64Match[1] : null;
-            if (img64) listImg64.push(img64);
-        });
-
-        let listText = [];
-
-        await recognizeTextFromListImage(listImg64)
-            .then((result) => {
-                listText = result;
-            })
-            .catch((error) => {
-                console.error("Error recognizing text from images:", error);
-            });
-
-        console.log(listText);
 
         await delay(1);
 
         await clickUndo();
 
+        delay(1);
+
         await forEachList(inputs, async (i, input) => {
             await delay(0.2);
-            input.value = listText[i];
+            input.value = input.getAttribute("placeholder");
         });
 
         const timeDo = TimeDoTask();
         console.log("Đợi thêm: ", timeDo, "s");
         clickDone(timeDo);
 
-        finishTask();
+		finishTask();
     }
 
     async function enhanceAutoFillAnswer() {
