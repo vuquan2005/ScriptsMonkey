@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.16.9
+// @version      20.16.7
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -714,7 +714,7 @@
         });
     }
 
-    // Hiển thị kế hoạch thi trên trang kế hoạch thi
+    // Hiển thị kế hoạch thi
     async function showExamPlanInHomePage() {
         const examPlanDOM = await fetchDOM("https://sv.haui.edu.vn/student/schedulefees/examplant");
         let listCourseCode = getCourseCode(examPlanDOM);
@@ -741,15 +741,14 @@
 
                 indexItem.textContent = `${i}`;
 
-                if (diffTime.direction === 1) {
-                    // Nếu chưa đến ngày thi thì tô màu vàng
-                    examPlan.style.backgroundColor = "rgb(248,226,135)";
-                    // Hiển thị khoảng cách ngày
-                    examPlan.children[3].innerHTML += `<br>(${diffTime.toString()})`;
-                } else {
-                    // Hiển thị khoảng cách ngày
-                    examPlan.children[3].innerHTML += `<br>(${diffTime.toString()})`;
-                }
+                // Tô màu sắp thi
+                if (diffTime.direction === 1 && diffTime.days <= 7)
+                    examPlan.style.backgroundColor = "#f89c87";
+                else if (diffTime.direction === 1)
+                    examPlan.style.backgroundColor = "#f8e287";
+
+                // Hiển thị khoảng cách ngày
+                examPlan.children[2].innerHTML += `<br>(${diffTime.toString()})`;
 
                 examScheduleContainer.appendChild(examPlan);
             }
@@ -760,7 +759,7 @@
         else notyf.success("Đã lấy thành công kế hoạch thi");
     }
 
-    // Hiển thị lịch thi trên trang kế hoạch thi
+    // Hiển thị lịch thi
     async function showExamScheduleInHomePage() {
         const examScheduleDOM = await fetchDOM(
             "https://sv.haui.edu.vn/student/schedulefees/transactionmodules"
@@ -784,15 +783,14 @@
                 checkItem.remove();
                 indexItem.textContent = `${i}`;
 
-                if (diffTime.direction === 1) {
-                    // Nếu chưa đến ngày thi thì tô màu vàng
-                    examScheduleElement.style.backgroundColor = "rgb(248,226,135)";
-                    // Hiển thị khoảng cách ngày
-                    examScheduleElement.children[2].innerHTML += `<br>(${diffTime.toString()})`;
-                } else {
-                    // Hiển thị khoảng cách ngày
-                    examScheduleElement.children[2].innerHTML += `<br>(${diffTime.toString()})`;
-                }
+                // Tô màu sắp thi
+                if (diffTime.direction === 1 && diffTime.days <= 7)
+                    examScheduleElement.style.backgroundColor = "#f89c87";
+                else if (diffTime.direction === 1)
+                    examScheduleElement.style.backgroundColor = "#f8e287";
+
+                // Hiển thị khoảng cách ngày
+                examScheduleElement.children[2].innerHTML += `<br>(${diffTime.toString()})`;
 
                 examScheduleContainer.appendChild(examScheduleElement);
             }
@@ -1458,7 +1456,7 @@
         score = score.replace(/.+(?=[ABCDF].*)/, "");
         if (/\d\.*\d*/.test(score)) {
             score = Math.ceil(score.match(/\d\.*\d*/)[0] * 2) / 2;
-            if (score > 0 || score <= 4.0) {
+            if (score > 0 && score <= 4.0) {
                 score = {
                     4.0: "A",
                     3.5: "B+",
