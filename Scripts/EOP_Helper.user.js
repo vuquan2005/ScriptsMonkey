@@ -346,9 +346,7 @@
                 const maxLen = Math.max(...dataArr.map((item) => item.newWord.length));
 
                 const txtContent = dataArr
-                    .map((item) => {
-                        item.newWord.padEnd(maxLen + 2, ": ") + item.meaning;
-                    })
+                    .map((item) => item.newWord.padEnd(maxLen + 2, " ") + ": " + item.meaning)
                     .join("\n\n");
 
                 downloadTxt("new_words_only-" + taskNum, txtContent);
