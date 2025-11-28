@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      3.1.0
+// @version      3.1.1
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -186,12 +186,12 @@
         });
     }
 
-	// Tắt thông báo hoàn thành
-	function disableCompleteNotification() {
-		waitForSelector(".btn_L3", 10000, 100).then(() => {
-			document.querySelector(".btn_L3").click();
-		});
-	}
+    // Tắt thông báo hoàn thành
+    function disableCompleteNotification() {
+        waitForSelector(".btn_L3", 10000, 100).then(() => {
+            document.querySelector(".btn_L3").click();
+        });
+    }
 
     // Tô màu số tiết nghỉ
     function highlightAbsence() {
@@ -330,6 +330,7 @@
                     .join("\n\n");
 
                 downloadTxt("new_words-" + taskNum, txtContent);
+                console.log("File downloaded!\n", txtContent);
 
                 window.history.back();
             },
@@ -344,7 +345,14 @@
 
                 const maxLen = Math.max(...dataArr.map((item) => item.newWord.length));
 
+                const txtContent = dataArr
+                    .map((item) => {
+                        item.newWord.padEnd(maxLen + 2, ": ") + item.meaning;
+                    })
+                    .join("\n\n");
+
                 downloadTxt("new_words_only-" + taskNum, txtContent);
+                console.log("File downloaded!\n", txtContent);
 
                 window.history.back();
             },
