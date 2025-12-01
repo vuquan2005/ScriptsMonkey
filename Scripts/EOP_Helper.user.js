@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Helper
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      3.1.1
+// @version      3.1.2
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -358,6 +358,45 @@
         );
     }
 
+    async function enhanceAutoFillAnswer() {
+        let listAns = [];
+        let listenerAttached = false;
+
+        await waitForSelector("div#mfooter button.btn.btn-danger.dnut", 500000);
+        const btnDone = document.querySelector('#mfooter button.btn.btn-info.dnut[type="button"]');
+        btnDone.addEventListener("click", () => {
+            if (!listenerAttached) {
+                listenerAttached = true;
+                waitForSelector("div#mfooter button.btn.btn-danger.dnut", 500000).then(() => {
+                    const btn = document.querySelector("div#mfooter button.btn.btn-danger.dnut");
+                    const inputs = document.querySelectorAll(
+                        "div.ditem input.danw.dinline[type='text']"
+                    );
+
+                    btn.addEventListener(
+                        "click",
+                        async () => {
+                            if (btn.matches(".btn-danger")) {
+                                listAns = [];
+                                for (let i = 0; i < inputs.length; i++) {
+                                    listAns.push(inputs[i].value);
+                                }
+                                console.log("List answers saved:", listAns);
+                            } else {
+                                console.log("Fill answers:", listAns);
+                                for (let i = 0; i < inputs.length; i++) {
+                                    await new Promise((resolve) => setTimeout(resolve, 50));
+                                    inputs[i].value = listAns[i];
+                                }
+                            }
+                        },
+                        true
+                    );
+                });
+            }
+        });
+    }
+
     function exportDataNewWords() {
         const data = document.querySelectorAll("div.ditem");
         const dataArr = [];
@@ -480,6 +519,7 @@
 
             runOnUrl(turnOffDoneSound, /study\/task\/\w+\?id=/);
             runOnUrl(downloadNewWords, /study\/task\/\w+\?id=/);
+            runOnUrl(enhanceAutoFillAnswer, /study\/task\/\w+\?id=/);
         })
         .catch((error) => {
             console.error(error);

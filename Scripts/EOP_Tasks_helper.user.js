@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         EOP Task helper en
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      2.4.13
+// @version      2.4.14
 // @description  Hỗ trợ nâng cao khi sử dụng trang web EOP
 // @author       QuanVu
 // @match        https://eop.edu.vn/*
@@ -392,38 +392,40 @@
 
     async function enhanceAutoFillAnswer() {
         let listAns = [];
+        let listenerAttached = false;
 
-        waitForSelector("div#mfooter button.btn.btn-danger.dnut", 500000).then(() => {
-            const btnShowAns = document.querySelector("div#mfooter button.btn.btn-danger.dnut");
-            const inputs = document.querySelectorAll("div.ditem input.danw.dinline[type='text']");
+        await waitForSelector("div#mfooter button.btn.btn-danger.dnut", 500000);
+        const btnDone = document.querySelector('#mfooter button.btn.btn-info.dnut[type="button"]');
+        btnDone.addEventListener("click", () => {
+            if (!listenerAttached) {
+                listenerAttached = true;
+                waitForSelector("div#mfooter button.btn.btn-danger.dnut", 500000).then(() => {
+                    const btn = document.querySelector("div#mfooter button.btn.btn-danger.dnut");
+                    const inputs = document.querySelectorAll(
+                        "div.ditem input.danw.dinline[type='text']"
+                    );
 
-            btnShowAns.addEventListener(
-                "click",
-                () => {
-                    forEachList(inputs, (i, el) => {
-                        listAns.push(el.value);
-                    });
-					console.log("List answers saved:", listAns);
-                },
-                true
-            );
-        });
-
-        waitForSelector("div#mfooter button.btn.btn-primary.dnut", 500000).then(() => {
-            const btnReDoQues = document.querySelector("div#mfooter button.btn.btn-primary.dnut");
-            const inputs = document.querySelectorAll("div.ditem input.danw.dinline[type='text']");
-
-            btnReDoQues.addEventListener(
-                "click",
-                () => {
-					console.log("Fill answers:", listAns);
-                    forEachList(inputs, async (i, input) => {
-						await delay(0.05);
-                        input.value = listAns[i];
-                    });
-                },
-                true
-            );
+                    btn.addEventListener(
+                        "click",
+                        async () => {
+                            if (btn.matches(".btn-danger")) {
+                                listAns = [];
+                                for (let i = 0; i < inputs.length; i++) {
+                                    listAns.push(inputs[i].value);
+                                }
+                                console.log("List answers saved:", listAns);
+                            } else {
+                                console.log("Fill answers:", listAns);
+                                for (let i = 0; i < inputs.length; i++) {
+                                    await new Promise((resolve) => setTimeout(resolve, 50));
+                                    inputs[i].value = listAns[i];
+                                }
+                            }
+                        },
+                        true
+                    );
+                });
+            }
         });
     }
 
