@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.17.1
+// @version      20.17.2
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -1748,6 +1748,7 @@
                 }
 
             const courseNameCell = course.children[3];
+			courseNameCell.setAttribute("title", "👆➡️🔖");
             markedCourse(courseCode, courseNameCell.textContent.trim(), courseNameCell);
         }
     }
@@ -1780,6 +1781,7 @@
 
             const markerCell = course.children[markerIndex];
             const courseName = course.children[2].textContent.trim();
+			markerCell.setAttribute("title", "👆➡️🔖");
             markedCourse(courseCode, courseName, markerCell);
         }
 
