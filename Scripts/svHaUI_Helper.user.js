@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.17.2
+// @version      20.17.3
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -171,6 +171,36 @@
         1: "rgb(200, 0, 0)", // D
         0: "rgb(157, 0, 255)", // F
     };
+
+    function checkNonCreditCourse(courseCredit) {
+        const isNonCreditCourse = courseCredit.getAttribute("nonCreditCourse") === "true";
+        return isNonCreditCourse;
+    }
+
+    function letterTo4(scoreLetter) {
+        return {
+            D: 1,
+            "D+": 1.5,
+            C: 2,
+            "C+": 2.5,
+            B: 3,
+            "B+": 3.5,
+            A: 4,
+        }[scoreLetter.trim().toUpperCase()];
+    }
+
+    function scoreToLetter(score4) {
+        return {
+            4.0: "A",
+            3.5: "B+",
+            3.0: "B",
+            2.5: "C+",
+            2.0: "C",
+            1.5: "D+",
+            1.0: "D",
+            0.0: "F",
+        }[score4];
+    }
 
     //===============================================================
     // Sửa tiêu đề trang
@@ -916,12 +946,6 @@
         return false;
     }
 
-    // Kiểm tra học phần không tính tín chỉ
-    function checkNonCreditCourse(courseCredit) {
-        const isNonCreditCourse = courseCredit.getAttribute("nonCreditCourse") === "true";
-        return isNonCreditCourse;
-    }
-
     // Tô màu tín chỉ
     function highlightCreditsCourse() {
         const kgrid = document.querySelector("div.kGrid");
@@ -1410,7 +1434,7 @@
         container.appendChild(toggleBtn);
     }
 
-    //
+    // Chuẩn hoá qua điểm chữ
     function normalizeScore(score) {
         score = score
             .trim()
@@ -1422,16 +1446,7 @@
         if (/\d\.*\d*/.test(score)) {
             score = Math.ceil(score.match(/\d\.*\d*/)[0] * 2) / 2;
             if (score > 0 && score <= 4.0) {
-                score = {
-                    4.0: "A",
-                    3.5: "B+",
-                    3.0: "B",
-                    2.5: "C+",
-                    2.0: "C",
-                    1.5: "D+",
-                    1.0: "D",
-                    0.0: "F",
-                }[score];
+                score = scoreToLetter(score);
             }
         } else if (/^[ABCDF].*/.test(score)) {
             score = score.replace(/^A.*$/g, "A");
@@ -1495,16 +1510,7 @@
                         score = originalScore;
                     }
 
-                    score4Cell.textContent = {
-                        A: "4",
-                        "B+": "3.5",
-                        B: "3",
-                        "C+": "2.5",
-                        C: "2",
-                        "D+": "1.5",
-                        D: "1",
-                        F: "0",
-                    }[score];
+                    score4Cell.textContent = letterToScore(score);
 
                     scoreCell.textContent = score;
 
@@ -1748,7 +1754,7 @@
                 }
 
             const courseNameCell = course.children[3];
-			courseNameCell.setAttribute("title", "👆➡️🔖");
+            courseNameCell.setAttribute("title", "👆➡️🔖");
             markedCourse(courseCode, courseNameCell.textContent.trim(), courseNameCell);
         }
     }
@@ -1772,6 +1778,10 @@
                     courseCodeCell.style.backgroundColor =
                         scoresBoxColor[yourStudyProcess[courseCode]];
                     courseCodeCell.style.color = "#FFFFFF";
+                    courseCodeCell.setAttribute(
+                        "title",
+                        `📌: ${scoreToLetter(yourStudyProcess[courseCode])}`
+                    );
                 } else {
                     const creditCell = course.children[3];
                     creditCell.style.backgroundColor =
@@ -1781,7 +1791,7 @@
 
             const markerCell = course.children[markerIndex];
             const courseName = course.children[2].textContent.trim();
-			markerCell.setAttribute("title", "👆➡️🔖");
+            markerCell.setAttribute("title", "👆➡️🔖");
             markedCourse(courseCode, courseName, markerCell);
         }
 
