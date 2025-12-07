@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.17.3
+// @version      20.17.4
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -1443,8 +1443,11 @@
             .replace(/[\u0300-\u036f]/g, "")
             .replace(/Đ/g, "D");
         score = score.replace(/.+(?=[ABCDF].*)/, "");
-        if (/\d\.*\d*/.test(score)) {
-            score = Math.ceil(score.match(/\d\.*\d*/)[0] * 2) / 2;
+        if (/\d+/.test(score)) {
+            score = Math.abs(Number(score));
+            score = score.toExponential();
+            score = parseFloat(score.split("e")[0]);
+            score = Math.ceil(score * 2) / 2;
             if (score > 0 && score <= 4.0) {
                 score = scoreToLetter(score);
             }
@@ -1501,7 +1504,7 @@
 
                 scoreCell.addEventListener("blur", (e) => {
                     let score = normalizeScore(scoreCell.textContent);
-                    console.log(score);
+                    // console.log(score);
 
                     if (!["A", "B+", "B", "C+", "C", "D+", "D", "F"].includes(score)) {
                         notyf.error(
@@ -1510,7 +1513,7 @@
                         score = originalScore;
                     }
 
-                    score4Cell.textContent = letterToScore(score);
+                    score4Cell.textContent = letterTo4(score);
 
                     scoreCell.textContent = score;
 
