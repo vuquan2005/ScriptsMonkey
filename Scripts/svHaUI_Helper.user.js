@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.17.5
+// @version      20.18.0
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -790,13 +790,37 @@
 
             if ((diffTime.direction === -1 && diffTime.days <= 20) || diffTime.direction === 1) {
                 i++;
-                examPlan.children[0].textContent = `${i}`;
+                const stt = examPlan.children[0];
+                stt.textContent = `${i}`;
 
                 if (diffTime.direction === 1 && diffTime.days <= 7)
                     examPlan.style.backgroundColor = "#f89c87";
                 else if (diffTime.direction === 1) examPlan.style.backgroundColor = "#f8e287";
 
                 examPlan.children[3].innerHTML += `<br>(${diffTime.toString()})`;
+
+                stt.setAttribute("title", "👆📥📅");
+                stt.addEventListener("click", () => {
+                    const name = examPlan.children[2].textContent.trim();
+                    const classCode = examPlan.children[1].textContent.trim();
+                    const startDate = examDate.split("/").reverse().join("");
+                    const startTime = examHour.replace("h", "");
+                    const endTime = Number(startTime) + 100;
+
+                    const eventData = {
+                        summary: name,
+                        uid: `${classCode}@sv.haui.edu.vn`,
+                        startDate: startDate,
+                        startTime: startTime,
+                        endTime: endTime,
+                        description: ``,
+                        location: "",
+                        alarms: [15, 30],
+                    };
+                    console.log(eventData);
+
+                    createICSFile(eventData, `Lich_thi_${name}_${classCode}`);
+                });
 
                 container.appendChild(examPlan);
             }
@@ -1987,7 +2011,7 @@ DTSTART:19700101T000000
 END:STANDARD
 END:VTIMEZONE
 `;
-        for (const event of events) {
+        for (const event of [].concat(events || [])) {
             icsContent += toICSEvent(event);
         }
         icsContent += `END:VCALENDAR`;
@@ -2067,8 +2091,6 @@ END:VTIMEZONE
     }
 
     function processCalendarData(listCourseData) {
-        const DTStamp = new Date().toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
-
         const startPeriodToTime = {
             1: "07:00",
             2: "07:50",
@@ -2162,35 +2184,43 @@ END:VALARM`
 
     // Tạo sự kiện ICS
     function toICSEvent(data) {
+        const DTStamp = new Date().toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+        data.exdate = data.exdate || [];
         let event = `
 BEGIN:VEVENT
 SUMMARY:${data.summary}
 UID:${data.uid}
-DTSTAMP:${data.dtstamp}
+DTSTAMP:${DTStamp}
 DTSTART;TZID=Asia/Ho_Chi_Minh:${data.startDate}T${data.startTime}00
 DTEND;TZID=Asia/Ho_Chi_Minh:${data.startDate}T${data.endTime}00
-DESCRIPTION:${data.description}
-LOCATION:${data.location}
+DESCRIPTION:${data.description || ""}
+LOCATION:${data.location || ""}`;
+        // Lặp
+        const isRecurring = data.byday && data.interval && data.total;
+        if (isRecurring) {
+            event += `
 RRULE:FREQ=WEEKLY;WKST=MO;BYDAY=${data.byday};INTERVAL=${data.interval};COUNT=${data.total}`;
-        // Thêm EXDATE nếu có
-        for (const exdate of data.exdate) {
-            event += `\nEXDATE;TZID=Asia/Ho_Chi_Minh:${exdate}T${data.startTime}00`;
+
+            // Thêm EXDATE nếu có
+            for (const exdate of data.exdate) {
+                event += `\nEXDATE;TZID=Asia/Ho_Chi_Minh:${exdate}T${data.startTime}00`;
+            }
         }
         event += addAlarm(data.alarms);
         event += `
 END:VEVENT
 `;
-
+        // Các sự kiện EXDATE
         for (const exdate of data.exdate) {
             event += `
 BEGIN:VEVENT
 SUMMARY:${data.summary}
 UID:${data.uid}
-DTSTAMP:${data.dtstamp}
+DTSTAMP:${DTStamp}
 DTSTART;TZID=Asia/Ho_Chi_Minh:${exdate}T${data.startTime}00
 DTEND;TZID=Asia/Ho_Chi_Minh:${exdate}T${data.endTime}00
-DESCRIPTION:${data.description}
-LOCATION:${data.location}
+DESCRIPTION:${data.description || ""}
+LOCATION:${data.location || ""}
 RECURRENCE-ID;TZID=Asia/Ho_Chi_Minh:${exdate}T${data.endTime}00`;
             event += addAlarm(data.alarms);
             event += `
