@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.17.4
+// @version      20.17.5
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -179,6 +179,7 @@
 
     function letterTo4(scoreLetter) {
         return {
+            F: 0,
             D: 1,
             "D+": 1.5,
             C: 2,
@@ -1923,7 +1924,9 @@
                 return { year: classCode.slice(0, 4), term: classCode[4] };
             });
             const calendarName = `Học kỳ ${term} ${year}-${Number(year) + 1}`;
-            createICSFile(calendarName);
+            const listCourseData = getCalendarData();
+            const events = processCalendarData(listCourseData);
+            createICSFile(events, calendarName);
         });
     }
 
@@ -1963,8 +1966,8 @@
         document.querySelector("#ctl02_butGet").click();
     }
 
-    function createICSFile(calendarName) {
-        const subjectsData = getData();
+    function createICSFile(events, calendarName) {
+        console.log(events);
         let icsContent = `BEGIN:VCALENDAR
 PRODID:-// VuQuan // svHaUI Helper //EN
 VERSION:2.0
@@ -1984,8 +1987,8 @@ DTSTART:19700101T000000
 END:STANDARD
 END:VTIMEZONE
 `;
-        for (const [classCode, data] of subjectsData) {
-            icsContent += toICSEvent(data);
+        for (const event of events) {
+            icsContent += toICSEvent(event);
         }
         icsContent += `END:VCALENDAR`;
 
@@ -2000,7 +2003,8 @@ END:VTIMEZONE
         URL.revokeObjectURL(url);
     }
 
-    function getData() {
+    // Lấy thông tin sự kiện
+    function getCalendarData() {
         const days = document.querySelectorAll(".panel-body > table > tbody tr:nth-child(n+2)");
 
         const regex1 =
@@ -2062,9 +2066,8 @@ END:VTIMEZONE
         return listCourseData;
     }
 
-    function toICSEvent(data) {
+    function processCalendarData(listCourseData) {
         const DTStamp = new Date().toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
-        const rule = findRule(data.date);
 
         const startPeriodToTime = {
             1: "07:00",
@@ -2104,73 +2107,92 @@ END:VTIMEZONE
             16: "21:25",
         };
 
-        const date0 = `${data.date[0].year}${String(data.date[0].month).padStart(2, "0")}${String(
-            data.date[0].day
-        ).padStart(2, "0")}`;
-        const startTime = startPeriodToTime[data.start].replace(":", "");
-        const endTime = endPeriodToTime[data.end].replace(":", "");
+        let events = [];
 
-        let alamr = GM_getValue("alamrCalender", [15, 30]);
+        for (const [classCode, data] of listCourseData) {
+            const rule = findRule(data.date);
+            console.log(data, " ", rule);
 
-        const eventData = {
-            dtstart: `${date0}T${startTime}00`,
-            dtend: `${date0}T${endTime}00`,
-            description: `${data.lecturer} \\n${data.sdt} - ${data.khoa}\\n${data.class}`,
-            byday: rule.byday.join(","),
-            exdate: rule.exday.map((d) => {
-                const day = String(d.getDate()).padStart(2, "0");
-                const month = String(d.getMonth() + 1).padStart(2, "0");
-                const year = d.getFullYear();
-                return `${year}${month}${day}`;
-            }),
-        };
+            const date0 = `${data.date[0].year}${String(data.date[0].month).padStart(
+                2,
+                "0"
+            )}${String(data.date[0].day).padStart(2, "0")}`;
+            const startTime = startPeriodToTime[data.start].replace(":", "");
+            const endTime = endPeriodToTime[data.end].replace(":", "");
 
-        let event = `
-BEGIN:VEVENT
-SUMMARY:${data.course}
-UID:${data.class}@sv.haui.edu.vn
-DTSTAMP:${DTStamp}
-DTSTART;TZID=Asia/Ho_Chi_Minh:${eventData.dtstart}
-DTEND;TZID=Asia/Ho_Chi_Minh:${eventData.dtend}
-DESCRIPTION:${eventData.description}
-LOCATION:${data.location}
-RRULE:FREQ=WEEKLY;WKST=MO;BYDAY=${eventData.byday};INTERVAL=${rule.interval};COUNT=${rule.total}`;
-        // Thêm EXDATE nếu có
-        for (const exdate of eventData.exdate) {
-            event += `\nEXDATE;TZID=Asia/Ho_Chi_Minh:${eventData.exdate}T${startTime}00`;
+            let alarms = GM_getValue("alamrCalender", [15, 30]);
+
+            const eventData = {
+                summary: data.course,
+                uid: `${data.class}@sv.haui.edu.vn`,
+                dtstamp: DTStamp,
+                startDate: date0,
+                startTime: startTime,
+                endTime: endTime,
+                description: `${data.lecturer} \\n${data.sdt} - ${data.khoa}\\n${data.class}`,
+                location: data.location,
+                byday: rule.byday.join(","),
+                interval: rule.interval,
+                total: rule.total,
+                exdate: rule.exday.map((d) => {
+                    const day = String(d.getDate()).padStart(2, "0");
+                    const month = String(d.getMonth() + 1).padStart(2, "0");
+                    const year = d.getFullYear();
+                    return `${year}${month}${day}`;
+                }),
+                alarms: alarms,
+            };
+            events.push(eventData);
         }
-        // Thêm ALARM nếu có
-        for (const minutes of alamr) {
-            event += `
+        return events;
+    }
+
+    function addAlarm(alarms) {
+        return alarms
+            .map(
+                (minutes) => `
 BEGIN:VALARM
 ACTION:DISPLAY
 TRIGGER:-P0DT0H${minutes}M0S
 DESCRIPTION:Báo trước ${minutes} phút
-END:VALARM`;
+END:VALARM`
+            )
+            .join("");
+    }
+
+    // Tạo sự kiện ICS
+    function toICSEvent(data) {
+        let event = `
+BEGIN:VEVENT
+SUMMARY:${data.summary}
+UID:${data.uid}
+DTSTAMP:${data.dtstamp}
+DTSTART;TZID=Asia/Ho_Chi_Minh:${data.startDate}T${data.startTime}00
+DTEND;TZID=Asia/Ho_Chi_Minh:${data.startDate}T${data.endTime}00
+DESCRIPTION:${data.description}
+LOCATION:${data.location}
+RRULE:FREQ=WEEKLY;WKST=MO;BYDAY=${data.byday};INTERVAL=${data.interval};COUNT=${data.total}`;
+        // Thêm EXDATE nếu có
+        for (const exdate of data.exdate) {
+            event += `\nEXDATE;TZID=Asia/Ho_Chi_Minh:${exdate}T${data.startTime}00`;
         }
+        event += addAlarm(data.alarms);
         event += `
 END:VEVENT
 `;
 
-        for (const exdate of eventData.exdate) {
+        for (const exdate of data.exdate) {
             event += `
 BEGIN:VEVENT
-SUMMARY:${data.course}
-UID:${data.class}@sv.haui.edu.vn
-DTSTAMP:${DTStamp}
-DTSTART;TZID=Asia/Ho_Chi_Minh:${exdate}T${startTime}00
-DTEND;TZID=Asia/Ho_Chi_Minh:${exdate}T${endTime}00
-DESCRIPTION:${eventData.description}
+SUMMARY:${data.summary}
+UID:${data.uid}
+DTSTAMP:${data.dtstamp}
+DTSTART;TZID=Asia/Ho_Chi_Minh:${exdate}T${data.startTime}00
+DTEND;TZID=Asia/Ho_Chi_Minh:${exdate}T${data.endTime}00
+DESCRIPTION:${data.description}
 LOCATION:${data.location}
-RECURRENCE-ID;TZID=Asia/Ho_Chi_Minh:${exdate}T${startTime}00`;
-            for (const minutes of alamr) {
-                event += `
-BEGIN:VALARM
-ACTION:DISPLAY
-TRIGGER:-P0DT0H${minutes}M0S
-DESCRIPTION:Báo trước ${minutes} phút
-END:VALARM`;
-            }
+RECURRENCE-ID;TZID=Asia/Ho_Chi_Minh:${exdate}T${data.endTime}00`;
+            event += addAlarm(data.alarms);
             event += `
 END:VEVENT
 `;
@@ -2179,6 +2201,7 @@ END:VEVENT
         return event;
     }
 
+    // Tìm quy luật
     function findRule(listDate) {
         const groupedDates = groupDatesByDayOfWeek(listDate);
 
