@@ -791,7 +791,7 @@
             if ((diffTime.direction === -1 && diffTime.days <= 20) || diffTime.direction === 1) {
                 i++;
                 const stt = examPlan.children[0];
-                stt.textContent = `${i}`;
+                stt.textContent = `${i} 📥`;
 
                 if (diffTime.direction === 1 && diffTime.days <= 7)
                     examPlan.style.backgroundColor = "#f89c87";
@@ -799,7 +799,7 @@
 
                 examPlan.children[3].innerHTML += `<br>(${diffTime.toString()})`;
 
-                stt.setAttribute("title", "👆📥📅");
+                stt.setAttribute("title", "Click để tải file ICS lịch thi");
                 stt.addEventListener("click", () => {
                     const name = examPlan.children[2].textContent.trim();
                     const classCode = examPlan.children[1].textContent.trim();
@@ -808,8 +808,8 @@
                     const endTime = Number(startTime) + 100;
 
                     const eventData = {
-                        summary: name,
-                        uid: `${classCode}@sv.haui.edu.vn`,
+                        summary: `Thi ${name}`,
+                        uid: `exam-${classCode}@sv.haui.edu.vn`,
                         startDate: startDate,
                         startTime: startTime,
                         endTime: endTime,
@@ -1991,7 +1991,6 @@
     }
 
     function createICSFile(events, calendarName) {
-        console.log(events);
         let icsContent = `BEGIN:VCALENDAR
 PRODID:-// VuQuan // svHaUI Helper //EN
 VERSION:2.0
@@ -2020,7 +2019,7 @@ END:VTIMEZONE
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = `Lich-Hoc.ics`;
+        a.download = `${calendarName}.ics`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
