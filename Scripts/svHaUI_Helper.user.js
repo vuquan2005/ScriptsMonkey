@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.18.0
+// @version      20.18.2
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -804,8 +804,8 @@
                     const name = examPlan.children[2].textContent.trim();
                     const classCode = examPlan.children[1].textContent.trim();
                     const startDate = examDate.split("/").reverse().join("");
-                    const startTime = examHour.replace("h", "");
-                    const endTime = Number(startTime) + 100;
+                    const startTime = examHour.replace("h", "").padStart(4, "0");
+                    const endTime = (Number(startTime) + 200).toString().padStart(4, "0");
 
                     const eventData = {
                         summary: `Thi ${name}`,
