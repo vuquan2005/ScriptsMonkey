@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Download captcha svHaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      4.1
+// @version      4.2
 // @description  Tự động tải captcha của svHaUI
 // @match        https://sv.haui.edu.vn/*
 // @grant        GM_getValue
@@ -126,7 +126,7 @@
             const isFarmMode = await GM_getValue("isFarmMode", false);
             downloadCaptcha(img64, label);
             
-            if (isFarmMode) {
+            if (isFarmMode && label) {
                 GM_setValue("isFarmMode", false);
                 setTimeout(() => {
                     window.location.href = "/sso";
