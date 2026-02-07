@@ -4,7 +4,8 @@
 // @version      4.0
 // @description  Tự động tải captcha của svHaUI
 // @match        https://sv.haui.edu.vn/*
-// @grant        none
+// @grant        GM_getValue
+// @grant        GM_setValue
 // ==/UserScript==
 
 (function () {
@@ -13,7 +14,7 @@
     const $ = (selector) => document.querySelector(selector);
 
     // 1. Gộp logic xử lý Captcha tại trang đăng nhập/đăng ký
-    async function setupCaptchaObserver(inputSelector, imgSelector) {
+    async function setupCaptchaObserver(inputSelector, imgSelector, isFarmMode = false) {
         const captchaInput = $(inputSelector);
         const captchaImg = $(imgSelector);
 
@@ -38,6 +39,7 @@
         window.addEventListener("beforeunload", () => {
             GM_setValue("lastURL", window.location.href);
             GM_setValue("isLoginPassed", true);
+            GM_setValue("isFarmMode", isFarmMode);
             if (captchaLabel.length === 5) {
                 GM_setValue("captchaLabel", captchaLabel);
             }
@@ -86,13 +88,17 @@
                     downloadCaptcha(base64, label);
                     setTimeout(() => location.reload(), 500);
                 } else {
-                    location.reload();
+                    // location.reload();
                 }
             }
         }
-        // TRƯỜNG HỢP 2: Trang đăng nhập SSO
+        // TRƯỜNG HỢP 2: Trang đăng nhập SSO (có token)
         else if (currentURL.includes("sso?token=")) {
             setupCaptchaObserver("input#ctl00_txtimgcode", "img#ctl00_Image1");
+        }
+        // TRƯỜNG HỢP 2b: Trang đăng nhập SSO (farm mode - không có token, chỉ /sso)
+        else if (/\/sso\/?$/.test(window.location.pathname)) {
+            setupCaptchaObserver("input#ctl00_txtimgcode", "img#ctl00_Image1", true);
         }
         // TRƯỜNG HỢP 3: Trang đăng ký học phần
         else if (currentURL.includes("register/")) {
@@ -108,7 +114,15 @@
         else if ($("span.user-name") && isLoginPassed) {
             const img64 = await GM_getValue("captchaImg", "");
             const label = await GM_getValue("captchaLabel", "");
+            const isFarmMode = await GM_getValue("isFarmMode", false);
             downloadCaptcha(img64, label);
+            
+            if (isFarmMode) {
+                GM_setValue("isFarmMode", false);
+                setTimeout(() => {
+                    window.location.href = "/sso";
+                }, 50);
+            }
         }
     }
 
