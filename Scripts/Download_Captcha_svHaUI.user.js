@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Download captcha svHaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      4.0
+// @version      4.1
 // @description  Tự động tải captcha của svHaUI
 // @match        https://sv.haui.edu.vn/*
 // @grant        GM_getValue
@@ -19,6 +19,14 @@
         const captchaImg = $(imgSelector);
 
         if (!captchaInput || !captchaImg) return;
+
+        // Kiểm tra: Nếu đã submit captcha trước đó mà vẫn ở trang login => Captcha SAI
+        const isLoginPassed = await GM_getValue("isLoginPassed", false);
+        if (isLoginPassed) {
+            const img64 = await GM_getValue("captchaImg", "");
+            const label = await GM_getValue("captchaLabel", "");
+            downloadCaptcha(img64, label, true); // true = wrong captcha
+        }
 
         // Chờ ảnh load xong mới lấy Base64 thay vì setTimeout 2s
         captchaImg.onload = () => {
@@ -47,12 +55,13 @@
     }
 
     // 2. Tối ưu hàm download: Thêm kiểm tra dữ liệu
-    function downloadCaptcha(base64, label) {
+    function downloadCaptcha(base64, label, isWrong = false) {
         if (!base64 || !label) return;
 
+        const prefix = isWrong ? " WRONG " : "";
         const a = document.createElement("a");
         a.href = base64;
-        a.download = `captcha_svHaUI__${label}.png`; // PNG tốt hơn cho captcha
+        a.download = `captcha_svHaUI__${prefix}${label}.png`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -79,21 +88,21 @@
         const isLoginPassed = await GM_getValue("isLoginPassed", false);
 
         // TRƯỜNG HỢP 1: Trang chỉ có ảnh captcha (Trang lấy mẫu)
-        if (currentURL.includes("AImages.aspx")) {
-            const image = $("img");
-            if (image) {
-                const base64 = convertImageToBase64(image);
-                let label = prompt("Nhập label captcha (5 ký tự):", "");
-                if (label && label.length === 5) {
-                    downloadCaptcha(base64, label);
-                    setTimeout(() => location.reload(), 500);
-                } else {
-                    // location.reload();
-                }
-            }
-        }
+        // if (currentURL.includes("AImages.aspx")) {
+        //     const image = $("img");
+        //     if (image) {
+        //         const base64 = convertImageToBase64(image);
+        //         let label = prompt("Nhập label captcha (5 ký tự):", "");
+        //         if (label && label.length === 5) {
+        //             downloadCaptcha(base64, label);
+        //             setTimeout(() => location.reload(), 500);
+        //         } else {
+        //             // location.reload();
+        //         }
+        //     }
+        // }
         // TRƯỜNG HỢP 2: Trang đăng nhập SSO (có token)
-        else if (currentURL.includes("sso?token=")) {
+        if (currentURL.includes("sso?token=")) {
             setupCaptchaObserver("input#ctl00_txtimgcode", "img#ctl00_Image1");
         }
         // TRƯỜNG HỢP 2b: Trang đăng nhập SSO (farm mode - không có token, chỉ /sso)
@@ -121,7 +130,7 @@
                 GM_setValue("isFarmMode", false);
                 setTimeout(() => {
                     window.location.href = "/sso";
-                }, 50);
+                }, 10);
             }
         }
     }
