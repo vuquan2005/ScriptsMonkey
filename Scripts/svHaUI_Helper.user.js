@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         sv.HaUI
 // @namespace    https://github.com/vuquan2005/ScriptsMonkey
-// @version      20.18.2
+// @version      20.19.0
 // @description  Công cụ hỗ trợ cho sinh viên HaUI
 // @author       QuanVu
 // @downloadURL  https://github.com/vuquan2005/ScriptsMonkey/raw/main/Scripts/svHaUI_Helper.user.js
@@ -16,6 +16,8 @@
 (function () {
     "use strict";
 
+    console.log("Recomend: github.com/vuquan2005/svHaUI-Helper for more features. \nBy: VuQuan");
+    
     function waitForSelector(selector, timeout = 10000, delay = 10) {
         return new Promise((resolve, reject) => {
             const element = document.querySelector(selector);
