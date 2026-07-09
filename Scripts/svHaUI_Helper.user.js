@@ -1184,7 +1184,7 @@
     // Lấy tổng số tín chỉ
     function getYourTotalCredits() {
         let totalCredits = document.querySelector(
-            "#ctl02_dvList > tbody > tr:nth-child(7) > td.k-table-viewdetail"
+            "table > tbody:nth-child(1) > tr:nth-child(7) > td:nth-child(2)"
         ).textContent;
         totalCredits = totalCredits.match(/\d+/)[0];
         const totalCreditsNumber = Number(totalCredits);
