@@ -204,72 +204,9 @@
     }
 
     //===============================================================
-    // Sửa tiêu đề trang
-    function changeTitle() {
-        let title = document.querySelector("span.k-panel-header-text:first-child")?.textContent;
-        if (title) {
-            title = title
-                .replace(/trường đại học công nghiệp hà nội/gi, "🏫")
-                .replace(/đại học công nghiệp hà nội/gi, "🏫")
-                .replace("CHI TIẾT HỌC PHẦN", "ℹ️")
-                .replace("CHI TIẾT", "ℹ️")
-                .replace("Kết quả thi các môn", "🎯 Điểm học phần")
-                .replace("Kết quả học tập các học phần", "🎯 Điểm TX");
-
-            title =
-                runOnUrl(
-                    () => {
-                        const kgrid = document.querySelector("div.kGrid");
-                        const name = kgrid
-                            .querySelector("table > tbody > tr > td:nth-child(2)")
-                            .textContent.trim();
-                        const className = kgrid
-                            .querySelector("table > tbody > tr:nth-child(3) > td:nth-child(2)")
-                            .textContent.trim();
-
-                        title = title.replace("🎯 Điểm học phần", "🎯 Điểm: ");
-                        title = title.replace("Kết quả học tập các môn", "🎯 Điểm TX: ");
-
-                        return (
-                            title + " " + (name ? name : "") + ": " + (className ? className : "")
-                        );
-                    },
-                    "/student/result/viewexamresult",
-                    "/student/result/viewstudyresult"
-                ) || title;
-
-            title =
-                runOnUrl(
-                    () => {
-                        const className = document
-                            .querySelector("table > tbody > tr > td:nth-child(2)")
-                            .textContent.trim();
-                        const classCode = document
-                            .querySelector("table > tbody > tr:nth-child(3) > td:nth-child(2)")
-                            .textContent.trim();
-
-                        title = title.replace("Kết quả học tập trên lớp", "🎯 Điểm TX: ");
-                        title = title.replace("Bảng kết quả thi", "🎯 Điểm thi: ");
-
-                        return (
-                            title +
-                            " " +
-                            (className ? className : "") +
-                            ": " +
-                            (classCode ? classCode : "")
-                        );
-                    },
-                    "/student/result/viewexamresultclass",
-                    "/student/result/viewstudyresultclass"
-                ) || title;
-
-            document.title = title;
-        }
-    }
-
     // Thay đổi đường dẫn trang chủ
     function changeHomePagePath() {
-        const homeElement = document.querySelector("div.left-sidebar-content a[href='/']");
+        const homeElement = document.querySelector("div.left-sidebar-wrapper a[href='/']");
         homeElement.href = "/home";
         const logo = document.querySelector(".navbar-brand");
         logo.href = "/home";
@@ -278,7 +215,7 @@
     // Hiển thị GPA trên thanh menu
     function displayGPA() {
         const info = GM_getValue("yourInfo") || {};
-        const menuTitle = document.querySelector("ul.sidebar-elements");
+        const menuTitle = document.querySelector("div#sbMain");
 
         const container = document.createElement("li");
         container.className = "bar-container";
@@ -310,33 +247,6 @@
 				display: inline-block;
 			}
 		`);
-    }
-
-    // Khảo sát nhanh
-    function fastSurvey() {
-        waitForSelector("table.card-body.table-responsive.table.table-bordered.table-striped").then(
-            (element) => {
-                const scores = element.querySelectorAll("thead > tr:nth-child(2) > td");
-                for (const score of scores) {
-                    const scoreId = score.textContent.trim().match(/\d+/)[0];
-                    const inputSelectScore = document.createElement("input");
-                    inputSelectScore.type = "radio";
-                    inputSelectScore.name = "select_score";
-                    inputSelectScore.value = scoreId;
-                    score.prepend(inputSelectScore);
-
-                    inputSelectScore.addEventListener("change", function () {
-                        const scoreElements = element.querySelectorAll(
-                            `td[title="${scoreId} điểm"] > input`
-                        );
-                        for (const scoreElement of scoreElements) {
-                            scoreElement.checked = true;
-                        }
-                        notyf.success(`Đã chọn ${scoreId} điểm`);
-                    });
-                }
-            }
-        );
     }
 
     // Hỗ trợ captcha
@@ -396,6 +306,18 @@
 									<path class="cls-1" d="m400.11 205.23c-1.4336 0.035156-2.9062 0.35547-4.1367 0.84766l-137.4 51.527c-9.8711 3.7305-9.8711 17.695 0 21.426l49.402 18.516v79.547c0 4.1172 2.2109 7.918 5.7891 9.9531l80.578 45.801c3.5078 1.9922 7.8086 1.9922 11.316 0l80.578-45.801h-0.003906c3.582-2.0352 5.793-5.8359 5.793-9.9531v-79.547l33.926-12.727v69.375h22.902v-85.875c-0.078124-5.8086-3.6758-8.8359-7.4258-10.711l-137.4-51.527c-1.0898-0.64844-2.4805-0.88672-3.9141-0.84766zm-0.10938 23.77 104.82 39.316-104.82 39.293-104.82-39.293zm-69.125 77.133 65.102 24.422c2.5938 0.97266 5.457 0.97266 8.0508 0l65.102-24.422v64.297l-69.129 39.293-69.129-39.293z"/>
 								</svg>
 								<span>Học kết hợp</span>
+							</a>
+						</li>
+						<li>
+							<a href="/sso/elearning">
+								<svg xmlns="http://www.w3.org/2000/svg" class="shortcut-icon" version="1.1" viewBox="144 144 512 512">
+									<defs>
+										<style>.cls-1{fill:#ff7900;}</style>
+									</defs>
+									<path class="cls-1" d="m183.92 148.09c-19.652 0-35.828 16.176-35.828 35.828v261.88h22.902v-261.88c0-7.3633 5.5625-12.926 12.926-12.926h432.16c7.3594 0 12.926 5.5625 12.926 12.926v284.78h-480.91v44.324c0 19.652 16.176 35.828 35.828 35.828h156.01l-17.824 80.152h-59.508v22.902h274.8v-22.902h-59.242l-17.824-80.152h155.74c19.648 0 35.824-16.176 35.824-35.828v-329.1c0-19.652-16.176-35.828-35.824-35.828zm-12.926 343.51h458.01v21.426c0 7.3555-5.5664 12.922-12.926 12.922h-432.16c-7.3633 0-12.926-5.5664-12.926-12.926zm192.39 57.25h73.488l17.824 80.152h-109.14z"/>
+									<path class="cls-1" d="m400.11 205.23c-1.4336 0.035156-2.9062 0.35547-4.1367 0.84766l-137.4 51.527c-9.8711 3.7305-9.8711 17.695 0 21.426l49.402 18.516v79.547c0 4.1172 2.2109 7.918 5.7891 9.9531l80.578 45.801c3.5078 1.9922 7.8086 1.9922 11.316 0l80.578-45.801h-0.003906c3.582-2.0352 5.793-5.8359 5.793-9.9531v-79.547l33.926-12.727v69.375h22.902v-85.875c-0.078124-5.8086-3.6758-8.8359-7.4258-10.711l-137.4-51.527c-1.0898-0.64844-2.4805-0.88672-3.9141-0.84766zm-0.10938 23.77 104.82 39.316-104.82 39.293-104.82-39.293zm-69.125 77.133 65.102 24.422c2.5938 0.97266 5.457 0.97266 8.0508 0l65.102-24.422v64.297l-69.129 39.293-69.129-39.293z"/>
+								</svg>
+								<span>Học onlinev</span>
 							</a>
 						</li>
 						<li>
@@ -1877,447 +1799,6 @@
         setTimeout(showmarkedCourse, 5000);
     }
 
-    // Export calender
-    function enhanceCalender() {
-        const btnContainer = document.querySelector(
-            "div.boxpanel-mc > .form-horizontal > .form-group:nth-child(3) > div.col-sm-4"
-        );
-        // Curent
-        const findTermBtn = document.createElement("input");
-        findTermBtn.type = "button";
-        findTermBtn.className = "btn btn-primary btn-space hover";
-        findTermBtn.value = "Lọc kì hiện tại";
-        btnContainer.appendChild(findTermBtn);
-
-        findTermBtn.addEventListener("click", () => {
-            const { year, term } = findCalender((data, date) => {
-                const match = data.match(/(\d{5})\w\w\d{7}/);
-                if (!match) return false;
-                const classCode = match[1];
-                return { year: classCode.slice(0, 4), term: classCode[4] };
-            });
-            console.log(year, term);
-            calendarFilterTerm(year, term);
-        });
-
-        // Select
-        const selectElement = document.createElement("select");
-        selectElement.id = "termSelector";
-
-        const currentYear = new Date().getFullYear();
-
-        const defaultOption = document.createElement("option");
-        defaultOption.text = "--- Chọn Kì/Năm Học ---";
-        defaultOption.value = "";
-        defaultOption.disabled = true;
-        defaultOption.selected = true;
-        selectElement.appendChild(defaultOption);
-
-        for (let year = currentYear; year >= currentYear - 4; year--) {
-            for (let term = 1; term <= 4; term++) {
-                const optionI = document.createElement("option");
-                const termName = ["1️⃣", "2️⃣", "🌸", "☀️"];
-                optionI.text = `${termName[term - 1]} : ${year} - ${year + 1}`;
-
-                if (term == 1) optionI.value = `${year}${term}`;
-                else optionI.value = `${year + 1}${term}`;
-
-                selectElement.appendChild(optionI);
-            }
-        }
-        btnContainer.appendChild(selectElement);
-
-        selectElement.addEventListener("change", (e) => {
-            const value = e.target.value;
-            const year = value.slice(0, 4);
-            const term = value[4];
-            calendarFilterTerm(year, term);
-        });
-
-        // Export
-        const exportBtn = document.createElement("input");
-        exportBtn.type = "button";
-        exportBtn.className = "btn btn-primary btn-space hover";
-        exportBtn.value = "Xuất lịch học (.ics)";
-        btnContainer.appendChild(exportBtn);
-        exportBtn.addEventListener("click", () => {
-            const { year, term } = findCalender((data, date) => {
-                const match = data.match(/(\d{5})\w\w\d{7}/);
-                if (!match) return false;
-                const classCode = match[1];
-                return { year: classCode.slice(0, 4), term: classCode[4] };
-            });
-            const calendarName = `Học kỳ ${term} ${year}-${Number(year) + 1}`;
-            const listCourseData = getCalendarData();
-            const events = processCalendarData(listCourseData);
-            createICSFile(events, calendarName);
-        });
-    }
-
-    function findCalender(callback) {
-        const rows = document.querySelectorAll(".panel-body > table > tbody tr:nth-child(n+2)");
-        for (const row of rows) {
-            const dateElement = row.children[2];
-            const date =
-                /(?<day>\d+)\/(?<month>\d+)\/(?<year>\d+)/.exec(dateElement.textContent.trim())
-                    ?.groups || {};
-            const calenders = row.querySelectorAll("td:nth-child(n+4)");
-            for (const calendar of calenders) {
-                const data = calendar.textContent.trim();
-                const value = callback(data, date);
-                if (value) return value;
-            }
-        }
-    }
-
-    function calendarFilterTerm(year, term) {
-        document.querySelector("#ctl02_inpStartDate").value = year;
-        document.querySelector("#ctl02_inpEndDate").value = year;
-        const termTimeMap = [
-            { startD: 1, startM: 9, endD: 30, endM: 12 },
-            { startD: 1, startM: 3, endD: 30, endM: 6 },
-            { startD: 1, startM: 1, endD: 31, endM: 3 },
-            { startD: 1, startM: 7, endD: 31, endM: 8 },
-        ];
-        const termTime = termTimeMap[term - 1];
-
-        document.querySelector("#ctl02_inpStartDate_d").value = termTime.startD;
-        document.querySelector("#ctl02_inpEndDate_d").value = termTime.endD;
-
-        document.querySelector("#ctl02_inpStartDate_m").value = termTime.startM;
-        document.querySelector("#ctl02_inpEndDate_m").value = termTime.endM;
-
-        document.querySelector("#ctl02_butGet").click();
-    }
-
-    function createICSFile(events, calendarName) {
-        let icsContent = `BEGIN:VCALENDAR
-PRODID:-// VuQuan // svHaUI Helper //EN
-VERSION:2.0
-CALSCALE:GREGORIAN
-METHOD:PUBLISH
-X-WR-CALNAME:${calendarName}
-X-WR-TIMEZONE:Asia/Ho_Chi_Minh
-X-WR-CALDESC:Lịch học sinh viên HAUI
-BEGIN:VTIMEZONE
-TZID:Asia/Ho_Chi_Minh
-X-LIC-LOCATION:Asia/Ho_Chi_Minh
-BEGIN:STANDARD
-TZOFFSETFROM:+0700
-TZOFFSETTO:+0700
-TZNAME:GMT+7
-DTSTART:19700101T000000
-END:STANDARD
-END:VTIMEZONE
-`;
-        for (const event of [].concat(events || [])) {
-            icsContent += toICSEvent(event);
-        }
-        icsContent += `END:VCALENDAR`;
-
-        const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `${calendarName}.ics`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    }
-
-    // Lấy thông tin sự kiện
-    function getCalendarData() {
-        const days = document.querySelectorAll(".panel-body > table > tbody tr:nth-child(n+2)");
-
-        const regex1 =
-            /\((?<start>\d+),(?:\d*,)*?(?<end>\d+)\)\s*-\s*(?<course>.+?)\s*\(Lớp:\s*(?<class>\d+\w+\d+)\)/;
-        const regex2 = /GV:\s*(?<lecturer>.+?)\s*\((?<sdt>\d+)?\s*-\s*(?<khoa>[^)]+)\)/;
-
-        const listCourseData = new Map();
-        let listErrorClassCode = [];
-
-        for (const day of days) {
-            const dateElement = day.children[2];
-            const date =
-                /(?<day>\d+)\/(?<month>\d+)\/(?<year>\d+)/.exec(dateElement.textContent.trim())
-                    ?.groups || {};
-            const sessions = day.querySelectorAll(
-                "td:nth-child(4), td:nth-child(5), td:nth-child(6)"
-            );
-            for (const session of sessions) {
-                const sessionContent = session.innerText.trim();
-                if (sessionContent == "") continue;
-
-                const subjects = sessionContent.split(/\n?\d+\.\s/).filter(Boolean);
-                if (subjects.length == 0) continue;
-
-                for (const subject of subjects) {
-                    const subjectLine = subject.split("\n");
-                    const classCode = subjectLine[0].match(/\d{5}\w+\d{7}/)?.[0] || subject;
-                    if (listErrorClassCode.includes(classCode)) continue;
-                    if (listCourseData.has(classCode)) {
-                        listCourseData.get(classCode).date.push(date);
-                        continue;
-                    }
-                    const match1 = subjectLine[0].match(regex1);
-                    const match2 = subjectLine[1].match(regex2);
-                    const match3 = subjectLine[2]
-                        .replaceAll(/[()]|( - Cơ sở \d* - Khu \w)/g, "")
-                        .trim();
-                    // Nếu không khớp thì lưu lại mã lớp bị lỗi và thông báo lỗi
-                    if (!match1 || !match2) {
-                        listErrorClassCode.push(classCode);
-                        const courseName = subject.match(/\(.+?\)\s*-\s*(.+?)\s\(/)?.[1];
-                        notyf.error(`Có lỗi khi lấy dữ liệu lớp:<br>${classCode}<br>${courseName}`);
-                        console.error(
-                            `Có lỗi khi lấy dữ liệu:\n${classCode}: ${courseName}\n${subject}`
-                        );
-                        continue;
-                    }
-
-                    const courseData = {
-                        ...match1.groups,
-                        ...match2.groups,
-                        location: match3,
-                        date: [date],
-                    };
-                    listCourseData.set(classCode, courseData);
-                }
-            }
-        }
-        return listCourseData;
-    }
-
-    function processCalendarData(listCourseData) {
-        const startPeriodToTime = {
-            1: "07:00",
-            2: "07:50",
-            3: "08:45",
-            4: "09:40",
-            5: "10:35",
-            6: "11:25",
-            7: "12:30",
-            8: "13:20",
-            9: "14:15",
-            10: "15:10",
-            11: "16:05",
-            12: "16:55",
-            13: "18:00",
-            14: "18:50",
-            15: "19:45",
-            16: "20:35",
-        };
-
-        const endPeriodToTime = {
-            1: "07:50",
-            2: "08:40",
-            3: "09:35",
-            4: "10:30",
-            5: "11:25",
-            6: "12:15",
-            7: "13:20",
-            8: "14:10",
-            9: "15:05",
-            10: "16:00",
-            11: "16:55",
-            12: "17:45",
-            13: "18:50",
-            14: "19:40",
-            15: "20:35",
-            16: "21:25",
-        };
-
-        let events = [];
-
-        for (const [classCode, data] of listCourseData) {
-            const rule = findRule(data.date);
-            console.log(data, " ", rule);
-
-            const date0 = `${data.date[0].year}${String(data.date[0].month).padStart(
-                2,
-                "0"
-            )}${String(data.date[0].day).padStart(2, "0")}`;
-            const startTime = startPeriodToTime[data.start].replace(":", "");
-            const endTime = endPeriodToTime[data.end].replace(":", "");
-
-            let alarms = GM_getValue("alamrCalender", [15, 30]);
-
-            const eventData = {
-                summary: data.course,
-                uid: `${data.class}@sv.haui.edu.vn`,
-                dtstamp: DTStamp,
-                startDate: date0,
-                startTime: startTime,
-                endTime: endTime,
-                description: `${data.lecturer} \\n${data.sdt} - ${data.khoa}\\n${data.class}`,
-                location: data.location,
-                byday: rule.byday.join(","),
-                interval: rule.interval,
-                total: rule.total,
-                exdate: rule.exday.map((d) => {
-                    const day = String(d.getDate()).padStart(2, "0");
-                    const month = String(d.getMonth() + 1).padStart(2, "0");
-                    const year = d.getFullYear();
-                    return `${year}${month}${day}`;
-                }),
-                alarms: alarms,
-            };
-            events.push(eventData);
-        }
-        return events;
-    }
-
-    function addAlarm(alarms) {
-        return alarms
-            .map(
-                (minutes) => `
-BEGIN:VALARM
-ACTION:DISPLAY
-TRIGGER:-P0DT0H${minutes}M0S
-DESCRIPTION:Báo trước ${minutes} phút
-END:VALARM`
-            )
-            .join("");
-    }
-
-    // Tạo sự kiện ICS
-    function toICSEvent(data) {
-        const DTStamp = new Date().toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
-        data.exdate = data.exdate || [];
-        let event = `
-BEGIN:VEVENT
-SUMMARY:${data.summary}
-UID:${data.uid}
-DTSTAMP:${DTStamp}
-DTSTART;TZID=Asia/Ho_Chi_Minh:${data.startDate}T${data.startTime}00
-DTEND;TZID=Asia/Ho_Chi_Minh:${data.startDate}T${data.endTime}00
-DESCRIPTION:${data.description || ""}
-LOCATION:${data.location || ""}`;
-        // Lặp
-        const isRecurring = data.byday && data.interval && data.total;
-        if (isRecurring) {
-            event += `
-RRULE:FREQ=WEEKLY;WKST=MO;BYDAY=${data.byday};INTERVAL=${data.interval};COUNT=${data.total}`;
-
-            // Thêm EXDATE nếu có
-            for (const exdate of data.exdate) {
-                event += `\nEXDATE;TZID=Asia/Ho_Chi_Minh:${exdate}T${data.startTime}00`;
-            }
-        }
-        event += addAlarm(data.alarms);
-        event += `
-END:VEVENT
-`;
-        // Các sự kiện EXDATE
-        for (const exdate of data.exdate) {
-            event += `
-BEGIN:VEVENT
-SUMMARY:${data.summary}
-UID:${data.uid}
-DTSTAMP:${DTStamp}
-DTSTART;TZID=Asia/Ho_Chi_Minh:${exdate}T${data.startTime}00
-DTEND;TZID=Asia/Ho_Chi_Minh:${exdate}T${data.endTime}00
-DESCRIPTION:${data.description || ""}
-LOCATION:${data.location || ""}
-RECURRENCE-ID;TZID=Asia/Ho_Chi_Minh:${exdate}T${data.endTime}00`;
-            event += addAlarm(data.alarms);
-            event += `
-END:VEVENT
-`;
-        }
-        event += "\n";
-        return event;
-    }
-
-    // Tìm quy luật
-    function findRule(listDate) {
-        const groupedDates = groupDatesByDayOfWeek(listDate);
-
-        let groupedMissingDates = {};
-
-        for (const [byday, days] of Object.entries(groupedDates)) {
-            groupedMissingDates[byday] = findMissingDates(days);
-        }
-
-        let result = { byday: [], interval: null, total: listDate.length, exday: [] };
-
-        for (const [byday, days] of Object.entries(groupedMissingDates)) {
-            if (result.interval === null) result.interval = days.interval;
-            else if (result.interval !== days.interval) {
-                result.interval = 0;
-                console.warn("Different intervals found:", byday, result.interval, days.interval);
-                notyf.error("Không thể xuất lịch do các buổi học có khoảng cách không đều nhau.");
-                break;
-            }
-            result.byday.push(byday);
-            result.exday.push(...days.missingDates);
-            result.total += days.missingDates.length;
-        }
-        return result;
-    }
-
-    function groupDatesByDayOfWeek(dateArray) {
-        const daysOfWeekNames = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"];
-
-        const groupedDates = {};
-
-        dateArray.forEach((dateObj) => {
-            const year = parseInt(dateObj.year);
-            const month = parseInt(dateObj.month) - 1;
-            const day = parseInt(dateObj.day);
-            const date = new Date(year, month, day);
-
-            const dayIndex = date.getDay();
-            const dayName = daysOfWeekNames[dayIndex];
-
-            if (!groupedDates[dayName]) {
-                groupedDates[dayName] = [];
-            }
-            groupedDates[dayName].push(date);
-        });
-
-        return groupedDates;
-    }
-
-    function findMissingDates(dateStrings) {
-        const dates = dateStrings.map((d) => new Date(d)).sort((a, b) => a - b);
-
-        if (dates.length < 2) return [];
-
-        let minDiff = Infinity;
-
-        for (let i = 0; i < dates.length - 1; i++) {
-            const diff = dates[i + 1] - dates[i];
-            if (diff > 0 && diff < minDiff) {
-                minDiff = diff;
-            }
-        }
-
-        const oneDayMs = 24 * 60 * 60 * 1000;
-        const weeksInterval = Math.round(minDiff / oneDayMs) / 7;
-
-        const missingDates = [];
-
-        for (let i = 0; i < dates.length - 1; i++) {
-            let current = dates[i].getTime();
-            const next = dates[i + 1].getTime();
-
-            if (next - current > minDiff * 1.1) {
-                let tempTime = current + minDiff;
-
-                while (tempTime < next - minDiff * 0.5) {
-                    missingDates.push(new Date(tempTime));
-                    tempTime += minDiff;
-                }
-            }
-        }
-
-        return {
-            interval: weeksInterval,
-            missingDates: missingDates,
-        };
-    }
 
     //===============================================================
 
@@ -2327,11 +1808,8 @@ END:VEVENT
             dismissible: true,
         });
 
-        runOnUrl(changeTitle, "");
         runOnUrl(changeHomePagePath, "");
         runOnUrl(displayGPA, "");
-
-        runOnUrl(fastSurvey, /\/survey\//);
 
         runOnUrl(captchaHelperRegister, "/register");
 
@@ -2411,8 +1889,6 @@ END:VEVENT
             "/training/viewcourseindustry",
             "/training/programmodulessemester"
         );
-
-        runOnUrl(enhanceCalender, "/timestable/calendarcl");
     }
 
     waitForSelector("#frmMain", 5000, 100)
